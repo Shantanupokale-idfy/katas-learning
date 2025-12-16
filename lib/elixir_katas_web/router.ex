@@ -90,6 +90,36 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/68-changesets", Kata68ChangesetsLive
     live "/katas/69-crud", Kata69CrudLive
     live "/katas/70-optimistic", Kata70OptimisticLive
+    live "/katas/71-streams", Kata71StreamsLive
+    live "/katas/72-infinite-scroll", Kata72InfiniteScrollLive
+    live "/katas/73-stream-insert-delete", Kata73StreamInsertDeleteLive
+    live "/katas/74-stream-reset", Kata74StreamResetLive
+    live "/katas/75-bulk-actions", Kata75BulkActionsLive
+    live "/katas/76-clock", Kata76TheClockLive
+    live "/katas/77-ticker", Kata77TheTickerLive
+    live "/katas/78-chat", Kata78ChatRoomLive
+    live "/katas/79-typing", Kata79TypingIndicatorLive
+    live "/katas/80-presence", Kata80PresenceListLive
+    live "/katas/81-cursor", Kata81LiveCursorLive
+    live "/katas/82-notifications", Kata82DistributedNotificationsLive
+    live "/katas/83-game", Kata83TheGameStateLive
+    live "/katas/84-focus", Kata84AccessibleFocusLive
+    live "/katas/85-scroll", Kata85ScrollToBottomLive
+    live "/katas/86-clipboard", Kata86ClipboardCopyLive
+    live "/katas/87-storage", Kata87LocalStorageLive
+    live "/katas/88-theme", Kata88ThemeSwitcherLive
+    live "/katas/89-chart", Kata89ChartJsLive
+    live "/katas/90-map", Kata90MapboxLive
+    live "/katas/91-masked", Kata91MaskedInputLive
+    live "/katas/92-dropzone", Kata92FileDropzoneLive
+    live "/katas/93-sortable", Kata93SortableListLive
+    live "/katas/94-audio", Kata94AudioPlayerLive
+    live "/katas/95-async", Kata95AsyncAssignsLive
+    live "/katas/96-uploads", Kata96FileUploadsLive
+    live "/katas/97-images", Kata97ImageProcessingLive
+    live "/katas/98-pdf", Kata98PDFGenerationLive
+    live "/katas/99-csv", Kata99CSVExportLive
+    live "/katas/100-error", Kata100ErrorBoundaryLive
     end
   end
 

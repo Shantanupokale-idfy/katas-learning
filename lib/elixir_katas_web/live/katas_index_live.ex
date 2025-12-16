@@ -404,6 +404,37 @@ defmodule ElixirKatasWeb.KatasIndexLive do
       <.kata_card title="68. Changesets 101" description="Schema-less changesets" path={~p"/katas/68-changesets"} />
       <.kata_card title="69. The CRUD" description="Full CRUD operations" path={~p"/katas/69-crud"} />
       <.kata_card title="70. Optimistic UI" description="Update before server confirms" path={~p"/katas/70-optimistic"} />
+      <.kata_card title="71. Streams Basic" description="Efficient large list handling" path={~p"/katas/71-streams"} />
+      <.kata_card title="72. Infinite Scroll" description="Pagination with scroll detection" path={~p"/katas/72-infinite-scroll"} />
+      <.kata_card title="73. Stream Insert/Delete" description="Real-time stream updates" path={~p"/katas/73-stream-insert-delete"} />
+      <.kata_card title="74. Stream Reset" description="Clear and repopulate streams" path={~p"/katas/74-stream-reset"} />
+      <.kata_card title="75. Bulk Actions" description="Multi-select operations" path={~p"/katas/75-bulk-actions"} />
+      <.kata_card title="76. The Clock" description="Server interval updates" path={~p"/katas/76-clock"} />
+      <.kata_card title="77. The Ticker" description="Stock price simulation" path={~p"/katas/77-ticker"} />
+      <.kata_card title="78. Chat Room" description="Message broadcasting" path={~p"/katas/78-chat"} />
+      <.kata_card title="79. Typing Indicator" description="Ephemeral presence" path={~p"/katas/79-typing"} />
+      <.kata_card title="80. Presence List" description="Online users" path={~p"/katas/80-presence"} />
+      <.kata_card title="81. Live Cursor" description="Mouse coordinates" path={~p"/katas/81-cursor"} />
+      <.kata_card title="82. Distributed Notifications" description="Cross-node alerts" path={~p"/katas/82-notifications"} />
+      <.kata_card title="83. The Game State" description="Multiplayer state" path={~p"/katas/83-game"} />
+      <.kata_card title="84. Accessible Focus" description="Focus management" path={~p"/katas/84-focus"} />
+      <.kata_card title="85. Scroll to Bottom" description="Auto-scroll hook" path={~p"/katas/85-scroll"} />
+      <.kata_card title="86. Clipboard Copy" description="System clipboard" path={~p"/katas/86-clipboard"} />
+      <.kata_card title="87. Local Storage" description="Browser persistence" path={~p"/katas/87-storage"} />
+      <.kata_card title="88. Theme Switcher" description="Dark/light mode" path={~p"/katas/88-theme"} />
+      <.kata_card title="89. Chart.js" description="Data visualization" path={~p"/katas/89-chart"} />
+      <.kata_card title="90. Mapbox" description="Map integration" path={~p"/katas/90-map"} />
+      <.kata_card title="91. Masked Input" description="Input formatting" path={~p"/katas/91-masked"} />
+      <.kata_card title="92. File Dropzone" description="Drag & drop" path={~p"/katas/92-dropzone"} />
+      <.kata_card title="93. Sortable List" description="Drag reordering" path={~p"/katas/93-sortable"} />
+      <.kata_card title="94. Audio Player" description="Media control" path={~p"/katas/94-audio"} />
+      <.kata_card title="95. Async Assigns" description="Non-blocking UI" path={~p"/katas/95-async"} />
+      <.kata_card title="96. File Uploads" description="Upload handling" path={~p"/katas/96-uploads"} />
+      <.kata_card title="97. Image Processing" description="Image resizing" path={~p"/katas/97-images"} />
+      <.kata_card title="98. PDF Generation" description="Document generation" path={~p"/katas/98-pdf"} />
+      <.kata_card title="99. CSV Export" description="Data export" path={~p"/katas/99-csv"} />
+      <.kata_card title="100. Error Boundary" description="Crash handling" path={~p"/katas/100-error"} />
+
       </div>
     </div>
     """
