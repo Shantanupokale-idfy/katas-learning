@@ -85,6 +85,16 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             Create a "click to reveal" component using boolean state and CSS blur filters.
           </p>
         </.link>
+
+        <.link navigate="/katas/08-accordion" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-cyan-500 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">08 - The Accordion</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Manage a collection of items where only one can be active at a time (`active_id`).
+          </p>
+        </.link>
       </div>
     </div>
     """
