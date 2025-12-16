@@ -10,6 +10,7 @@ This file tracks your progress through the Elixir Katas.
 | 03 - The Mirror | Completed | 2025-12-16 | Verified form bindings |
 | 04 - The Toggler | Completed | 2025-12-16 | Verified conditional rendering |
 | 05 - The Color Picker | Completed | 2025-12-16 | Verified multiple state bindings |
+| 06 - The Resizer | Completed | 2025-12-16 | Verified dynamic width/height |
 
 ## Infrastructure Updates
 | Update | Date | Notes |
