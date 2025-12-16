@@ -59,10 +59,12 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
             </button>
             
             <div 
-              class={"transition-all duration-300 ease-in-out overflow-hidden " <> if(@active_id == faq.id, do: "max-h-48 opacity-100", else: "max-h-0 opacity-0")}
+              class={"grid transition-all duration-300 ease-in-out " <> if(@active_id == faq.id, do: "grid-rows-[1fr] opacity-100", else: "grid-rows-[0fr] opacity-0")}
             >
-              <div class="p-4 pt-0 text-base-content/80 leading-relaxed border-t border-base-200">
-                {faq.answer}
+              <div class="overflow-hidden">
+                <div class="p-4 pt-0 text-base-content/80 leading-relaxed border-t border-base-200">
+                  {faq.answer}
+                </div>
               </div>
             </div>
 
