@@ -156,10 +156,15 @@ defmodule ElixirKatasWeb.Router do
   scope "/", ElixirKatasWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :require_authenticated_user,
+    live_session :use_cases,
       layout: {ElixirKatasWeb.Layouts, :use_case},
       on_mount: [{ElixirKatasWeb.UserAuth, :require_authenticated}] do
       live "/usecases/tasky", TaskyLive.Index
+    end
+
+    live_session :require_authenticated_user,
+      layout: {ElixirKatasWeb.Layouts, :app},
+      on_mount: [{ElixirKatasWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
     end
