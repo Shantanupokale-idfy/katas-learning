@@ -75,6 +75,16 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             Learn to bind integer state to CSS `width` and `height` properties.
           </p>
         </.link>
+
+        <.link navigate="/katas/07-spoiler" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-yellow-500 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">07 - The Spoiler</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Create a "click to reveal" component using boolean state and CSS blur filters.
+          </p>
+        </.link>
       </div>
     </div>
     """

@@ -11,6 +11,7 @@ This file tracks your progress through the Elixir Katas.
 | 04 - The Toggler | Completed | 2025-12-16 | Verified conditional rendering |
 | 05 - The Color Picker | Completed | 2025-12-16 | Verified multiple state bindings |
 | 06 - The Resizer | Completed | 2025-12-16 | Verified dynamic width/height |
+| 07 - The Spoiler | Completed | 2025-12-16 | Verified boolean toggle/CSS blur |
 
 ## Infrastructure Updates
 | Update | Date | Notes |
