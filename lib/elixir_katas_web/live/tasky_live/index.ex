@@ -12,7 +12,9 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
      socket
      |> assign(:page_title, "Tasky")
      |> stream(:todos, Tasky.list_todos())
-     |> assign(:form, to_form(Tasky.change_todo(%Todo{})))}
+     |> assign(:form, to_form(Tasky.change_todo(%Todo{})))
+     |> assign(:show_confirm_modal, false)
+     |> assign(:confirm_delete_id, nil)}
   end
 
   def handle_event("validate", %{"todo" => todo_params}, socket) do
@@ -41,6 +43,32 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     todo = Tasky.get_todo!(id)
     {:ok, updated_todo} = Tasky.update_todo(todo, %{is_complete: !todo.is_complete})
     {:noreply, stream_insert(socket, :todos, updated_todo)}
+  end
+
+  def handle_event("confirm_delete", %{"id" => id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:confirm_delete_id, id)
+     |> assign(:show_confirm_modal, true)}
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:confirm_delete_id, nil)
+     |> assign(:show_confirm_modal, false)}
+  end
+
+  def handle_event("delete_todo", _params, socket) do
+    if id = socket.assigns.confirm_delete_id do
+      todo = Tasky.get_todo!(id)
+      Tasky.delete_todo(todo)
+    end
+    
+    {:noreply,
+     socket
+     |> assign(:confirm_delete_id, nil)
+     |> assign(:show_confirm_modal, false)}
   end
 
   def handle_info({:todo_created, todo}, socket) do
@@ -98,12 +126,46 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                   <%= todo.title %>
                 </span>
               </div>
+              <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                <.icon name="hero-trash" class="h-5 w-5" />
+              </button>
             </li>
           </ul>
           
 
         </div>
       </div>
+
+      <%= if @show_confirm_modal do %>
+      <.modal 
+        id="confirm_modal" 
+        show={@show_confirm_modal} 
+        on_cancel={Phoenix.LiveView.JS.push("cancel_delete")}
+      >
+        <div class="p-4 sm:p-6 text-center">
+            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
+              <.icon name="hero-exclamation-triangle" class="h-6 w-6 text-red-600" />
+            </div>
+            <h3 class="text-base font-semibold leading-6 text-gray-900 mb-2">Delete Task</h3>
+            <p class="text-sm text-gray-500 mb-6">Are you sure you want to delete this task? This action cannot be undone.</p>
+            
+            <div class="flex justify-end gap-3">
+              <button 
+                phx-click="cancel_delete"
+                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button 
+                phx-click="delete_todo"
+                class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+              >
+                Delete
+              </button>
+            </div>
+        </div>
+      </.modal>
+      <% end %>
     </div>
     """
   end
