@@ -24,6 +24,7 @@ defmodule ElixirKatasWeb.Router do
       live "/katas/02-counter", Kata02CounterLive
       live "/katas/03-mirror", Kata03MirrorLive
       live "/katas/04-toggler", Kata04TogglerLive
+      live "/katas/05-color-picker", Kata05ColorPickerLive
     end
   end
 

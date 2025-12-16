@@ -9,6 +9,7 @@ This file tracks your progress through the Elixir Katas.
 | 02 - Counter | Completed | 2025-12-16 | Verified manually |
 | 03 - The Mirror | Completed | 2025-12-16 | Verified form bindings |
 | 04 - The Toggler | Completed | 2025-12-16 | Verified conditional rendering |
+| 05 - The Color Picker | Completed | 2025-12-16 | Verified multiple state bindings |
 
 ## Infrastructure Updates
 | Update | Date | Notes |

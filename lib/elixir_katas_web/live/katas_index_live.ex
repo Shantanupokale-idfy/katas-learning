@@ -55,6 +55,16 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             Learn conditional rendering (`if`) and how to switch CSS classes dynamically based on state.
           </p>
         </.link>
+
+        <.link navigate="/katas/05-color-picker" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-pink-500 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">05 - The Color Picker</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Manage multiple state values (`r, g, b`) and apply inline styles dynamically.
+          </p>
+        </.link>
       </div>
     </div>
     """
