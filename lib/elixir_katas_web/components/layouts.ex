@@ -31,7 +31,7 @@ defmodule ElixirKatasWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
-  slot :inner_block, required: true
+
 
   def app(assigns) do
     ~H"""
@@ -60,6 +60,10 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
                    01 - Hello World
                  </.link>
+                 <.link navigate="/katas/02" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-400"></span>
+                   02 - Counter
+                 </.link>
               </div>
             </div>
           </nav>
@@ -81,7 +85,7 @@ defmodule ElixirKatasWeb.Layouts do
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
            <.flash_group flash={@flash} />
            <div class="mx-auto max-w-5xl">
-             {render_slot(@inner_block)}
+             {@inner_content}
            </div>
         </main>
       </div>

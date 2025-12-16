@@ -18,7 +18,11 @@ defmodule ElixirKatasWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/katas/01", Kata01HelloWorldLive
+    live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
+      live "/katas", KatasIndexLive
+      live "/katas/01", Kata01HelloWorldLive
+      live "/katas/02", Kata02CounterLive
+    end
   end
 
   # Other scopes may use custom stacks.
