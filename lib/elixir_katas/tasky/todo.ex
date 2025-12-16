@@ -7,6 +7,8 @@ defmodule ElixirKatas.Tasky.Todo do
     field :is_complete, :boolean, default: false
     field :is_favorite, :boolean, default: false
 
+    belongs_to :user, ElixirKatas.Accounts.User
+
     timestamps()
   end
 

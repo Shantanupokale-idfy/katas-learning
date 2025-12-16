@@ -32,15 +32,16 @@ defmodule ElixirKatas.Tasky do
   Returns the list of todos.
   
   Supports pagination options: `page` (default 1) and `per_page` (default 5).
+  Requires `user_id` to scope todos to a specific user.
   """
-  def list_todos(opts \\ []) do
+  def list_todos(user_id, opts \\ []) do
     page = Keyword.get(opts, :page, 1)
     per_page = Keyword.get(opts, :per_page, 5)
     offset = (page - 1) * per_page
 
     search = Keyword.get(opts, :search)
     
-    base_query = Todo
+    base_query = from t in Todo, where: t.user_id == ^user_id
     
     query = if search && search != "" do
       search_term = "%#{search}%"
@@ -57,9 +58,9 @@ defmodule ElixirKatas.Tasky do
     # We need to filter the aggregate count too
     count_query = if search && search != "" do
         search_term = "%#{search}%"
-        from t in Todo, where: ilike(t.title, ^search_term)
+        from t in Todo, where: t.user_id == ^user_id and ilike(t.title, ^search_term)
     else
-        Todo
+        from t in Todo, where: t.user_id == ^user_id
     end
 
     total_count = Repo.aggregate(count_query, :count, :id)
@@ -77,13 +78,14 @@ defmodule ElixirKatas.Tasky do
 
   @doc """
   Returns the total count of todos, optionally filtered by search.
+  Requires `user_id` to scope todos to a specific user.
   """
-  def count_todos(search \\ nil) do
+  def count_todos(user_id, search \\ nil) do
     query = if search && search != "" do
         search_term = "%#{search}%"
-        from t in Todo, where: ilike(t.title, ^search_term)
+        from t in Todo, where: t.user_id == ^user_id and ilike(t.title, ^search_term)
     else
-        Todo
+        from t in Todo, where: t.user_id == ^user_id
     end
     Repo.aggregate(query, :count, :id)
   end
@@ -116,8 +118,11 @@ defmodule ElixirKatas.Tasky do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_todo(attrs) do
-    %Todo{}
+  @doc """
+  Creates a todo for a specific user.
+  """
+  def create_todo(user_id, attrs) do
+    %Todo{user_id: user_id}
     |> Todo.changeset(attrs)
     |> Repo.insert()
     |> broadcast(:todo_created)

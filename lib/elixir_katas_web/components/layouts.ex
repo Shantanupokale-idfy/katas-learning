@@ -31,7 +31,7 @@ defmodule ElixirKatasWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
-
+  slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
@@ -478,7 +478,7 @@ defmodule ElixirKatasWeb.Layouts do
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
            <.flash_group flash={@flash} />
            <div class="mx-auto max-w-5xl">
-             {@inner_content}
+             <%= render_slot(@inner_block) %>
            </div>
         </main>
       </div>

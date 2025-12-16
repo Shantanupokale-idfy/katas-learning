@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :elixir_katas, :scopes,
+  user: [
+    default: true,
+    module: ElixirKatas.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: ElixirKatas.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :elixir_katas,
   ecto_repos: [ElixirKatas.Repo],
   generators: [timestamp_type: :utc_datetime]

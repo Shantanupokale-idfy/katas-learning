@@ -22,7 +22,8 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     search = params["search"] || ""
     per_page = 5
     
-    pagination = Tasky.list_todos(page: page, per_page: per_page, search: search)
+    user_id = socket.assigns.current_user.id
+    pagination = Tasky.list_todos(user_id, page: page, per_page: per_page, search: search)
     
     {:noreply,
      socket
@@ -47,9 +48,11 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("save", %{"todo" => todo_params}, socket) do
-    case Tasky.create_todo(todo_params) do
+    user_id = socket.assigns.current_user.id
+    
+    case Tasky.create_todo(user_id, todo_params) do
       {:ok, todo} ->
-        total_count = Tasky.count_todos(socket.assigns.search)
+        total_count = Tasky.count_todos(user_id, socket.assigns.search)
         total_pages = ceil(total_count / socket.assigns.per_page)
 
         {:noreply,
@@ -95,7 +98,8 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       Tasky.delete_todo(todo)
     end
     
-    total_count = Tasky.count_todos(socket.assigns.search)
+    user_id = socket.assigns.current_user.id
+    total_count = Tasky.count_todos(user_id, socket.assigns.search)
     total_pages = ceil(total_count / socket.assigns.per_page)
 
     {:noreply,
