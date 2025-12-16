@@ -52,7 +52,23 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("search", %{"query" => search}, socket) do
-    {:noreply, push_patch(socket, to: ~p"/usecases/tasky?page=1&search=#{search}")}
+    {:noreply, push_patch(socket, to: build_url(socket, %{search: search, page: 1}))}
+  end
+
+  def handle_event("filter_category", %{"category" => category}, socket) do
+    {:noreply, push_patch(socket, to: build_url(socket, %{category: category, page: 1}))}
+  end
+
+  def handle_event("filter_priority", %{"priority" => priority}, socket) do
+    {:noreply, push_patch(socket, to: build_url(socket, %{priority: priority, page: 1}))}
+  end
+
+  def handle_event("filter_due_date", %{"due_date_filter" => due_date_filter}, socket) do
+    {:noreply, push_patch(socket, to: build_url(socket, %{due_date_filter: due_date_filter, page: 1}))}
+  end
+
+  def handle_event("clear_filters", _params, socket) do
+    {:noreply, push_patch(socket, to: build_url(socket, %{category: "", priority: "", due_date_filter: "", page: 1}))}
   end
 
   def handle_event("validate", %{"todo" => todo_params}, socket) do
@@ -130,6 +146,21 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:noreply, stream_delete(socket, :todos, todo)}
   end
 
+  defp build_url(socket, updates) do
+    params = %{
+      "page" => to_string(updates[:page] || socket.assigns.page),
+      "search" => updates[:search] || socket.assigns.search,
+      "category" => updates[:category] || socket.assigns.category,
+      "priority" => updates[:priority] || socket.assigns.priority,
+      "due_date_filter" => updates[:due_date_filter] || socket.assigns.due_date_filter
+    }
+    |> Enum.reject(fn {_k, v} -> v == "" end)
+    |> Enum.map(fn {k, v} -> "#{k}=#{URI.encode_www_form(v)}" end)
+    |> Enum.join("&")
+
+    "/usecases/tasky?" <> params
+  end
+
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -149,17 +180,47 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <.icon name="hero-magnifying-glass" class="h-5 w-5 text-gray-400" />
                 </div>
-                <form phx-change="search" phx-submit="search" onsubmit="return false;">
+                <form phx-change="search" phx-submit="search">
                   <input 
                     type="text" 
                     name="query" 
                     value={@search}
                     placeholder="Search tasks..." 
-                    phx-debounce="300"
                     class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" 
                   />
                 </form>
              </div>
+          </div>
+
+          <!-- Filter Controls -->
+          <div class="mb-6 space-y-3">
+            <div class="flex flex-wrap gap-2">
+              <select phx-change="filter_category" name="category" class="text-sm border-gray-300 rounded-md">
+                <option value="">All Categories</option>
+                <option :for={cat <- @categories} value={cat} selected={@category == cat}>{cat}</option>
+              </select>
+
+              <select phx-change="filter_priority" name="priority" class="text-sm border-gray-300 rounded-md">
+                <option value="">All Priorities</option>
+                <option value="high" selected={@priority == "high"}>High</option>
+                <option value="medium" selected={@priority == "medium"}>Medium</option>
+                <option value="low" selected={@priority == "low"}>Low</option>
+              </select>
+
+              <select phx-change="filter_due_date" name="due_date_filter" class="text-sm border-gray-300 rounded-md">
+                <option value="">All Dates</option>
+                <option value="overdue" selected={@due_date_filter == "overdue"}>Overdue</option>
+                <option value="today" selected={@due_date_filter == "today"}>Due Today</option>
+                <option value="week" selected={@due_date_filter == "week"}>This Week</option>
+                <option value="no_date" selected={@due_date_filter == "no_date"}>No Date</option>
+              </select>
+
+              <%= if @category != "" || @priority != "" || @due_date_filter != "" do %>
+                <button phx-click="clear_filters" class="text-sm text-indigo-600 hover:text-indigo-800">
+                  Clear Filters
+                </button>
+              <% end %>
+            </div>
           </div>
 
           <!-- Add Task Form -->
