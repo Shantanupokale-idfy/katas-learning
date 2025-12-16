@@ -14,6 +14,8 @@ This file tracks your progress through the Elixir Katas.
 | 07 - The Spoiler | Completed | 2025-12-16 | Verified boolean toggle/CSS blur |
 | 08 - The Accordion | Completed | 2025-12-16 | Verified active ID tracking |
 | 09 - The Tabs | Completed | 2025-12-16 | Verified tab switching & conditional rendering |
+| 10 - Character Counter | Completed | 2025-12-16 | Verified string length & limits |
+| 11 - The Stopwatch | Completed | 2025-12-16 | Verified process interval & formatting |
 
 ## Infrastructure Updates
 | Update | Date | Notes |

@@ -104,6 +104,25 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             Switch content based on active tab state.
           </p>
         </.link>
+
+        <.link navigate="/katas/10-character-counter" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-red-500 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">10 - Character Counter</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Real-time string length calculation with limit validation and visual feedback.
+          </p>
+        </.link>
+        <.link navigate="/katas/11-stopwatch" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-blue-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">11 - The Stopwatch</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            A server-driven timer using process messages and interval handling.
+          </p>
+        </.link>
       </div>
     </div>
     """
