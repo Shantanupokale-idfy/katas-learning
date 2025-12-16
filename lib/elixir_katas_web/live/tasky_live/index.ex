@@ -8,28 +8,45 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       Tasky.subscribe()
     end
 
+    user_id = socket.assigns.current_scope.user.id
+    categories = Tasky.list_categories(user_id)
+
     {:ok, 
      socket
      |> assign(:page_title, "Tasky")
      |> assign(:form, to_form(Tasky.change_todo(%Todo{})))
      |> assign(:show_confirm_modal, false)
      |> assign(:confirm_delete_id, nil)
+     |> assign(:categories, categories)
      |> stream(:todos, [])}
   end
 
   def handle_params(params, _url, socket) do
     page = String.to_integer(params["page"] || "1")
     search = params["search"] || ""
+    category = params["category"] || ""
+    priority = params["priority"] || ""
+    due_date_filter = params["due_date_filter"] || ""
     per_page = 5
     
     user_id = socket.assigns.current_scope.user.id
-    pagination = Tasky.list_todos(user_id, page: page, per_page: per_page, search: search)
+    pagination = Tasky.list_todos(user_id, 
+      page: page, 
+      per_page: per_page, 
+      search: search,
+      category: category,
+      priority: priority,
+      due_date_filter: due_date_filter
+    )
     
     {:noreply,
      socket
      |> assign(:page, page)
      |> assign(:per_page, per_page)
      |> assign(:search, search)
+     |> assign(:category, category)
+     |> assign(:priority, priority)
+     |> assign(:due_date_filter, due_date_filter)
      |> assign(:total_pages, pagination.total_pages)
      |> stream(:todos, pagination.entries, reset: true)}
   end
@@ -155,6 +172,26 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                 </div>
                 <.input field={@form[:title]} type="text" placeholder="Add a new task..." 
                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" />
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <.input field={@form[:category]} type="text" placeholder="Category" list="categories-list"
+                  class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
+                <datalist id="categories-list">
+                  <option :for={cat <- @categories} value={cat}>{cat}</option>
+                </datalist>
+              </div>
+              
+              <div>
+                <.input field={@form[:priority]} type="select" options={[{"Low", "low"}, {"Medium", "medium"}, {"High", "high"}]}
+                  class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
+              </div>
+              
+              <div>
+                <.input field={@form[:due_date]} type="date"
+                  class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
               </div>
             </div>
           </.form>
