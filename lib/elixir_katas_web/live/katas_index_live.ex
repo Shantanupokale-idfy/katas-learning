@@ -123,6 +123,145 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             A server-driven timer using process messages and interval handling.
           </p>
         </.link>
+
+        <.link navigate="/katas/12-timer" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-orange-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">12 - The Timer</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Countdown timer with start/stop/reset and auto-termination.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/13-events-mastery" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-green-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">13 - Events Mastery</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Explore focus, blur, and keyup events with real-time logging.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/14-keybindings" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-purple-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">14 - Keybindings</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Global window keyboard shortcuts with <code>phx-window-keydown</code>.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/15-calculator" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-gray-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">15 - The Calculator</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Complex state management simulating a real calculator.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/16-list" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-indigo-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">16 - The List</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Render a list and append new items.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/17-remover" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-red-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">17 - The Remover</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Remove specific items from a list by ID.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/18-editor" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-yellow-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">18 - The Editor</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Inline editing of list items.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/19-filter" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-cyan-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">19 - The Filter</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Real-time client-side filtering of data.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/20-sorter" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-teal-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">20 - The Sorter</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Sort a table by column headers (asc/desc).
+          </p>
+        </.link>
+        <.link navigate="/katas/21-paginator" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-purple-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">21 - The Paginator</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Simple offset-based pagination Logic.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/22-highlighter" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-yellow-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">22 - The Highlighter</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Highlighting search terms within text.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/23-multi-select" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-blue-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">23 - The Multi-Select</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Selecting multiple items from a list with MapSet.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/24-grid" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-cyan-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">24 - The Grid</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Rendering data in a responsive grid layout.
+          </p>
+        </.link>
+
+        <.link navigate="/katas/25-tree" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-indigo-600 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">25 - The Tree</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Recursive rendering of nested data structures.
+          </p>
+        </.link>
       </div>
     </div>
     """

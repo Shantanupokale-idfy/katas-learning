@@ -31,6 +31,20 @@ defmodule ElixirKatasWeb.Router do
       live "/katas/09-tabs", Kata09TabsLive
       live "/katas/10-character-counter", Kata10CharacterCounterLive
       live "/katas/11-stopwatch", Kata11StopwatchLive
+      live "/katas/12-timer", Kata12TimerLive
+      live "/katas/13-events-mastery", Kata13EventsMasteryLive
+      live "/katas/14-keybindings", Kata14KeybindingsLive
+      live "/katas/15-calculator", Kata15CalculatorLive
+      live "/katas/16-list", Kata16ListLive
+      live "/katas/17-remover", Kata17RemoverLive
+      live "/katas/18-editor", Kata18EditorLive
+      live "/katas/19-filter", Kata19FilterLive
+      live "/katas/20-sorter", Kata20SorterLive
+    live "/katas/21-paginator", Kata21PaginatorLive
+    live "/katas/22-highlighter", Kata22HighlighterLive
+    live "/katas/23-multi-select", Kata23MultiSelectLive
+    live "/katas/24-grid", Kata24GridLive
+    live "/katas/25-tree", Kata25TreeLive
     end
   end
 

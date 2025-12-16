@@ -16,6 +16,20 @@ This file tracks your progress through the Elixir Katas.
 | 09 - The Tabs | Completed | 2025-12-16 | Verified tab switching & conditional rendering |
 | 10 - Character Counter | Completed | 2025-12-16 | Verified string length & limits |
 | 11 - The Stopwatch | Completed | 2025-12-16 | Verified process interval & formatting |
+| 12 - The Timer | Completed | 2025-12-16 | Verified countdown & auto-stop |
+| 13 - Events Mastery | Completed | 2025-12-16 | Verified logs for focus/blur/key |
+| 14 - Keybindings | Completed | 2025-12-16 | Verified global window keys |
+| 15 - The Calculator | Completed | 2025-12-16 | Verified complex state logic |
+| 16 - The List | Completed | 2025-12-16 | Verified appending items |
+| 17 - The Remover | Completed | 2025-12-16 | Verified removal by ID |
+| 18 - The Editor | Completed | 2025-12-16 | Verified inline editing |
+| 19 - The Filter | Completed | 2025-12-16 | Verified filtering (search) |
+| 20 - The Sorter | Completed | 2025-12-16 | Verified sorting by column |
+| 21 - The Paginator | Completed | 2025-12-16 | Verified offset-based pagination |
+| 22 - The Highlighter | Completed | 2025-12-16 | Verified text highlighting |
+| 23 - The Multi-Select | Completed | 2025-12-16 | Verified MapSet selection logic |
+| 24 - The Grid | Completed | 2025-12-16 | Verified CSS Grid Responsive Layout |
+| 25 - The Tree | Completed | 2025-12-16 | Verified recursive tree rendering |
 
 ## Infrastructure Updates
 | Update | Date | Notes |

@@ -23,6 +23,8 @@ The application is built with **Phoenix LiveView** 1.0+.
 
 Adding a new kata involves touching 5 distinct files. Follow this checklist:
 
+For each kata add the "Interactive", "Source Code" and "Notes" tabs.
+
 ### 1. Create the LiveView Module
 **Path:** `lib/elixir_katas_web/live/kata_XX_name_live.ex`
 
