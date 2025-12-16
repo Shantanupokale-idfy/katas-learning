@@ -70,6 +70,26 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/48-redirects", Kata48RedirectsLive
     live "/katas/49-translator", Kata49TranslatorLive
     live "/katas/50-components", Kata50ComponentsLive
+    live "/katas/51-card", Kata51CardLive
+    live "/katas/52-button", Kata52ButtonLive
+    live "/katas/53-icon", Kata53IconLive
+    live "/katas/54-modal", Kata54ModalLive
+    live "/katas/55-slideover", Kata55SlideoverLive
+    live "/katas/56-tooltip", Kata56TooltipLive
+    live "/katas/57-dropdown", Kata57DropdownLive
+    live "/katas/58-flash", Kata58FlashLive
+    live "/katas/59-skeleton", Kata59SkeletonLive
+    live "/katas/60-progress", Kata60ProgressLive
+    live "/katas/61-stateful", Kata61StatefulLive
+    live "/katas/62-component-id", Kata62ComponentIdLive
+    live "/katas/63-send-update", Kata63SendUpdateLive
+    live "/katas/64-send-self", Kata64SendSelfLive
+    live "/katas/65-child-parent", Kata65ChildParentLive
+    live "/katas/66-sibling", Kata66SiblingLive
+    live "/katas/67-lazy", Kata67LazyLive
+    live "/katas/68-changesets", Kata68ChangesetsLive
+    live "/katas/69-crud", Kata69CrudLive
+    live "/katas/70-optimistic", Kata70OptimisticLive
     end
   end
 

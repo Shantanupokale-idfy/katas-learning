@@ -384,6 +384,26 @@ defmodule ElixirKatasWeb.KatasIndexLive do
         description="Creating reusable components with attr and slot."
         path={~p"/katas/50-components"}
       />
+      <.kata_card title="51. The Card" description="Slots for header, body, footer" path={~p"/katas/51-card"} />
+      <.kata_card title="52. The Button" description="Variants, sizes, loading states" path={~p"/katas/52-button"} />
+      <.kata_card title="53. The Icon" description="Wrapping SVG icon libraries" path={~p"/katas/53-icon"} />
+      <.kata_card title="54. The Modal" description="Global UI state with JS commands" path={~p"/katas/54-modal"} />
+      <.kata_card title="55. The Slide-over" description="Drawer component with transitions" path={~p"/katas/55-slideover"} />
+      <.kata_card title="56. The Tooltip" description="CSS-only tooltips" path={~p"/katas/56-tooltip"} />
+      <.kata_card title="57. The Dropdown" description="Menu with click-outside detection" path={~p"/katas/57-dropdown"} />
+      <.kata_card title="58. Flash Messages" description="Auto-dismissing toast notifications" path={~p"/katas/58-flash"} />
+      <.kata_card title="59. The Skeleton" description="Loading state placeholders" path={~p"/katas/59-skeleton"} />
+      <.kata_card title="60. The Progress Bar" description="Server-driven progress updates" path={~p"/katas/60-progress"} />
+      <.kata_card title="61. Stateful Component" description="LiveComponent lifecycle" path={~p"/katas/61-stateful"} />
+      <.kata_card title="62. Component ID" description="Managing unique IDs" path={~p"/katas/62-component-id"} />
+      <.kata_card title="63. Send Update" description="Parent updating child state" path={~p"/katas/63-send-update"} />
+      <.kata_card title="64. Send Self" description="Child updating its own state" path={~p"/katas/64-send-self"} />
+      <.kata_card title="65. Child-to-Parent" description="Messaging up the tree" path={~p"/katas/65-child-parent"} />
+      <.kata_card title="66. Sibling Communication" description="Via parent coordinator" path={~p"/katas/66-sibling"} />
+      <.kata_card title="67. Lazy Loading" description="Async component loading" path={~p"/katas/67-lazy"} />
+      <.kata_card title="68. Changesets 101" description="Schema-less changesets" path={~p"/katas/68-changesets"} />
+      <.kata_card title="69. The CRUD" description="Full CRUD operations" path={~p"/katas/69-crud"} />
+      <.kata_card title="70. Optimistic UI" description="Update before server confirms" path={~p"/katas/70-optimistic"} />
       </div>
     </div>
     """

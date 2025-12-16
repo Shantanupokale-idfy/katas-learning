@@ -62,3 +62,23 @@ This file tracks your progress through the Elixir Katas.
 | Layout Refactor | 2025-12-16 | Added Sidebar and Tabbed Viewer (Interactive/Source/Notes) |
 | Typography Plugin | 2025-12-16 | Installed @tailwindcss/typography for formatted notes |
 | Sidebar Fix | 2025-12-16 | Fixed layout slot issue (inner_block vs inner_content) & added Katas Index |
+| 51 - The Card | Completed | 2025-12-16 | UI component with slots |
+| 52 - The Button | Completed | 2025-12-16 | Button variants and states |
+| 53 - The Icon | Completed | 2025-12-16 | Icon wrapper component |
+| 54 - The Modal | Completed | 2025-12-16 | Modal dialog component |
+| 55 - The Slide-over | Completed | 2025-12-16 | Drawer component |
+| 56 - The Tooltip | Completed | 2025-12-16 | Tooltip component |
+| 57 - The Dropdown | Completed | 2025-12-16 | Dropdown menu component |
+| 58 - Flash Messages | Completed | 2025-12-16 | Toast notifications |
+| 59 - The Skeleton | Completed | 2025-12-16 | Loading placeholders |
+| 60 - The Progress Bar | Completed | 2025-12-16 | Progress indicator |
+| 61 - Stateful Component | Completed | 2025-12-16 | LiveComponent patterns |
+| 62 - Component ID | Completed | 2025-12-16 | Component ID management |
+| 63 - Send Update | Completed | 2025-12-16 | Parent-child communication |
+| 64 - Send Self | Completed | 2025-12-16 | Self-updating components |
+| 65 - Child-to-Parent | Completed | 2025-12-16 | Child-parent messaging |
+| 66 - Sibling Communication | Completed | 2025-12-16 | Sibling component communication |
+| 67 - Lazy Loading | Completed | 2025-12-16 | Async component loading |
+| 68 - Changesets 101 | Completed | 2025-12-16 | Changeset basics |
+| 69 - The CRUD | Completed | 2025-12-16 | CRUD operations |
+| 70 - Optimistic UI | Completed | 2025-12-16 | Optimistic updates |

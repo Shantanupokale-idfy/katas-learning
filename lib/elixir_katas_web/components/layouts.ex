@@ -256,6 +256,86 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-red-500"></span>
                    50 - Functional Components
                  </.link>
+                 <.link navigate="/katas/51-card" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-500"></span>
+                   51 - The Card
+                 </.link>
+                 <.link navigate="/katas/52-button" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-500"></span>
+                   52 - The Button
+                 </.link>
+                 <.link navigate="/katas/53-icon" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-500"></span>
+                   53 - The Icon
+                 </.link>
+                 <.link navigate="/katas/54-modal" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-pink-500"></span>
+                   54 - The Modal
+                 </.link>
+                 <.link navigate="/katas/55-slideover" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-indigo-500"></span>
+                   55 - The Slide-over
+                 </.link>
+                 <.link navigate="/katas/56-tooltip" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-cyan-500"></span>
+                   56 - The Tooltip
+                 </.link>
+                 <.link navigate="/katas/57-dropdown" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-orange-500"></span>
+                   57 - The Dropdown
+                 </.link>
+                 <.link navigate="/katas/58-flash" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                   58 - Flash Messages
+                 </.link>
+                 <.link navigate="/katas/59-skeleton" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-yellow-500"></span>
+                   59 - The Skeleton
+                 </.link>
+                 <.link navigate="/katas/60-progress" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-500"></span>
+                   60 - The Progress Bar
+                 </.link>
+                 <.link navigate="/katas/61-stateful" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-500"></span>
+                   61 - Stateful Component
+                 </.link>
+                 <.link navigate="/katas/62-component-id" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-500"></span>
+                   62 - Component ID
+                 </.link>
+                 <.link navigate="/katas/63-send-update" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-500"></span>
+                   63 - Send Update
+                 </.link>
+                 <.link navigate="/katas/64-send-self" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-pink-500"></span>
+                   64 - Send Self
+                 </.link>
+                 <.link navigate="/katas/65-child-parent" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-indigo-500"></span>
+                   65 - Child-to-Parent
+                 </.link>
+                 <.link navigate="/katas/66-sibling" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-cyan-500"></span>
+                   66 - Sibling Communication
+                 </.link>
+                 <.link navigate="/katas/67-lazy" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-orange-500"></span>
+                   67 - Lazy Loading
+                 </.link>
+                 <.link navigate="/katas/68-changesets" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                   68 - Changesets 101
+                 </.link>
+                 <.link navigate="/katas/69-crud" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-yellow-500"></span>
+                   69 - The CRUD
+                 </.link>
+                 <.link navigate="/katas/70-optimistic" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-500"></span>
+                   70 - Optimistic UI
+                 </.link>
               </div>
             </div>
           </nav>
