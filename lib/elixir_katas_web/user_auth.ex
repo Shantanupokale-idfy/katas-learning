@@ -30,14 +30,14 @@ defmodule ElixirKatasWeb.UserAuth do
   Logs the user in.
 
   Redirects to the session's `:user_return_to` path
-  or falls back to the `signed_in_path/1`.
+  or falls back to the home page.
   """
   def log_in_user(conn, user, params \\ %{}) do
     user_return_to = get_session(conn, :user_return_to)
 
     conn
     |> create_or_extend_session(user, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: user_return_to || ~p"/")
   end
 
   @doc """
