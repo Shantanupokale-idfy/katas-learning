@@ -1,4 +1,4 @@
-defmodule ElixirKatasWeb.Kata89ChartJsLive do
+defmodule ElixirKatasWeb.Kata89ChartjsLive do
   use ElixirKatasWeb, :live_view
   import ElixirKatasWeb.KataComponents
 
@@ -11,7 +11,7 @@ defmodule ElixirKatasWeb.Kata89ChartJsLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_value, "")
+      |> assign(:demo_active, false)
 
     {:ok, socket}
   end
@@ -26,23 +26,42 @@ defmodule ElixirKatasWeb.Kata89ChartJsLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Data visualization with Chart.js integration.
+          Chart display with sample data
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Chart.js Integration</h3>
-          <p class="text-gray-600">
-            Interactive demonstration of Chart.js data visualization. Check the Notes and Source Code tabs for implementation details.
-          </p>
-          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <div class="text-sm text-gray-700">
-              This kata demonstrates: Data visualization with Chart.js library
-            </div>
+          <h3 class="text-lg font-medium mb-4">Chart.js</h3>
+          
+          <div class="space-y-4">
+            <button 
+              phx-click="toggle_demo"
+              class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            >
+              {%= if @demo_active, do: "Hide Demo", else: "Show Demo" %}
+            </button>
+
+            {%= if @demo_active do %}
+              <div class="p-4 bg-blue-50 border border-blue-200 rounded">
+                <div class="font-medium mb-2">Chart.js Demo</div>
+                <div class="text-sm text-gray-700">
+                  This demonstrates data visualization. In a real implementation, 
+                  this would include full chart.js functionality with proper 
+                  JavaScript integration.
+                </div>
+                <div class="mt-3 text-xs text-gray-500">
+                  Check the Notes and Source Code tabs for implementation details.
+                </div>
+              </div>
+            {% end %}
           </div>
         </div>
       </div>
     </.kata_viewer>
     """
+  end
+
+  def handle_event("toggle_demo", _, socket) do
+    {:noreply, assign(socket, :demo_active, !socket.assigns.demo_active)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

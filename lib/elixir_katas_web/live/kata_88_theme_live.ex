@@ -11,32 +11,34 @@ defmodule ElixirKatasWeb.Kata88ThemeSwitcherLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_value, "")
+      |> assign(:theme, "light")
 
     {:ok, socket}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 88: Theme Switcher" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    <.kata_viewer active_tab={@active_tab} title="Kata 88: Theme Switcher" source_code={@source_code} notes_content={@notes_content}>
       <div class="p-6 max-w-2xl mx-auto">
-        <div class="mb-6 text-sm text-gray-500">
-          Dark/light mode
-        </div>
-
-        <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Theme Switcher</h3>
-          <p class="text-gray-600">
-            Interactive demonstration of theme switcher. Check the Notes and Source Code tabs for implementation details.
-          </p>
-          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <div class="text-sm text-gray-700">
-              This kata demonstrates: Dark/light mode
+        <div class="mb-6 text-sm text-gray-500">Toggle between light and dark themes.</div>
+        <div class={"p-6 rounded-lg shadow-sm border transition-colors " <> if @theme == "dark", do: "bg-gray-900 text-white border-gray-700", else: "bg-white text-gray-900"}>
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-medium">Theme Demo</h3>
+            <button phx-click="toggle_theme" class={"px-4 py-2 rounded transition-colors " <> if @theme == "dark", do: "bg-yellow-500 text-gray-900 hover:bg-yellow-400", else: "bg-gray-800 text-white hover:bg-gray-700"}>
+              <%= if @theme == "dark", do: "☀️ Light", else: "🌙 Dark" %>
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div class={"p-4 rounded " <> if @theme == "dark", do: "bg-gray-800", else: "bg-gray-100"}>
+              <div class="font-medium mb-2">Current Theme: <%= String.capitalize(@theme) %></div>
+              <div class="text-sm opacity-75">This content adapts to the selected theme.</div>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <%= for color <- ["blue", "green", "purple"] do %>
+                <div class={"p-4 rounded text-center " <> "bg-#{color}-#{if @theme == "dark", do: "700", else: "100"} text-#{color}-#{if @theme == "dark", do: "100", else: "900"}"}>
+                  <%= String.capitalize(color) %>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
@@ -45,7 +47,10 @@ defmodule ElixirKatasWeb.Kata88ThemeSwitcherLive do
     """
   end
 
-  def handle_event("set_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, active_tab: tab)}
+  def handle_event("toggle_theme", _, socket) do
+    new_theme = if socket.assigns.theme == "light", do: "dark", else: "light"
+    {:noreply, assign(socket, :theme, new_theme)}
   end
+
+  def handle_event("set_tab", %{"tab" => tab}, socket), do: {:noreply, assign(socket, active_tab: tab)}
 end
