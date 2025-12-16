@@ -95,7 +95,7 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/73-stream-insert-delete", Kata73StreamInsertDeleteLive
     live "/katas/74-stream-reset", Kata74StreamResetLive
     live "/katas/75-bulk-actions", Kata75BulkActionsLive
-    live "/katas/76-clock", Kata76TheClockLive
+    live "/katas/76-clock", Kata76ClockLive
     live "/katas/77-ticker", Kata77TheTickerLive
     live "/katas/78-chat", Kata78ChatRoomLive
     live "/katas/79-typing", Kata79TypingIndicatorLive
