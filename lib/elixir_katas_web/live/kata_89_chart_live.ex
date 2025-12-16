@@ -71,8 +71,10 @@ defmodule ElixirKatasWeb.Kata89ChartjsLive do
   def handle_event("randomize", _, socket) do
     data = Enum.map(1..7, fn _ -> :rand.uniform(100) end)
     
+    # Update the map, not the socket path directly for variables
+    current_data = socket.assigns.chart_data
     new_chart_data = 
-      put_in(socket.assigns.chart_data[:datasets], [
+      put_in(current_data[:datasets], [
         %{
           label: "Sales",
           data: data,

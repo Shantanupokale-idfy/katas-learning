@@ -11,7 +11,7 @@ defmodule ElixirKatasWeb.Kata98PDFGenerationLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_active, false)
+      |> assign(:form, to_form(%{"title" => "My Document", "body" => "## Section 1\nContent goes here..."}))
 
     {:ok, socket}
   end
@@ -26,42 +26,56 @@ defmodule ElixirKatasWeb.Kata98PDFGenerationLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Generate PDF documents
+          Generate PDF documents from HTML/Markdown using wkhtmltopdf
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">PDF Generation</h3>
+          <h3 class="text-lg font-medium mb-4">Create PDF Document</h3>
           
-          <div class="space-y-4">
-            <button 
-              phx-click="toggle_demo"
-              class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
-              <%= if @demo_active, do: "Hide Demo", else: "Show Demo" %>
-            </button>
-
-            <%= if @demo_active do %>
-              <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                <div class="font-medium mb-2">PDF Generation Demo</div>
-                <div class="text-sm text-gray-700">
-                  This demonstrates document generation. In a real implementation, 
-                  this would include full pdf generation functionality with proper 
-                  JavaScript integration.
-                </div>
-                <div class="mt-3 text-xs text-gray-500">
-                  Check the Notes and Source Code tabs for implementation details.
-                </div>
+          <form action="/exports/pdf" method="post">
+            <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
+            
+            
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Document Title</label>
+                <input 
+                  type="text" 
+                  name="title" 
+                  value={@form[:title].value} 
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
               </div>
-            <% end %>
-          </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Content (Markdown supported)</label>
+                <textarea 
+                  name="body" 
+                  rows="8" 
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                ><%= @form[:body].value %></textarea>
+              </div>
+
+              <div class="flex justify-end">
+                <button 
+                  type="submit" 
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <span class="mr-2">Download PDF</span>
+                  <.icon name="hero-document-arrow-down" class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </.kata_viewer>
     """
   end
 
-  def handle_event("toggle_demo", _, socket) do
-    {:noreply, assign(socket, :demo_active, !socket.assigns.demo_active)}
+  def handle_event("validate", %{"title" => title, "body" => body}, socket) do
+    # Just update the form for UI feedback if we wanted preview
+    {:noreply, assign(socket, :form, to_form(%{"title" => title, "body" => body}))}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

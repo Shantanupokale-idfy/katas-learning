@@ -92,6 +92,7 @@ This file tracks your progress through the Elixir Katas.
 | 88 - Theme Switcher | Enhanced | 2025-12-16 | Session-based theme toggle |
 | 89 - Chart.js | Enhanced | 2025-12-16 | Integrated Chart.js via JS Hook |
 | 90 - Mapbox | Pending | - | Leaflet.js integration pending |
+| 92 - File Dropzone | Completed | 2025-12-16 | Advanced UI with file management |
 | 93 - Sortable List | Pending | - | SortableJS integration pending |
 | 94 - Audio Player | Enhanced | 2025-12-16 | HTML5 Audio Hook with server controls |
 | 95 - Async Assigns | Enhanced | 2025-12-16 | Used assign_async for non-blocking UI |
@@ -101,4 +102,6 @@ This file tracks your progress through the Elixir Katas.
 | 80 - Presence List | Enhanced | 2025-12-16 | Phoenix.Presence tracking |
 | 81 - Live Cursor | Enhanced | 2025-12-16 | Multi-user cursor tracking |
 | 96 - File Uploads | Enhanced | 2025-12-16 | Integrated allow_upload & drag-drop |
+| 97 - Image Processing | Enhanced | 2025-12-16 | Mogrify (ImageMagick) integration |
+| 98 - PDF Generation | Enhanced | 2025-12-16 | PdfGenerator (wkhtmltopdf) integration |
 | 99 - CSV Export | Enhanced | 2025-12-16 | NimbleCSV export with download |
