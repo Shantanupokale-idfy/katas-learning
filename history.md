@@ -115,4 +115,6 @@ This file tracks your progress through the Elixir Katas.
 | Tasky Level 3 | Completed | 2025-12-16 | Added Favorites Logic & UI (Star Icon) |
 | Tasky Yellow Belt | Completed | 2025-12-16 | Added Pagination & Search (Level 1 & 2) |
 | Tasky Orange Belt | Completed | 2025-12-16 | Added Authentication (phx.gen.auth, user scoping) |
+| Tasky Green Belt | Completed | 2025-12-16 | Added category, priority, and due date fields with filtering, visual indicators, and color-coded badges |
 | Navigation Refactoring | Completed | 2025-12-16 | Added landing page hub, Use Cases index |
+```
