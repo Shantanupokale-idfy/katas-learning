@@ -16,7 +16,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <.link navigate="/katas/01" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+        <.link navigate="/katas/01-hello-world" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
           <div class="flex items-center mb-4">
             <span class="w-3 h-3 rounded-full bg-green-500 mr-3"></span>
             <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">01 - Hello World</h2>
@@ -26,7 +26,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
           </p>
         </.link>
 
-        <.link navigate="/katas/02" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+        <.link navigate="/katas/02-counter" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
           <div class="flex items-center mb-4">
             <span class="w-3 h-3 rounded-full bg-blue-500 mr-3"></span>
             <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">02 - Counter</h2>
@@ -36,7 +36,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
           </p>
         </.link>
 
-        <.link navigate="/katas/03" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+        <.link navigate="/katas/03-mirror" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
           <div class="flex items-center mb-4">
             <span class="w-3 h-3 rounded-full bg-purple-500 mr-3"></span>
             <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">03 - The Mirror</h2>
@@ -46,7 +46,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
           </p>
         </.link>
 
-        <.link navigate="/katas/04" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+        <.link navigate="/katas/04-toggler" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
           <div class="flex items-center mb-4">
             <span class="w-3 h-3 rounded-full bg-orange-500 mr-3"></span>
             <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">04 - The Toggler</h2>

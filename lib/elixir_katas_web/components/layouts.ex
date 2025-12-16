@@ -56,19 +56,19 @@ defmodule ElixirKatasWeb.Layouts do
               </h3>
               <div class="mt-2 space-y-1 pl-2">
                  <!-- Example Kata Link -->
-                 <.link navigate="/katas/01" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                 <.link navigate="/katas/01-hello-world" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
                    01 - Hello World
                  </.link>
-                 <.link navigate="/katas/02" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                 <.link navigate="/katas/02-counter" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-blue-400"></span>
                    02 - Counter
                  </.link>
-                 <.link navigate="/katas/03" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                 <.link navigate="/katas/03-mirror" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-purple-400"></span>
                    03 - The Mirror
                  </.link>
-                 <.link navigate="/katas/04" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                 <.link navigate="/katas/04-toggler" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-orange-400"></span>
                    04 - The Toggler
                  </.link>

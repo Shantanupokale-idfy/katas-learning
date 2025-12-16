@@ -20,10 +20,10 @@ defmodule ElixirKatasWeb.Router do
     get "/", PageController, :home
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
       live "/katas", KatasIndexLive
-      live "/katas/01", Kata01HelloWorldLive
-      live "/katas/02", Kata02CounterLive
-      live "/katas/03", Kata03MirrorLive
-      live "/katas/04", Kata04TogglerLive
+      live "/katas/01-hello-world", Kata01HelloWorldLive
+      live "/katas/02-counter", Kata02CounterLive
+      live "/katas/03-mirror", Kata03MirrorLive
+      live "/katas/04-toggler", Kata04TogglerLive
     end
   end
 
