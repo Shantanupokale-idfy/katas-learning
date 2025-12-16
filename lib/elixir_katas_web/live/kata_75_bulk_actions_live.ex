@@ -89,8 +89,8 @@ defmodule ElixirKatasWeb.Kata75BulkActionsLive do
   end
 
   def handle_event("delete_selected", _, socket) do
-    Enum.each(socket.assigns.selected_ids, fn id ->
-      stream_delete_by_dom_id(socket, :items, "items-#{id}")
+    socket = Enum.reduce(socket.assigns.selected_ids, socket, fn id, acc ->
+      stream_delete_by_dom_id(acc, :items, "items-#{id}")
     end)
     
     {:noreply, assign(socket, :selected_ids, MapSet.new())}

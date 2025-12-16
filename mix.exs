@@ -62,10 +62,13 @@ defmodule ElixirKatas.MixProject do
       {:req, "~> 0.5"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.26"},
+      {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.2.0"},
+      {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:nimble_csv, "~> 1.2"},
+      {:mogrify, "~> 0.9.3"},
+      {:pdf_generator, "~> 0.6"},
       {:earmark, "~> 1.4"}
     ]
   end

@@ -12,6 +12,7 @@ defmodule ElixirKatas.Application do
       ElixirKatas.Repo,
       {DNSCluster, query: Application.get_env(:elixir_katas, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ElixirKatas.PubSub},
+      ElixirKatasWeb.Presence,
       # Start a worker by calling: ElixirKatas.Worker.start_link(arg)
       # {ElixirKatas.Worker, arg},
       # Start to serve requests, typically the last entry

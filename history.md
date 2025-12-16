@@ -82,3 +82,14 @@ This file tracks your progress through the Elixir Katas.
 | 68 - Changesets 101 | Completed | 2025-12-16 | Changeset basics |
 | 69 - The CRUD | Completed | 2025-12-16 | CRUD operations |
 | 70 - Optimistic UI | Completed | 2025-12-16 | Optimistic updates |
+| 71 - Streams Basic | Completed | 2025-12-16 | Stream operations |
+| 72 - Infinite Scroll | Enhanced | 2025-12-16 | IntersectionObserver hook |
+| 73 - Stream Insert/Delete | Completed | 2025-12-16 | Stream manipulation |
+| 74 - Stream Reset | Completed | 2025-12-16 | Stream filtering |
+| 75 - Bulk Actions | Enhanced | 2025-12-16 | Fixed bulk delete |
+| 76 - The Clock | Completed | 2025-12-16 | Server-side intervals |
+| 77 - The Ticker | Enhanced | 2025-12-16 | PubSub stock updates |
+| 78 - Chat Room | Enhanced | 2025-12-16 | Multi-user PubSub chat |
+| 79 - Typing Indicator | Enhanced | 2025-12-16 | PubSub typing events |
+| 80 - Presence List | Enhanced | 2025-12-16 | Phoenix.Presence tracking |
+| 81 - Live Cursor | Enhanced | 2025-12-16 | Multi-user cursor tracking |

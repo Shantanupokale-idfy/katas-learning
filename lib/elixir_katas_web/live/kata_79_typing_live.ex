@@ -2,17 +2,28 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
   use ElixirKatasWeb, :live_view
   import ElixirKatasWeb.KataComponents
 
+  @topic "typing:demo"
+  @typing_timeout 3000
+
   def mount(_params, _session, socket) do
     source_code = File.read!(__ENV__.file)
     notes_content = File.read!("notes/kata_79_typing_notes.md")
+
+    username = "User#{:rand.uniform(9999)}"
+
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
+    end
 
     socket =
       socket
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:typing, false)
+      |> assign(:typing_users, MapSet.new())
       |> assign(:message, "")
+      |> assign(:username, username)
+      |> assign(:timer_ref, nil)
 
     {:ok, socket}
   end
@@ -27,22 +38,28 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Show typing indicator when user is typing.
+          Multi-user typing indicators with PubSub. Open in multiple tabs to test!
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
+          <div class="mb-4 text-sm text-gray-600">
+            You are: <span class="font-medium text-indigo-600"><%= @username %></span>
+          </div>
+          
           <div class="mb-4 h-20 flex items-center">
-            <%= if @typing do %>
+            <%= if MapSet.size(@typing_users) > 0 do %>
               <div class="flex items-center gap-2 text-gray-500">
                 <div class="flex gap-1">
                   <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
                   <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
                   <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
                 </div>
-                <span class="text-sm">Someone is typing...</span>
+                <span class="text-sm">
+                  <%= typing_text(@typing_users) %>
+                </span>
               </div>
             <% else %>
-              <div class="text-gray-400 text-sm">Start typing to see the indicator</div>
+              <div class="text-gray-400 text-sm">No one is typing...</div>
             <% end %>
           </div>
           
@@ -51,9 +68,13 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
             phx-keyup="typing"
             phx-debounce="300"
             value={@message}
-            placeholder="Type something..."
+            placeholder="Type something to broadcast typing indicator..."
             class="w-full px-4 py-2 border rounded"
           />
+          
+          <div class="mt-4 text-xs text-gray-500">
+            Open this page in multiple browser tabs and type in different tabs to see typing indicators.
+          </div>
         </div>
       </div>
     </.kata_viewer>
@@ -62,10 +83,75 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
 
   def handle_event("typing", %{"value" => value}, socket) do
     typing = String.length(value) > 0
-    {:noreply, assign(socket, typing: typing, message: value)}
+    
+    if typing do
+      # Broadcast that this user is typing
+      Phoenix.PubSub.broadcast(
+        ElixirKatas.PubSub,
+        @topic,
+        {:user_typing, socket.assigns.username}
+      )
+      
+      # Cancel existing timer if any
+      if socket.assigns.timer_ref do
+        Process.cancel_timer(socket.assigns.timer_ref)
+      end
+      
+      # Set a timer to stop typing after timeout
+      timer_ref = Process.send_after(self(), :stop_typing, @typing_timeout)
+      
+      {:noreply, assign(socket, message: value, timer_ref: timer_ref)}
+    else
+      # User cleared the input, stop typing
+      Phoenix.PubSub.broadcast(
+        ElixirKatas.PubSub,
+        @topic,
+        {:user_stopped_typing, socket.assigns.username}
+      )
+      
+      {:noreply, assign(socket, message: value, timer_ref: nil)}
+    end
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
+  end
+
+  def handle_info({:user_typing, username}, socket) do
+    # Don't show own typing indicator
+    if username != socket.assigns.username do
+      typing_users = MapSet.put(socket.assigns.typing_users, username)
+      {:noreply, assign(socket, :typing_users, typing_users)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info({:user_stopped_typing, username}, socket) do
+    typing_users = MapSet.delete(socket.assigns.typing_users, username)
+    {:noreply, assign(socket, :typing_users, typing_users)}
+  end
+
+  def handle_info(:stop_typing, socket) do
+    # Broadcast that this user stopped typing
+    Phoenix.PubSub.broadcast(
+      ElixirKatas.PubSub,
+      @topic,
+      {:user_stopped_typing, socket.assigns.username}
+    )
+    
+    {:noreply, assign(socket, timer_ref: nil)}
+  end
+
+  defp typing_text(typing_users) do
+    users = MapSet.to_list(typing_users)
+    count = length(users)
+    
+    cond do
+      count == 1 -> "#{hd(users)} is typing..."
+      count == 2 -> "#{Enum.join(users, " and ")} are typing..."
+      count > 2 -> "#{count} people are typing..."
+      true -> ""
+    end
   end
 end
