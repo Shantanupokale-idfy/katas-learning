@@ -5,14 +5,15 @@ defmodule ElixirKatas.Tasky.Todo do
   schema "todos" do
     field :title, :string
     field :is_complete, :boolean, default: false
+    field :is_favorite, :boolean, default: false
 
-    timestamps(type: :utc_datetime)
+    timestamps()
   end
 
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :is_complete])
-    |> validate_required([:title, :is_complete])
+    |> cast(attrs, [:title, :is_complete, :is_favorite])
+    |> validate_required([:title])
   end
 end

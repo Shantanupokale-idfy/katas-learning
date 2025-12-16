@@ -45,6 +45,12 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end
 
+  def handle_event("toggle_favorite", %{"id" => id}, socket) do
+    todo = Tasky.get_todo!(id)
+    {:ok, updated_todo} = Tasky.update_todo(todo, %{is_favorite: !todo.is_favorite})
+    {:noreply, stream_insert(socket, :todos, updated_todo)}
+  end
+
   def handle_event("confirm_delete", %{"id" => id}, socket) do
     {:noreply,
      socket
@@ -126,9 +132,18 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                   <%= todo.title %>
                 </span>
               </div>
-              <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                <.icon name="hero-trash" class="h-5 w-5" />
-              </button>
+              <div class="flex items-center gap-2">
+                <button phx-click="toggle_favorite" phx-value-id={todo.id} class="focus:outline-none transition-transform active:scale-95 group/fav">
+                   <%= if todo.is_favorite do %>
+                     <.icon name="hero-star-solid" class="h-5 w-5 text-yellow-500" />
+                   <% else %>
+                     <.icon name="hero-star" class="h-5 w-5 text-gray-300 group-hover/fav:text-yellow-400" />
+                   <% end %>
+                </button>
+                <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <.icon name="hero-trash" class="h-5 w-5" />
+                </button>
+              </div>
             </li>
           </ul>
           

@@ -112,3 +112,4 @@ This file tracks your progress through the Elixir Katas.
 |:---|:---|:---|:---|
 | Tasky Level 1 | Completed | 2025-12-16 | Basic CRUD (List, Add, Toggle) with Tailwind |
 | Tasky Level 2 | Completed | 2025-12-16 | Added Delete Button & Confirmation Modal |
+| Tasky Level 3 | Completed | 2025-12-16 | Added Favorites Logic & UI (Star Icon) |
