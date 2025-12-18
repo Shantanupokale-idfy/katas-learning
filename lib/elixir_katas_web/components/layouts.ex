@@ -38,7 +38,7 @@ defmodule ElixirKatasWeb.Layouts do
       <div class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col" data-layout-source="custom-app">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
           <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-            Elixir LiveView Katas
+            Phoenix LiveView Katas
           </span>
         </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="sidebar-nav" id="sidebar-nav">
@@ -469,7 +469,7 @@ defmodule ElixirKatasWeb.Layouts do
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
         <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 md:hidden">
-             <span class="text-lg font-bold">Elixir LiveView Katas</span>
+             <span class="text-lg font-bold">Phoenix LiveView Katas</span>
              <!-- Simple mobile menu placeholder or just basic nav -->
         </header>
 
@@ -497,8 +497,8 @@ defmodule ElixirKatasWeb.Layouts do
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="csrf-token" content={get_csrf_token()} />
-        <.live_title suffix=" · Elixir LiveView Katas">
-          {assigns[:page_title] || "Elixir LiveView Katas"}
+        <.live_title suffix=" · Phoenix LiveView Katas">
+          {assigns[:page_title] || "Phoenix LiveView Katas"}
         </.live_title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -536,7 +536,7 @@ defmodule ElixirKatasWeb.Layouts do
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
               <div class="flex items-center space-x-4">
                 <.link navigate="/" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-                  Elixir LiveView Katas
+                  Phoenix LiveView Katas
                 </.link>
                 <span class="text-gray-400">|</span>
                 <.link navigate="/usecases" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">

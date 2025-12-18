@@ -10,7 +10,7 @@ This file serves as a central hub for navigating the project's documentation.
 
 ## Quick Links
 
-- [Elixir LiveView Katas Web Source](lib/elixir_katas_web)
+- [Phoenix LiveView Katas Web Source](lib/elixir_katas_web)
 - [LiveViews](lib/elixir_katas_web/live)
 - [Router](lib/elixir_katas_web/router.ex)
 

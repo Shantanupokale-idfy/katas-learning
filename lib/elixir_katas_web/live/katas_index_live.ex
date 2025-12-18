@@ -10,7 +10,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
     ~H"""
     <div class="max-w-4xl mx-auto py-8">
       <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
-        Welcome to Elixir LiveView Katas
+        Welcome to Phoenix LiveView Katas
       </h1>
       <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
         Select a kata from the sidebar or the list below to begin your journey.

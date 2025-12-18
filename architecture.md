@@ -1,6 +1,6 @@
-# Elixir LiveView Katas Architecture
+# Phoenix LiveView Katas Architecture
 
-This document outlines the architecture of the Elixir LiveView Katas application and provides a guide for adding new katas.
+This document outlines the architecture of the Phoenix LiveView Katas application and provides a guide for adding new katas.
 
 ## Architecture Overview
 

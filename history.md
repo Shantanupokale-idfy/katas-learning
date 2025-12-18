@@ -1,6 +1,6 @@
-# Elixir LiveView Katas history
+# Phoenix LiveView Katas history
 
-This file tracks your progress through the Elixir LiveView Katas.
+This file tracks your progress through the Phoenix LiveView Katas.
 
 ## Progress Overview
 | Kata | Status | Completion Date | Notes |

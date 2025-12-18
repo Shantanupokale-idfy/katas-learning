@@ -1,4 +1,4 @@
-# Elixir LiveView Katas Curriculum: The 104
+# Phoenix LiveView Katas Curriculum: The 104
 
 A comprehensive path to mastery. Target: Complete all 104 to become a LiveView Expert.
 
