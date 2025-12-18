@@ -310,6 +310,10 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     end
   end
 
+  defp is_image?(content_type) do
+    String.starts_with?(content_type, "image/")
+  end
+
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -618,19 +622,30 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
 
             <div class="grid grid-cols-2 gap-4 mb-4">
                <%= for attachment <- @selected_todo.attachments do %>
-                 <div class="relative flex items-center p-2 rounded border border-gray-200 bg-gray-50 group">
-                    <div class="flex-1 min-w-0">
-                       <a href={attachment.path} target="_blank" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 truncate block">
-                         <%= attachment.filename %>
-                       </a>
-                       <p class="text-xs text-gray-500"><%= humanize_size(attachment.size) %></p>
+                 <div class="relative flex flex-col p-2 rounded border border-gray-200 bg-gray-50 group">
+                    <div class="flex items-center mb-2">
+                        <div class="flex-1 min-w-0">
+                           <a href={attachment.path} target="_blank" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 truncate block">
+                             <%= attachment.filename %>
+                           </a>
+                           <p class="text-xs text-gray-500"><%= humanize_size(attachment.size) %></p>
+                        </div>
+                        <button phx-click="delete_attachment" phx-value-id={attachment.id} class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">
+                          <.icon name="hero-x-mark" class="h-4 w-4" />
+                        </button>
                     </div>
-                    <button phx-click="delete_attachment" phx-value-id={attachment.id} class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">
-                      <.icon name="hero-x-mark" class="h-4 w-4" />
-                    </button>
+                    
+                    <%= if is_image?(attachment.content_type) do %>
+                      <div class="mt-2 text-center bg-gray-200 rounded overflow-hidden">
+                        <img src={attachment.path} class="max-h-32 mx-auto object-contain" />
+                      </div>
+                    <% end %>
                  </div>
                <% end %>
             </div>
+            
+            <!-- ... (upload form unchanged) ... -->
+
 
              <form phx-submit="save_attachment" phx-change="validate_upload">
                <div class="flex items-center justify-center w-full" phx-drop-target={@uploads.attachment.ref}>

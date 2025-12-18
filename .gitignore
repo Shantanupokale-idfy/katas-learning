@@ -1,3 +1,6 @@
+#uploads
+priv/static/uploads
+
 # SQLite temporary files
 *.db-shm
 *.db-wal

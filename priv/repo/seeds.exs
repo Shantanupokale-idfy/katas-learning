@@ -67,4 +67,13 @@ alias ElixirKatas.Tasky
   "user_id" => user.id
 })
 
-IO.puts("Created sample Todo with Subtasks and Comments.")
+# Add attachment
+{:ok, _} = Tasky.create_attachment(%{
+  "filename" => "demo-image.svg",
+  "content_type" => "image/svg+xml",
+  "path" => "/uploads/demo-image.svg",
+  "size" => 1234,
+  "todo_id" => todo.id
+})
+
+IO.puts("Created sample Todo with Subtasks, Comments, and Attachment.")
