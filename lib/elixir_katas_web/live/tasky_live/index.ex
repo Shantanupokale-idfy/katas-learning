@@ -18,6 +18,8 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
      |> assign(:show_confirm_modal, false)
      |> assign(:confirm_delete_id, nil)
      |> assign(:categories, categories)
+     |> assign(:selected_todo, nil)
+     |> allow_upload(:attachment, accept: ~w(.jpg .jpeg .png .pdf .txt), max_entries: 1)
      |> stream(:todos, [])}
   end
 
@@ -137,6 +139,104 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
      |> assign(:show_confirm_modal, false)}
   end
 
+  # Blue Belt Handlers
+
+  def handle_event("open_todo", %{"id" => id}, socket) do
+    todo = Tasky.get_todo!(id)
+    {:noreply, assign(socket, selected_todo: todo)}
+  end
+
+  def handle_event("close_todo", _params, socket) do
+    {:noreply, assign(socket, selected_todo: nil)}
+  end
+
+  def handle_event("save_subtask", %{"subtask" => subtask_params}, socket) do
+    params = Map.put(subtask_params, "todo_id", socket.assigns.selected_todo.id)
+    
+    case Tasky.create_subtask(params) do
+      {:ok, _subtask} ->
+        # Refresh the selected todo to show new subtask
+        updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+        {:noreply, assign(socket, selected_todo: updated_todo)}
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Could not create subtask")}
+    end
+  end
+
+  def handle_event("toggle_subtask", %{"id" => id}, socket) do
+    subtask = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Subtask, id)
+    {:ok, _} = Tasky.update_subtask(subtask, %{is_complete: !subtask.is_complete})
+    
+    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    {:noreply, assign(socket, selected_todo: updated_todo)}
+  end
+
+  def handle_event("delete_subtask", %{"id" => id}, socket) do
+    subtask = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Subtask, id)
+    {:ok, _} = Tasky.delete_subtask(subtask)
+
+    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    {:noreply, assign(socket, selected_todo: updated_todo)}
+  end
+
+  def handle_event("save_comment", %{"comment" => comment_params}, socket) do
+    params = comment_params
+      |> Map.put("todo_id", socket.assigns.selected_todo.id)
+      |> Map.put("user_id", socket.assigns.current_scope.user.id)
+
+    case Tasky.create_comment(params) do
+      {:ok, _comment} ->
+        updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+        {:noreply, assign(socket, selected_todo: updated_todo)}
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Could not create comment")}
+    end
+  end
+
+  def handle_event("validate_upload", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("save_attachment", _params, socket) do
+    uploaded_files =
+      consume_uploaded_entries(socket, :attachment, fn %{path: path}, entry ->
+        dest_dir = Path.join(["priv", "static", "uploads"])
+        File.mkdir_p!(dest_dir)
+        dest = Path.join(dest_dir, "#{entry.uuid}-#{entry.client_name}")
+        File.cp!(path, dest)
+        
+        # Return the params needed to create the attachment record
+        {:ok, %{
+          "filename" => entry.client_name,
+          "content_type" => entry.client_type,
+          "path" => "/uploads/#{entry.uuid}-#{entry.client_name}",
+          "size" => entry.client_size,
+          "todo_id" => socket.assigns.selected_todo.id
+        }}
+      end)
+
+    # Create records for uploaded files
+    Enum.each(uploaded_files, fn attrs ->
+      Tasky.create_attachment(attrs)
+    end)
+
+    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    {:noreply, assign(socket, selected_todo: updated_todo)}
+  end
+
+  def handle_event("delete_attachment", %{"id" => id}, socket) do
+    attachment = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Attachment, id)
+    
+    # Try to delete the file from disk (optional, but good practice)
+    file_path = Path.join(["priv", "static", attachment.path])
+    File.rm(file_path)
+
+    {:ok, _} = Tasky.delete_attachment(attachment)
+    
+    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    {:noreply, assign(socket, selected_todo: updated_todo)}
+  end
+
   def handle_info({:todo_created, todo}, socket) do
     {:noreply, stream_insert(socket, :todos, todo, at: 0)}
   end
@@ -199,6 +299,14 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
           days_until <= 7 -> "Due in #{days_until} days"
           true -> "Due #{Calendar.strftime(due_date, "%b %d, %Y")}"
         end
+    end
+  end
+
+  defp humanize_size(size) do
+    cond do
+      size < 1024 -> "#{size} B"
+      size < 1024 * 1024 -> "#{Float.round(size / 1024, 1)} KB"
+      true -> "#{Float.round(size / (1024 * 1024), 1)} MB"
     end
   end
 
@@ -318,9 +426,9 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                   </button>
                   <div class="ml-3 flex-1">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <span class={"text-sm font-medium #{if todo.is_complete, do: "text-gray-400 line-through", else: "text-gray-900"}"}>
+                      <button phx-click="open_todo" phx-value-id={todo.id} class={"text-sm font-medium hover:underline text-left #{if todo.is_complete, do: "text-gray-400 line-through", else: "text-gray-900"}"}>
                         <%= todo.title %>
-                      </span>
+                      </button>
                       
                       <!-- Priority Badge -->
                       <%= if todo.priority do %>
@@ -425,6 +533,166 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                 Delete
               </button>
             </div>
+        </div>
+      </.modal>
+      <% end %>
+
+      <%= if @selected_todo do %>
+      <.modal id="todo_detail_modal" show={true} on_cancel={Phoenix.LiveView.JS.push("close_todo")}>
+        <div class="p-4 sm:px-6">
+          <!-- Header -->
+          <!-- Header -->
+          <div class="mb-6 border-b pb-4 flex justify-between items-start">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900"><%= @selected_todo.title %></h2>
+              <div class="mt-2 flex items-center gap-2">
+                 <%= if @selected_todo.category do %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                    <%= @selected_todo.category %>
+                  </span>
+                 <% end %>
+                 <%= if @selected_todo.priority do %>
+                  <span class={"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium #{priority_class(@selected_todo.priority)}"}>
+                    <%= String.capitalize(@selected_todo.priority) %>
+                  </span>
+                 <% end %>
+                  <%= if @selected_todo.due_date do %>
+                      <span class={"text-xs #{due_date_class(@selected_todo.due_date)}"}>
+                          <.icon name="hero-calendar" class="h-3 w-3 inline" />
+                          <%= format_due_date(@selected_todo.due_date) %>
+                      </span>
+                  <% end %>
+              </div>
+            </div>
+            <button phx-click="close_todo" class="text-gray-400 hover:text-gray-500 transition-colors">
+              <.icon name="hero-x-mark" class="h-6 w-6" />
+              <span class="sr-only">Close</span>
+            </button>
+          </div>
+
+          <!-- Subtasks Section -->
+          <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <.icon name="hero-list-bullet" class="h-5 w-5 text-gray-500" />
+              Subtasks
+            </h3>
+            
+            <div class="space-y-2 mb-4">
+              <%= for subtask <- @selected_todo.subtasks do %>
+                <div class="flex items-center group">
+                  <button phx-click="toggle_subtask" phx-value-id={subtask.id} class="focus:outline-none">
+                    <%= if subtask.is_complete do %>
+                      <.icon name="hero-check-circle-solid" class="h-5 w-5 text-green-500" />
+                    <% else %>
+                      <.icon name="hero-check-circle" class="h-5 w-5 text-gray-300 hover:text-green-500" />
+                    <% end %>
+                  </button>
+                  <span class={"ml-2 text-sm flex-1 #{if subtask.is_complete, do: "text-gray-400 line-through", else: "text-gray-700"}"}>
+                    <%= subtask.title %>
+                  </span>
+                  <button phx-click="delete_subtask" phx-value-id={subtask.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                    <.icon name="hero-trash" class="h-4 w-4" />
+                  </button>
+                </div>
+              <% end %>
+              
+              <%= if Enum.empty?(@selected_todo.subtasks) do %>
+                <p class="text-sm text-gray-400 italic">No subtasks yet.</p>
+              <% end %>
+            </div>
+
+            <form phx-submit="save_subtask" class="flex gap-2">
+              <input type="text" name="subtask[title]" placeholder="Add a subtask..." required class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+              <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none">
+                Add
+              </button>
+            </form>
+          </div>
+
+          <!-- Attachments Section -->
+          <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <.icon name="hero-paper-clip" class="h-5 w-5 text-gray-500" />
+              Attachments
+            </h3>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+               <%= for attachment <- @selected_todo.attachments do %>
+                 <div class="relative flex items-center p-2 rounded border border-gray-200 bg-gray-50 group">
+                    <div class="flex-1 min-w-0">
+                       <a href={attachment.path} target="_blank" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 truncate block">
+                         <%= attachment.filename %>
+                       </a>
+                       <p class="text-xs text-gray-500"><%= humanize_size(attachment.size) %></p>
+                    </div>
+                    <button phx-click="delete_attachment" phx-value-id={attachment.id} class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">
+                      <.icon name="hero-x-mark" class="h-4 w-4" />
+                    </button>
+                 </div>
+               <% end %>
+            </div>
+
+             <form phx-submit="save_attachment" phx-change="validate_upload">
+               <div class="flex items-center justify-center w-full" phx-drop-target={@uploads.attachment.ref}>
+                  <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                           <.icon name="hero-cloud-arrow-up" class="h-8 w-8 text-gray-400 mb-2" />
+                          <p class="text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                      </div>
+                      <.live_file_input upload={@uploads.attachment} class="hidden" />
+                  </label>
+               </div>
+               
+               <%= for entry <- @uploads.attachment.entries do %>
+                 <div class="mt-2 flex items-center justify-between text-sm text-gray-600 bg-gray-100 p-2 rounded">
+                   <span><%= entry.client_name %></span>
+                   <button type="submit" class="text-indigo-600 font-medium hover:text-indigo-500">Upload</button>
+                 </div>
+               <% end %>
+             </form>
+          </div>
+
+          <!-- Comments Section -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <.icon name="hero-chat-bubble-left" class="h-5 w-5 text-gray-500" />
+              Comments
+            </h3>
+            
+            <div class="space-y-4 mb-4 max-h-60 overflow-y-auto">
+              <%= for comment <- @selected_todo.comments do %>
+                <div class="flex space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                      <%= String.at(comment.user.email, 0) |> String.upcase() %>
+                    </div>
+                  </div>
+                  <div class="flex-1 bg-gray-50 rounded-lg px-4 py-2">
+                     <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-bold text-gray-900"><%= comment.user.email %></h4>
+                        <span class="text-xs text-gray-500"><%= Calendar.strftime(comment.inserted_at, "%b %d, %H:%M") %></span>
+                     </div>
+                     <p class="text-sm text-gray-700 mt-1"><%= comment.content %></p>
+                  </div>
+                </div>
+              <% end %>
+               <%= if Enum.empty?(@selected_todo.comments) do %>
+                <p class="text-sm text-gray-400 italic">No comments yet.</p>
+              <% end %>
+            </div>
+            
+            <form phx-submit="save_comment">
+              <div class="mt-2">
+                <textarea name="comment[content]" rows="2" required placeholder="Add a comment..." class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+              </div>
+              <div class="mt-2 flex justify-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
+                  Post
+                </button>
+              </div>
+            </form>
+          </div>
+
         </div>
       </.modal>
       <% end %>

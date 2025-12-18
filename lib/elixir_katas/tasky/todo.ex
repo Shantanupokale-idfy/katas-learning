@@ -11,6 +11,9 @@ defmodule ElixirKatas.Tasky.Todo do
     field :due_date, :date
 
     belongs_to :user, ElixirKatas.Accounts.User
+    has_many :subtasks, ElixirKatas.Tasky.Subtask, on_delete: :delete_all
+    has_many :comments, ElixirKatas.Tasky.Comment, on_delete: :delete_all
+    has_many :attachments, ElixirKatas.Tasky.Attachment, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

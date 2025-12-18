@@ -172,7 +172,10 @@ defmodule ElixirKatas.Tasky do
       ** (Ecto.NoResultsError)
 
   """
-  def get_todo!(id), do: Repo.get!(Todo, id)
+  def get_todo!(id) do
+    Repo.get!(Todo, id)
+    |> Repo.preload([:subtasks, comments: [:user], attachments: []])
+  end
 
   @doc """
   Creates a todo.
@@ -267,5 +270,63 @@ defmodule ElixirKatas.Tasky do
       where: t.user_id == ^user_id and not is_nil(t.due_date) and t.due_date < ^today
 
     Repo.aggregate(query, :count, :id)
+  end
+  alias ElixirKatas.Tasky.Subtask
+  alias ElixirKatas.Tasky.Comment
+  alias ElixirKatas.Tasky.Attachment
+
+  # ... Subtasks ...
+  def list_subtasks(todo_id) do
+    Repo.all(from s in Subtask, where: s.todo_id == ^todo_id, order_by: [asc: s.inserted_at])
+  end
+
+  def create_subtask(attrs) do
+    %Subtask{}
+    |> Subtask.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_subtask(%Subtask{} = subtask, attrs) do
+    subtask
+    |> Subtask.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_subtask(%Subtask{} = subtask) do
+    Repo.delete(subtask)
+  end
+
+  def change_subtask(%Subtask{} = subtask, attrs \\ %{}) do
+    Subtask.changeset(subtask, attrs)
+  end
+
+  # ... Comments ...
+  def list_comments(todo_id) do
+    Repo.all(from c in Comment, where: c.todo_id == ^todo_id, preload: [:user], order_by: [asc: c.inserted_at])
+  end
+
+  def create_comment(attrs) do
+    %Comment{}
+    |> Comment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_comment(%Comment{} = comment, attrs \\ %{}) do
+    Comment.changeset(comment, attrs)
+  end
+
+  # ... Attachments ...
+  def list_attachments(todo_id) do
+    Repo.all(from a in Attachment, where: a.todo_id == ^todo_id, order_by: [desc: a.inserted_at])
+  end
+
+  def create_attachment(attrs) do
+    %Attachment{}
+    |> Attachment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def delete_attachment(%Attachment{} = attachment) do
+    Repo.delete(attachment)
   end
 end
