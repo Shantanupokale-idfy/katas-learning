@@ -241,6 +241,9 @@ This file tracks your progress through the Phoenix LiveView Katas.
     - Simplified `kata_01_hello_world_live.ex` by removing the static console mockup `div` to declutter the UI.
     - (Note: "Click me" button logic preserved/toggled during experimental refactoring).
 
+
+4. User wise kata editing in progress
+
 **Files Modified**:
 - `lib/elixir_katas_web/live/kata_live.ex`
 - `lib/elixir_katas/katas/user_kata.ex`
