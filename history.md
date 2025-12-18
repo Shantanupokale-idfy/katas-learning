@@ -183,3 +183,39 @@ This file tracks your progress through the Elixir Katas.
 - Purple Belt: Real-time collaboration, task assignment
 - Brown Belt: Drag & drop, bulk actions, export/import
 - Black Belt: Email notifications, mobile optimization, keyboard shortcuts
+
+### 2025-12-18 - Tasky Blue Belt Implementation
+
+**Objective**: Add deep-dive features to Tasky: Subtasks, Comments, and Attachments.
+
+**Changes Made**:
+
+1. **Database & Schema**
+   - Created `Subtask` schema (title, is_complete, todo_id)
+   - Created `Comment` schema (content, user_id, todo_id)
+   - Created `Attachment` schema (filename, content_type, path, size, todo_id)
+   - Updated `Todo` schema with `has_many` associations for all above.
+
+2. **Context**
+   - Added CRUD functions for Subtasks, Comments, and Attachments in `Tasky` context.
+   - Updated `get_todo!` to preload these associations.
+
+3. **Frontend - Task Detail Modal**
+   - Implemented a comprehensive modal view when clicking a task title.
+   - **Subtasks**: List view with toggle checkboxes and inline addition form.
+   - **Attachments**: File upload support (drag & drop), list view with download/open support, and **image previews**.
+   - **Comments**: Comment stream with user email and timestamp.
+
+4. **UX Improvements**
+   - **Attachment Previews**: Added logic to display inline previews for image attachments.
+   - **Delete Confirmation**: Implemented a generic `confirm_delete` modal that works for both Todos (Tasky Level 2) and Attachments.
+   - **Visuals**: Replaced 'x' icon with trash can for deletes; ensuring modal stacking works correctly.
+
+**Files Modified**:
+- `priv/repo/migrations/20251218053816_add_blue_belt_tables.exs`
+- `lib/elixir_katas/tasky/subtask.ex`, `comment.ex`, `attachment.ex`
+- `lib/elixir_katas/tasky.ex`
+- `lib/elixir_katas_web/live/tasky_live/index.ex`
+
+**Next Steps**:
+- Purple Belt: Real-time collaboration (Presence, Assignments)
