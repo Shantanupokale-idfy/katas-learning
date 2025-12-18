@@ -25,7 +25,7 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLive do
 
         <div class="mt-8 flex gap-4">
           <button phx-click="toggle" class="btn btn-primary">
-            {if @clicked, do: "You clicked me!", else: "Click me!"}
+            {if @clicked, do: "You clicked me!!!", else: "Click me!"}
           </button>
         </div>
       </div>

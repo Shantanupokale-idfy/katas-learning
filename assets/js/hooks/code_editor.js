@@ -5,6 +5,7 @@ import { oneDark } from "@codemirror/theme-one-dark"
 
 export default {
     mounted() {
+        this.timer = null
         this.initEditor()
     },
 
@@ -24,9 +25,12 @@ export default {
                     oneDark,
                     EditorView.updateListener.of((update) => {
                         if (update.docChanged) {
-                            this.pushEventTo(this.el, "save_source", {
-                                source: update.state.doc.toString()
-                            })
+                            clearTimeout(this.timer)
+                            this.timer = setTimeout(() => {
+                                this.pushEventTo(this.el, "save_source", {
+                                    source: update.state.doc.toString()
+                                })
+                            }, 2000)
                         }
                     })
                 ]

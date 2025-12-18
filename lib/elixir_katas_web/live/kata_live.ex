@@ -33,11 +33,23 @@ defmodule ElixirKatasWeb.KataLive do
          |> assign_defaults()}
       end
 
+      def handle_params(params, url, socket) do
+        tab = params["tab"] || "notes"
+        
+        # safely parse key parts
+        path = URI.parse(url).path
+        
+        {:noreply, 
+         socket
+         |> assign(active_tab: tab)
+         |> assign(current_path: path)}
+      end
+
       # Allow overriding assign_defaults for generic setup
       defp assign_defaults(socket), do: socket
 
       def handle_event("set_tab", %{"tab" => tab}, socket) do
-        {:noreply, assign(socket, active_tab: tab)}
+        {:noreply, push_patch(socket, to: socket.assigns.current_path <> "?tab=#{tab}")}
       end
 
       def handle_event("save_source", %{"source" => source}, socket) do
