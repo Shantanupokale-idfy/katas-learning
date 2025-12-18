@@ -8,7 +8,7 @@ defmodule ElixirKatasWeb.Kata45TabsUrlLive do
 
     socket =
       socket
-      |> assign(active_tab: "interactive")
+      |> assign(active_tab: "notes")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
       |> assign(:content_tab, "profile")

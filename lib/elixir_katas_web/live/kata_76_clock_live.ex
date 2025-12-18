@@ -12,7 +12,7 @@ defmodule ElixirKatasWeb.Kata76ClockLive do
 
     socket =
       socket
-      |> assign(active_tab: "interactive")
+      |> assign(active_tab: "notes")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
       |> assign(:current_time, DateTime.utc_now())

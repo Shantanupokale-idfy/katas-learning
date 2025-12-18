@@ -9,7 +9,7 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
 
     {:ok, 
      socket
-     |> assign(active_tab: "interactive")
+     |> assign(active_tab: "notes")
      |> assign(selected_tab: :home)
      |> assign(source_code: source_code)
      |> assign(notes_content: notes_content)}

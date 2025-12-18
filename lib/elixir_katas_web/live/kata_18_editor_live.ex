@@ -14,7 +14,7 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
 
     {:ok, 
      socket
-     |> assign(active_tab: "interactive")
+     |> assign(active_tab: "notes")
      |> assign(source_code: source_code)
      |> assign(notes_content: notes_content)
      |> assign(items: initial_items)

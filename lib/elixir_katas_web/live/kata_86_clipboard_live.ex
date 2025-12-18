@@ -8,7 +8,7 @@ defmodule ElixirKatasWeb.Kata86ClipboardCopyLive do
 
     socket =
       socket
-      |> assign(active_tab: "interactive")
+      |> assign(active_tab: "notes")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
       |> assign(:text_to_copy, "Hello from LiveView!")

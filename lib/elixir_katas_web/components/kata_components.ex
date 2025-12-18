@@ -14,14 +14,14 @@ defmodule ElixirKatasWeb.KataComponents do
         <h2 class="text-xl font-bold">{@title}</h2>
         
         <div class="flex gap-2">
+          <.tab_button active={@active_tab == "notes"} phx-click="set_tab" phx-value-tab="notes">
+            Description
+          </.tab_button>
           <.tab_button active={@active_tab == "interactive"} phx-click="set_tab" phx-value-tab="interactive">
             Interactive
           </.tab_button>
           <.tab_button active={@active_tab == "source"} phx-click="set_tab" phx-value-tab="source">
             Source Code
-          </.tab_button>
-          <.tab_button active={@active_tab == "notes"} phx-click="set_tab" phx-value-tab="notes">
-            Notes
           </.tab_button>
         </div>
       </div>

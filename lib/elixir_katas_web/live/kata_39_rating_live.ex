@@ -8,7 +8,7 @@ defmodule ElixirKatasWeb.Kata39RatingLive do
 
     socket =
       socket
-      |> assign(active_tab: "interactive")
+      |> assign(active_tab: "notes")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
       |> assign(:rating, 0) # 0 to 5
