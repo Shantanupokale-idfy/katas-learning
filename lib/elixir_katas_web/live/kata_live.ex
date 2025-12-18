@@ -41,7 +41,9 @@ defmodule ElixirKatasWeb.KataLive do
                user_kata ->
                  # Restore user's session to the hot seat
                  if Application.get_env(:elixir_katas, :env) != :test do
-                   File.write!(source_code_file, user_kata.source_code)
+                   if File.read!(source_code_file) != user_kata.source_code do
+                     File.write!(source_code_file, user_kata.source_code)
+                   end
                  end
                  {user_kata.source_code, false}
              end
