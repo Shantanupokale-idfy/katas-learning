@@ -37,3 +37,6 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLive do
     {:noreply, update(socket, :clicked, &(!&1))}
   end
 end
+ked, &(!&1))}
+  end
+end

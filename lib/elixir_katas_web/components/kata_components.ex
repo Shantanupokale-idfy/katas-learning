@@ -7,13 +7,15 @@ defmodule ElixirKatasWeb.KataComponents do
   attr :notes_content, :string, required: true
   slot :inner_block, required: true
   
+  attr :read_only, :boolean, default: false
+  
   def kata_viewer(assigns) do
     ~H"""
     <div class="flex flex-col h-full">
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-4 py-2">
         <h2 class="text-xl font-bold">{@title}</h2>
         
-        <div class="flex gap-2">
+        <div class="flex gap-2 items-center">
           <.tab_button active={@active_tab == "notes"} phx-click="set_tab" phx-value-tab="notes">
             Description
           </.tab_button>
@@ -23,6 +25,18 @@ defmodule ElixirKatasWeb.KataComponents do
           <.tab_button active={@active_tab == "source"} phx-click="set_tab" phx-value-tab="source">
             Source Code
           </.tab_button>
+          
+          <%= if @read_only do %>
+             <span class="ml-2 px-2 py-1 text-xs font-semibold bg-gray-200 text-gray-700 rounded-full dark:bg-gray-700 dark:text-gray-300">
+               Read Only
+             </span>
+          <% else %>
+             <%= if @active_tab == "source" do %>
+                <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="ml-2 btn btn-xs btn-outline btn-error">
+                  Revert to Original
+                </button>
+             <% end %>
+          <% end %>
         </div>
       </div>
 
@@ -32,11 +46,12 @@ defmodule ElixirKatasWeb.KataComponents do
             {render_slot(@inner_block)}
           
           <% "source" -> %>
-            <div class="mockup-code w-full p-0 overflow-hidden">
+            <div class="mockup-code w-full p-0 overflow-hidden relative">
               <div 
                 id={"editor-#{@title |> slugify()}"}
                 phx-hook="CodeEditor" 
-                data-content={@source_code} 
+                data-content={@source_code}
+                data-read-only={"#{@read_only}"}
                 phx-update="ignore"
                 class="w-full text-sm"
               ></div>

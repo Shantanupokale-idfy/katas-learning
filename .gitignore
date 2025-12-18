@@ -1,7 +1,10 @@
 #uploads
 priv/static/uploads
 
+*.bak
+
 # SQLite temporary files
+*_test.db
 *.db-shm
 *.db-wal
 

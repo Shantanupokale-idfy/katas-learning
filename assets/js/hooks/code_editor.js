@@ -15,6 +15,7 @@ export default {
 
     initEditor() {
         const initialContent = this.el.dataset.content
+        const isReadOnly = this.el.dataset.readOnly === "true"
 
         this.editor = new EditorView({
             state: EditorState.create({
@@ -23,8 +24,9 @@ export default {
                     basicSetup,
                     elixir(),
                     oneDark,
+                    EditorState.readOnly.of(isReadOnly),
                     EditorView.updateListener.of((update) => {
-                        if (update.docChanged) {
+                        if (update.docChanged && !isReadOnly) {
                             clearTimeout(this.timer)
                             this.timer = setTimeout(() => {
                                 this.pushEventTo(this.el, "save_source", {
