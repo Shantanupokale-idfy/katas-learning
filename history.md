@@ -1,6 +1,6 @@
-# Elixir Katas history
+# Elixir LiveView Katas history
 
-This file tracks your progress through the Elixir Katas.
+This file tracks your progress through the Elixir LiveView Katas.
 
 ## Progress Overview
 | Kata | Status | Completion Date | Notes |

@@ -1,6 +1,6 @@
-# Elixir Katas Architecture
+# Elixir LiveView Katas Architecture
 
-This document outlines the architecture of the Elixir Katas application and provides a guide for adding new katas.
+This document outlines the architecture of the Elixir LiveView Katas application and provides a guide for adding new katas.
 
 ## Architecture Overview
 
