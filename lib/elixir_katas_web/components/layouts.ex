@@ -35,7 +35,7 @@ defmodule ElixirKatasWeb.Layouts do
     ~H"""
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
-      <div class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col" data-layout-source="custom-app">
+      <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="custom-app">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
           <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
             Phoenix LiveView Katas
@@ -468,9 +468,20 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 md:hidden">
-             <span class="text-lg font-bold">Phoenix LiveView Katas</span>
-             <!-- Simple mobile menu placeholder or just basic nav -->
+        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <!-- Burger Menu Button -->
+          <button
+            id="sidebar-toggle"
+            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onclick="toggleSidebar()"
+            aria-label="Toggle sidebar"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <span class="text-lg font-bold md:hidden">Phoenix LiveView Katas</span>
+          <div class="w-10"></div> <!-- Spacer for mobile centering -->
         </header>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
@@ -481,6 +492,18 @@ defmodule ElixirKatasWeb.Layouts do
         </main>
       </div>
     </div>
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const isHidden = sidebar.classList.contains('-ml-64');
+        
+        if (isHidden) {
+          sidebar.classList.remove('-ml-64');
+        } else {
+          sidebar.classList.add('-ml-64');
+        }
+      }
+    </script>
     """
   end
 
