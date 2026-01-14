@@ -30,7 +30,7 @@
 
 ## Advanced Patterns
 - [ ] **124. Command Pattern** - Undoable actions with command queue
-- [ ] **125. State Machines** - Using `:gen_statem` for complex workflows
+- [x] **125. State Machines** - Using `:gen_statem` for complex workflows
 - [ ] **126. Event Sourcing** - Audit logging and state reconstruction
 - [ ] **127. CQRS Pattern** - Separating read/write models
 - [ ] **128. Saga Pattern** - Distributed transaction coordination
@@ -50,7 +50,7 @@
 - [ ] **138. Error Reporting** - Integration with Sentry/AppSignal
 
 ## Advanced UI Patterns
-- [ ] **139. Virtual Scrolling** - Rendering large lists efficiently
+- [x] **139. Virtual Scrolling** - Rendering large lists efficiently
 - [ ] **140. Optimistic Locking** - Handling concurrent edits
 - [ ] **141. Conflict Resolution** - Merging concurrent changes
 - [ ] **142. Collaborative Editing** - CRDT basics for real-time collaboration
