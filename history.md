@@ -267,3 +267,56 @@ This file tracks your progress through the Phoenix LiveView Katas.
 - `feat: add collapsible sidebar with burger menu`
 - `docs: update kata notes with problem statements and implementations`
 
+### 2026-01-14 - Kata 104: GenServer Integration
+
+**Objective**: Implement advanced kata demonstrating GenServer integration with LiveView for background job processing.
+
+**Changes Made**:
+
+1. **GenServer Worker** (`lib/elixir_katas/workers/job_queue.ex`)
+   - Created `JobQueue` GenServer managing background job queue
+   - Implemented job lifecycle: pending → processing → completed/failed/cancelled
+   - Added PubSub broadcasting for real-time updates
+   - Async job processing with progress tracking
+   - Supports job cancellation and cleanup
+
+2. **LiveView Component** (`lib/elixir_katas_web/live/kata_104_genserver_live.ex`)
+   - Interactive job queue UI with real-time updates
+   - Dashboard stats (total, pending, processing, completed, failed)
+   - Job submission form with validation
+   - Visual progress bars for active jobs
+   - Multi-tab sync demonstration via PubSub
+
+3. **Documentation** (`notes/kata_104_genserver_notes.md`)
+   - Comprehensive guide on GenServer + LiveView patterns
+   - Architecture diagrams and mental models
+   - Common use cases: job queues, caching, rate limiting
+   - Code examples and best practices
+   - Common pitfalls and testing strategies
+
+4. **Application Supervision** (`lib/elixir_katas/application.ex`)
+   - Added `JobQueue` to supervision tree for automatic startup and crash recovery
+
+5. **Curriculum Update** (`curriculum.md`)
+   - Added Kata #104 to Section 10: Advanced & System Mastery
+
+**Key Features**:
+- ✅ Process isolation between GenServer and LiveView
+- ✅ Real-time updates via PubSub (works across multiple tabs)
+- ✅ Background job processing with simulated work
+- ✅ Job cancellation and cleanup
+- ✅ Visual progress tracking
+- ✅ Production-ready supervision tree integration
+
+**Files Created**:
+- `lib/elixir_katas/workers/job_queue.ex`
+- `lib/elixir_katas_web/live/kata_104_genserver_live.ex`
+- `notes/kata_104_genserver_notes.md`
+
+**Files Modified**:
+- `lib/elixir_katas/application.ex`
+- `curriculum.md`
+- `history.md`
+
+**Target Audience**: Senior Elixir developers learning production patterns for background job processing and process management.
+

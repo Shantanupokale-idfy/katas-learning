@@ -13,8 +13,8 @@ defmodule ElixirKatas.Application do
       {DNSCluster, query: Application.get_env(:elixir_katas, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ElixirKatas.PubSub},
       ElixirKatasWeb.Presence,
-      # Start a worker by calling: ElixirKatas.Worker.start_link(arg)
-      # {ElixirKatas.Worker, arg},
+      # Start the JobQueue GenServer for background job processing
+      {ElixirKatas.Workers.JobQueue, []},
       # Start to serve requests, typically the last entry
       ElixirKatasWeb.Endpoint
     ]

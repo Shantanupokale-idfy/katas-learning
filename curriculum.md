@@ -124,3 +124,5 @@ A comprehensive path to mastery. Target: Complete all 104 to become a LiveView E
 101. **LiveView Testing** (Unit testing views and events)
 102. **Integration Testing** (Wallaby/Playwright E2E tests)
 103. **The Final Project** (Collaborative Kanban Board)
+104. **GenServer Integration** (Background workers with LiveView) [DONE]
+

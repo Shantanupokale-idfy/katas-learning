@@ -434,6 +434,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
       <.kata_card title="98. PDF Generation" description="Document generation" path={~p"/katas/98-pdf"} />
       <.kata_card title="99. CSV Export" description="Data export" path={~p"/katas/99-csv"} />
       <.kata_card title="100. Error Boundary" description="Crash handling" path={~p"/katas/100-error"} />
+      <.kata_card title="104. GenServer Integration" description="Background workers with LiveView" path={~p"/katas/104-genserver"} />
 
       </div>
     </div>
