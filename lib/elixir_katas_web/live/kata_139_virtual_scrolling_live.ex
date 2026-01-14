@@ -256,6 +256,10 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
     {:noreply, update_filtered_and_visible(socket)}
   end
 
+  def handle_event("set_tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, active_tab: tab)}
+  end
+
   defp update_filtered_and_visible(socket) do
     filtered = apply_filters(socket.assigns)
     count = length(filtered)
@@ -279,10 +283,6 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
 
   defp slice_items(items, start, finish) do
     Enum.slice(items, start, max(0, finish - start))
-  end
-
-  def handle_event("set_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, active_tab: tab)}
   end
 
   def handle_info(_msg, socket) do
