@@ -5,6 +5,21 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
   @items_per_page 50
   @item_height 80 # pixels
 
+  def update(%{event: event, params: params}, socket) do
+    # IO.inspect({event, params}, label: "FORWARDED EVENT")
+    handle_event(event, params, socket)
+    |> case do
+      {:noreply, socket} -> {:ok, socket}
+      {:ok, socket} -> {:ok, socket}
+    end
+  end
+
+  def update(%{info_msg: msg}, socket) do
+    # IO.inspect(msg, label: "INFO MSG")
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
     if socket.assigns[:__initialized__] do
       {:ok, assign(socket, assigns)}
@@ -12,32 +27,41 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
       socket = assign(socket, assigns)
       socket = assign(socket, :__initialized__, true)
 
-      # Load all data once (in production, this might come from DB)
+      # Load all data once
       all_items = load_large_dataset()
 
       socket =
         socket
-        |> assign(active_tab: "notes")
+        |> assign(active_tab: "interactive")
         |> assign(:all_items, all_items)
         |> assign(:total_items, length(all_items))
-        |> assign(:items_per_page, @items_per_page)
         |> assign(:item_height, @item_height)
-        |> assign(:visible_start, 0)
-        |> assign(:visible_end, @items_per_page)
-        |> assign(:scroll_top, 0)
+        |> assign(:items_per_page, @items_per_page)
         |> assign(:container_height, 600)
         |> assign(:search_query, "")
         |> assign(:filter_category, "all")
         |> assign(:filter_status, "all")
-        
+        |> assign(:visible_start, 0)
+        |> assign(:visible_end, @items_per_page)
+        |> assign(:scroll_top, 0)
+      
+      # Initial calculation
+      filtered = apply_filters(socket.assigns)
+      visible = slice_items(filtered, 0, @items_per_page + 100) # Increased buffer
+
+      socket = 
+        socket
+        |> assign(:filtered_items, filtered)
+        |> assign(:visible_items, visible)
+        |> assign(:filtered_count, length(filtered))
+
       {:ok, socket}
     end
   end
 
   def render(assigns) do
     ~H"""
-    
-      <div class="p-6 max-w-6xl mx-auto">
+    <div class="p-6 max-w-6xl mx-auto">
         <div class="mb-6">
           <h2 class="text-2xl font-bold mb-2">Virtual Scrolling</h2>
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -52,59 +76,59 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
             <!-- Search -->
             <div>
               <label class="block text-sm font-medium mb-2">Search</label>
-              <input 
-                type="text" 
-                phx-change="search"
-                phx-target={@myself}
-                phx-debounce="300"
-                name="query"
-                value={@search_query}
-                placeholder="Search items..."
-                class="w-full px-3 py-2 border rounded"
-              />
+              <form phx-change="search" phx-target={@myself}>
+                <input 
+                  type="text" 
+                  phx-debounce="300"
+                  name="query"
+                  value={@search_query}
+                  placeholder="Search items..."
+                  class="w-full px-3 py-2 border rounded"
+                />
+              </form>
             </div>
 
             <!-- Category Filter -->
             <div>
               <label class="block text-sm font-medium mb-2">Category</label>
-              <select 
-                phx-change="filter_category"
-                phx-target={@myself}
-                name="category"
-                class="w-full px-3 py-2 border rounded"
-              >
-                <option value="all" selected={@filter_category == "all"}>All Categories</option>
-                <option value="Technology" selected={@filter_category == "Technology"}>Technology</option>
-                <option value="Science" selected={@filter_category == "Science"}>Science</option>
-                <option value="Art" selected={@filter_category == "Art"}>Art</option>
-                <option value="Music" selected={@filter_category == "Music"}>Music</option>
-                <option value="Sports" selected={@filter_category == "Sports"}>Sports</option>
-                <option value="Food" selected={@filter_category == "Food"}>Food</option>
-                <option value="Travel" selected={@filter_category == "Travel"}>Travel</option>
-                <option value="Books" selected={@filter_category == "Books"}>Books</option>
-              </select>
+              <form phx-change="filter_category" phx-target={@myself}>
+                <select 
+                  name="category"
+                  class="w-full px-3 py-2 border rounded"
+                >
+                  <option value="all" selected={@filter_category == "all"}>All Categories</option>
+                  <option value="Technology" selected={@filter_category == "Technology"}>Technology</option>
+                  <option value="Science" selected={@filter_category == "Science"}>Science</option>
+                  <option value="Art" selected={@filter_category == "Art"}>Art</option>
+                  <option value="Music" selected={@filter_category == "Music"}>Music</option>
+                  <option value="Sports" selected={@filter_category == "Sports"}>Sports</option>
+                  <option value="Food" selected={@filter_category == "Food"}>Food</option>
+                  <option value="Travel" selected={@filter_category == "Travel"}>Travel</option>
+                  <option value="Books" selected={@filter_category == "Books"}>Books</option>
+                </select>
+              </form>
             </div>
 
             <!-- Status Filter -->
             <div>
               <label class="block text-sm font-medium mb-2">Status</label>
-              <select 
-                phx-change="filter_status"
-                phx-target={@myself}
-                name="status"
-                class="w-full px-3 py-2 border rounded"
-              >
-                <option value="all" selected={@filter_status == "all"}>All Statuses</option>
-                <option value="active" selected={@filter_status == "active"}>Active</option>
-                <option value="pending" selected={@filter_status == "pending"}>Pending</option>
-                <option value="completed" selected={@filter_status == "completed"}>Completed</option>
-                <option value="archived" selected={@filter_status == "archived"}>Archived</option>
-              </select>
+              <form phx-change="filter_status" phx-target={@myself}>
+                <select 
+                  name="status"
+                  class="w-full px-3 py-2 border rounded"
+                >
+                  <option value="all" selected={@filter_status == "all"}>All Statuses</option>
+                  <option value="active" selected={@filter_status == "active"}>Active</option>
+                  <option value="pending" selected={@filter_status == "pending"}>Pending</option>
+                  <option value="completed" selected={@filter_status == "completed"}>Completed</option>
+                  <option value="archived" selected={@filter_status == "archived"}>Archived</option>
+                </select>
+              </form>
             </div>
           </div>
 
           <div class="text-sm text-gray-600">
-            Showing <%= @visible_end - @visible_start %> of <%= length(filtered_items(assigns)) %> items
+            Showing <%= Enum.count(@visible_items) %> of <%= @filtered_count %> items
             <%= if @search_query != "" or @filter_category != "all" or @filter_status != "all" do %>
               (filtered from <%= @total_items %> total)
             <% end %>
@@ -114,21 +138,22 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
         <!-- Virtual Scroll Container -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border overflow-hidden">
           <div 
-            id="virtual-scroll-container"
+            id={"virtual-scroll-container-#{@id}"}
             phx-hook="VirtualScroll"
-            phx-update="ignore"
+            phx-target={@myself}
             data-item-height={@item_height}
             data-container-height={@container_height}
-            data-total-items={length(filtered_items(assigns))}
+            data-total-items={@filtered_count}
             style={"height: #{@container_height}px; overflow-y: auto; position: relative;"}
             class="virtual-scroll-container"
           >
             <!-- Spacer to create scrollable height -->
-            <div style={"height: #{length(filtered_items(assigns)) * @item_height}px; position: relative;"}>
+            <div style={"height: #{@filtered_count * @item_height}px; position: relative;"}>
               <!-- Visible items -->
               <div style={"position: absolute; top: #{@visible_start * @item_height}px; width: 100%;"}>
-                <%= for item <- visible_items(assigns) do %>
+                <%= for item <- @visible_items do %>
                   <div 
+                    id={"item-#{item["id"]}"}
                     class="item-row border-b p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     style={"height: #{@item_height}px;"}
                     data-item-id={item["id"]}
@@ -184,57 +209,84 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
           </div>
         </div>
       </div>
-    
     """
   end
 
-  def handle_event("scroll", %{"scrollTop" => scroll_top}, socket) do
-    scroll_top = String.to_integer(scroll_top)
+  def handle_event("scroll", %{"scrollTop" => scroll_top_str}, socket) do
+    scroll_top = 
+      case Float.parse(scroll_top_str) do
+        {f, _} -> round(f)
+        :error -> 0
+      end
     
-    # Calculate which items should be visible
-    visible_start = max(0, div(scroll_top, @item_height) - 5) # Add buffer
+    # IO.inspect(scroll_top, label: "SCROLL TOP")
+    
+    # Increase buffers significantly for preloading (Overscan)
+    visible_start = max(0, div(scroll_top, @item_height) - 50) # 50 items above
     visible_end = min(
-      length(filtered_items(socket.assigns)),
-      visible_start + @items_per_page + 10 # Add buffer
+      socket.assigns.filtered_count,
+      visible_start + @items_per_page + 100 # 100 items below
     )
+
+    # IO.inspect({visible_start, visible_end}, label: "WINDOW")
+
+    visible = slice_items(socket.assigns.filtered_items, visible_start, visible_end)
 
     {:noreply, 
      socket
      |> assign(:scroll_top, scroll_top)
      |> assign(:visible_start, visible_start)
      |> assign(:visible_end, visible_end)
+     |> assign(:visible_items, visible)
     }
   end
 
   def handle_event("search", %{"query" => query}, socket) do
-    {:noreply, 
-     socket
-     |> assign(:search_query, query)
-     |> assign(:visible_start, 0)
-     |> assign(:visible_end, @items_per_page)
-    }
+    socket = assign(socket, :search_query, query)
+    {:noreply, update_filtered_and_visible(socket)}
   end
 
   def handle_event("filter_category", %{"category" => category}, socket) do
-    {:noreply,
-     socket
-     |> assign(:filter_category, category)
-     |> assign(:visible_start, 0)
-     |> assign(:visible_end, @items_per_page)
-    }
+    socket = assign(socket, :filter_category, category)
+    {:noreply, update_filtered_and_visible(socket)}
   end
 
   def handle_event("filter_status", %{"status" => status}, socket) do
-    {:noreply,
-     socket
-     |> assign(:filter_status, status)
-     |> assign(:visible_start, 0)
-     |> assign(:visible_end, @items_per_page)
-    }
+    socket = assign(socket, :filter_status, status)
+    {:noreply, update_filtered_and_visible(socket)}
+  end
+
+  defp update_filtered_and_visible(socket) do
+    filtered = apply_filters(socket.assigns)
+    count = length(filtered)
+    visible = slice_items(filtered, 0, @items_per_page + 80) # Preload cushion
+
+    socket
+    |> assign(:filtered_items, filtered)
+    |> assign(:filtered_count, count)
+    |> assign(:visible_items, visible)
+    |> assign(:visible_start, 0)
+    |> assign(:visible_end, @items_per_page + 80)
+    |> assign(:scroll_top, 0)
+  end
+
+  defp apply_filters(assigns) do
+    assigns.all_items
+    |> filter_by_search(assigns.search_query)
+    |> filter_by_category(assigns.filter_category)
+    |> filter_by_status(assigns.filter_status)
+  end
+
+  defp slice_items(items, start, finish) do
+    Enum.slice(items, start, max(0, finish - start))
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
+  end
+
+  def handle_info(_msg, socket) do
+    {:noreply, socket}
   end
 
   # Private functions
@@ -259,15 +311,6 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
     end
   end
 
-  defp filtered_items(assigns) do
-    items = assigns.all_items
-
-    items
-    |> filter_by_search(assigns.search_query)
-    |> filter_by_category(assigns.filter_category)
-    |> filter_by_status(assigns.filter_status)
-  end
-
   defp filter_by_search(items, ""), do: items
   defp filter_by_search(items, query) do
     query_lower = String.downcase(query)
@@ -285,11 +328,6 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
   defp filter_by_status(items, "all"), do: items
   defp filter_by_status(items, status) do
     Enum.filter(items, fn item -> item["status"] == status end)
-  end
-
-  defp visible_items(assigns) do
-    filtered_items(assigns)
-    |> Enum.slice(assigns.visible_start, assigns.visible_end - assigns.visible_start)
   end
 
   defp status_class("active"), do: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
