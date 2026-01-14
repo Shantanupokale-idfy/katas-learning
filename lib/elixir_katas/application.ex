@@ -15,6 +15,8 @@ defmodule ElixirKatas.Application do
       ElixirKatasWeb.Presence,
       # Start the JobQueue GenServer for background job processing
       {ElixirKatas.Workers.JobQueue, []},
+      # Start the VendingMachine state machine
+      {ElixirKatas.Workers.VendingMachine, []},
       # Start to serve requests, typically the last entry
       ElixirKatasWeb.Endpoint
     ]
