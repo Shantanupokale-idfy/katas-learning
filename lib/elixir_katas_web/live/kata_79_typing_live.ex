@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @topic "typing:demo"
   @typing_timeout 3000

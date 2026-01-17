@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata77TheTickerLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @topic "stock:ticker"
 

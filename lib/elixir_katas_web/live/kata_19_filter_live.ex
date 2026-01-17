@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata19FilterLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -87,7 +86,7 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
 
   # Simple highlighter for bonus points (though officially in later kata, it helps UX here)
   defp highlight(text, ""), do: text
-  defp highlight(text, query) do
+  defp highlight(text, _query) do
     # This is a naive implementation. For real highlighting, we'd need safe HTML rendering.
     # Since we can't easily return safe HTML tuple from helper without Phoenix.HTML logic here easily,
     # we will just return text for this basic kata.

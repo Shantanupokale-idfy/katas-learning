@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata18EditorLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -31,7 +30,7 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
                <li class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[4rem] flex items-center">
                  <%= if @editing_id == item.id do %>
                    <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself} class="w-full flex gap-2">
-                     <input type="hidden" name="id" value={item.id} />
+                     <input type="hidden" name="_id" value={item.id} />
                      <input 
                        type="text" 
                        name="text" 
@@ -74,7 +73,7 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
 
   def handle_event("validate", _, socket), do: {:noreply, socket}
 
-  def handle_event("save", %{"id" => id, "text" => text}, socket) do
+  def handle_event("save", %{"_id" => id, "text" => text}, socket) do
     new_items = Enum.map(socket.assigns.items, fn item -> 
       if item.id == id, do: %{item | text: text}, else: item
     end)

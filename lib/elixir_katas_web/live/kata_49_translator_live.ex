@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata49TranslatorLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @translations %{
     "en" => %{

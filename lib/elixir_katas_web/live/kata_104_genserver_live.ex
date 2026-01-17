@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata104GenserverLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
   alias ElixirKatas.Workers.JobQueue
 
   @topic "job_queue:updates"

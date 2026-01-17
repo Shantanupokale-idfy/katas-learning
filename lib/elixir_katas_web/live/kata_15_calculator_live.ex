@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata15CalculatorLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -136,7 +135,7 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
   defp calculate(a, "+", b), do: a + b
   defp calculate(a, "-", b), do: a - b
   defp calculate(a, "*", b), do: a * b
-  defp calculate(a, "/", b), do: if b == 0, do: 0.0, else: a / b
+  defp calculate(a, "/", b), do: (if b == 0, do: 0.0, else: a / b)
   defp calculate(_, _, b), do: b
 
   defp format_number(n) do

@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @items_per_page 50
   @item_height 80 # pixels

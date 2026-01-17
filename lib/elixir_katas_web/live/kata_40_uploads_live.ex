@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata40UploadsLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -118,7 +117,7 @@ defmodule ElixirKatasWeb.Kata40UploadsLive do
     # Here we just collect their client-side names to prove it worked
     
     uploaded_files =
-      consume_uploaded_entries(socket, :avatar, fn meta, entry ->
+      consume_uploaded_entries(socket, :avatar, fn _meta, entry ->
         # meta is %{path: "/tmp/..."}, entry is the UploadEntry struct
         # client_name is in the entry struct
         {:ok, entry.client_name}

@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata80PresenceListLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   alias ElixirKatasWeb.Presence
 

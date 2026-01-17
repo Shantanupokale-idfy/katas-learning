@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata32ComparisonValidationLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -88,7 +87,7 @@ defmodule ElixirKatasWeb.Kata32ComparisonValidationLive do
     {:noreply, assign(socket, :form, to_form(params, errors: errors))}
   end
 
-  def handle_event("save", params, socket) do
+  def handle_event("save", _params, socket) do
     {:noreply, 
      socket
      |> put_flash(:info, "Password updated successfully!")

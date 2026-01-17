@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata78ChatRoomLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @topic "chat:lobby"
 

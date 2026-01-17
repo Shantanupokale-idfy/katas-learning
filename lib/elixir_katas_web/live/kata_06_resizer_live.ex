@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata06ResizerLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)

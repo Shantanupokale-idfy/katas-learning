@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata125StatemachineLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
   alias ElixirKatas.Workers.VendingMachine
 
   @topic "vending_machine:updates"

@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata72InfiniteScrollLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @per_page 10
 

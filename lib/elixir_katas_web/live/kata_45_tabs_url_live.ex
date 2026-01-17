@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata45TabsUrlLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)

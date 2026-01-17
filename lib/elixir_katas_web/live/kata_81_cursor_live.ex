@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata81LiveCursorLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   @topic "cursor:demo"
 

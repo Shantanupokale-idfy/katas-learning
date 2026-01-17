@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata96FileUploadsLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -132,11 +131,11 @@ defmodule ElixirKatasWeb.Kata96FileUploadsLive do
     {:noreply, update(socket, :uploaded_files, &(&1 ++ uploaded_files))}
   end
 
-  defp error_to_string(:too_large), do: "File is too large"
-  defp error_to_string(:too_many_files), do: "You have selected too many files"
-  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
-
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
   end
+
+  defp error_to_string(:too_large), do: "File is too large"
+  defp error_to_string(:too_many_files), do: "You have selected too many files"
+  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
 end

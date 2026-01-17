@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata67LazyLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(%{info_msg: msg}, socket) do
     {:noreply, socket} = handle_info(msg, socket)

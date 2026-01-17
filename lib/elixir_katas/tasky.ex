@@ -21,15 +21,6 @@ defmodule ElixirKatas.Tasky do
 
   @doc """
   Returns the list of todos.
-
-  ## Examples
-
-      iex> list_todos()
-      [%Todo{}, ...]
-
-  """
-  @doc """
-  Returns the list of todos.
   
   Supports pagination options: `page` (default 1) and `per_page` (default 5).
   Requires `user_id` to scope todos to a specific user.
@@ -177,18 +168,6 @@ defmodule ElixirKatas.Tasky do
     |> Repo.preload([:subtasks, comments: [:user], attachments: []])
   end
 
-  @doc """
-  Creates a todo.
-
-  ## Examples
-
-      iex> create_todo(%{field: value})
-      {:ok, %Todo{}}
-
-      iex> create_todo(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   @doc """
   Creates a todo for a specific user.
   """

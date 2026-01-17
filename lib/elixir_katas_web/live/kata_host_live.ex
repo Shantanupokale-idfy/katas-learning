@@ -159,7 +159,7 @@ defmodule ElixirKatasWeb.KataHostLive do
      kata_name = "Kata#{kata_id}"
 
      # Start Async Task
-     task = Task.async(fn -> 
+     _task = Task.async(fn -> 
         # 1. Compile
         compile_result = DynamicCompiler.compile(user_id, kata_name, source)
         
@@ -181,46 +181,6 @@ defmodule ElixirKatasWeb.KataHostLive do
      }
   end
 
-  def handle_info({ref, result}, socket) when is_reference(ref) do
-    Process.demonitor(ref, [:flush])
-    
-    case result do
-      {:ok, new_module} ->
-        {:noreply, 
-         socket
-         |> assign(:compiling, false)
-         |> assign(:compile_error, nil) # Success - clear error
-         |> assign(:saved_at, System.system_time(:second)) # Updated save timestamp
-         |> assign(:dynamic_module, new_module)
-         |> assign(:is_user_author, true)
-        }
-      
-      {:error, err} ->
-         {:noreply, 
-          socket
-          |> assign(:compiling, false)
-          |> assign(:compile_error, "Compilation failed: #{inspect(err)}")
-         }
-    end
-  end
-
-  # Handle task crashing
-  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
-     {:noreply, 
-      socket
-      |> assign(:compiling, false)
-      |> put_flash(:error, "Compiler crashed: #{inspect(reason)}")
-     }
-  end
-
-  # Catch-all to forward messages to the component
-  def handle_info(msg, socket) do
-    if socket.assigns.dynamic_module do
-      send_update(socket.assigns.dynamic_module, id: "kata-sandbox", info_msg: msg)
-    end
-    {:noreply, socket}
-  end
-  
   def handle_event("revert", _, socket) do
      user_id = socket.assigns.user_id
      kata_id = socket.assigns.kata_id
@@ -259,6 +219,46 @@ defmodule ElixirKatasWeb.KataHostLive do
   def handle_event(event, params, socket) do
     if socket.assigns.dynamic_module do
       send_update(socket.assigns.dynamic_module, id: "kata-sandbox", event: event, params: params)
+    end
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, result}, socket) when is_reference(ref) do
+    Process.demonitor(ref, [:flush])
+    
+    case result do
+      {:ok, new_module} ->
+        {:noreply, 
+         socket
+         |> assign(:compiling, false)
+         |> assign(:compile_error, nil) # Success - clear error
+         |> assign(:saved_at, System.system_time(:second)) # Updated save timestamp
+         |> assign(:dynamic_module, new_module)
+         |> assign(:is_user_author, true)
+        }
+      
+      {:error, err} ->
+         {:noreply, 
+          socket
+          |> assign(:compiling, false)
+          |> assign(:compile_error, "Compilation failed: #{inspect(err)}")
+         }
+    end
+  end
+
+  # Handle task crashing
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
+     {:noreply, 
+      socket
+      |> assign(:compiling, false)
+      |> put_flash(:error, "Compiler crashed: #{inspect(reason)}")
+     }
+  end
+
+  # Catch-all to forward messages to the component
+  def handle_info(msg, socket) do
+    if socket.assigns.dynamic_module do
+      send_update(socket.assigns.dynamic_module, id: "kata-sandbox", info_msg: msg)
     end
     {:noreply, socket}
   end

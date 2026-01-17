@@ -1,6 +1,5 @@
 defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
   use ElixirKatasWeb, :live_component
-  import ElixirKatasWeb.KataComponents
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
@@ -101,6 +100,10 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
     {:noreply, load_async_data(socket)}
   end
 
+  def handle_event("set_tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, active_tab: tab)}
+  end
+
   defp load_async_data(socket) do
     socket
     |> assign_async(:stats, fn -> 
@@ -115,9 +118,5 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
         %{name: "Bob Johnson", status: "Away"}
       ]}}
     end)
-  end
-
-  def handle_event("set_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, active_tab: tab)}
   end
 end
