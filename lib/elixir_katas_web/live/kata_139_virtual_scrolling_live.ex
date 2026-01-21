@@ -9,7 +9,6 @@ defmodule ElixirKatasWeb.Kata139VirtualScrollingLive do
     handle_event(event, params, socket)
     |> case do
       {:noreply, socket} -> {:ok, socket}
-      {:ok, socket} -> {:ok, socket}
     end
   end
 

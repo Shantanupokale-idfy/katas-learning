@@ -238,7 +238,6 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:ok, _} = Tasky.delete_attachment(attachment)
     
     updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
-    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
     {:noreply, 
      socket 
      |> assign(:selected_todo, updated_todo)
