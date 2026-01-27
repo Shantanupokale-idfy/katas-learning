@@ -29,6 +29,8 @@ Called whenever someone joins or leaves.
 <details>
 <summary>View Solution</summary>
 
-<pre><code class="elixir">Enum.sort_by(users, & &1.joined_at, :desc)
+<pre><code class="elixir"># Get the map of presence info, convert to list, and sort
+users = Phoenix.Presence.list(socket) |> Enum.map(fn {k, v} -> v end)
+sorted = Enum.sort_by(users, & &1.joined_at, :desc)
 </code></pre>
 </details>

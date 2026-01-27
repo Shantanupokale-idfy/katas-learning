@@ -35,6 +35,11 @@ Log **Mouse Enter** and **Mouse Leave** events on the input container.
 
 <pre><code class="elixir">&lt;div phx-mouseenter="mouse_enter" phx-mouseleave="mouse_leave"&gt; ... &lt;/div&gt;
 
-def handle_event("mouse_enter", _, socket), do: log(socket, "Mouse Entered")
-def handle_event("mouse_leave", _, socket), do: log(socket, "Mouse Left")</code></pre>
+def handle_event("mouse_enter", _, socket) do
+  {:noreply, update(socket, :logs, &["Mouse Entered" | &1])}
+end
+
+def handle_event("mouse_leave", _, socket) do
+  {:noreply, update(socket, :logs, &["Mouse Left" | &1])}
+end</code></pre>
 </details>

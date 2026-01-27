@@ -26,6 +26,8 @@ Add **"Select Only Even IDs"**. A button that programmatically selects item 2, 4
 <summary>View Solution</summary>
 
 <pre><code class="elixir">def handle_event("select_even", _, socket) do
+  # In a real app, you'd fetch these from your DB or source
+  all_ids = 1..100 
   evens = Enum.filter(all_ids, &(rem(&1, 2) == 0)) |> MapSet.new()
   {:noreply, assign(socket, selected_ids: evens)}
 end

@@ -43,8 +43,9 @@ Enforce a **Limit**. Allow the user to select at most **3 items**. If they try t
 
 <pre><code class="elixir">def handle_event("toggle", %{"item" => item}, socket) do
   # check size before adding
+  selected = socket.assigns.selected
   if MapSet.size(selected) &lt; 3 or MapSet.member?(selected, item) do
-     # proceed
+     # proceed with toggle logic...
   else
      {:noreply, put_flash(socket, :error, "Max 3 items allowed!")}
   end
