@@ -1,51 +1,98 @@
 # Kata 00: LiveView Fundamentals
 
-## The Concept
-**Server-Side Rendering with Client-Side Dynamics**.
-LiveView enables rich, real-time user experiences with server-rendered HTML.
-It removes the need for complex client-side JavaScript frameworks (React/Vue) for 90% of use cases.
+## The Missing Manual
+Welcome to **Phoenix LiveView**.
+This isn't just a library; it's a paradigm shift.
+Most web frameworks (React, Vue, Svelte) run on the **Client**. LiveView runs on the **Server**.
 
-## The Architecture
-1.  **Initial Load (HTTP)**: The browser requests the page. The server renders the FULL HTML frame. This is crucial for SEO and "Time to First Paint".
-2.  **Connection (WebSocket)**: A tiny JS client (`live.js`) connects to the server via WebSocket.
-3.  **The Loop**:
-    *   **Event**: User clicks a button. JS sends payload to Server.
-    *   **Update**: Server process (`GenServer`) handles event, updates state (`assigns`).
-    *   **Diff**: Server calculates the *minimal* HTML difference (diff) needed.
-    *   **Patch**: Server sends diff to Client. Client patches the DOM.
+Understanding this mental model is the key to everything that follows.
 
-## Core Concepts
+---
 
-### 1. The Socket (`socket`)
-The `socket` is the single source of truth. It holds the state (`assigns`).
-It is immutable. Every operation (`assign`, `push_event`) returns a *new* socket.
+## 1. The Mental Model
+In a traditional SPA (Single Page App):
+1.  Browser downloads HTML + Huge JS Bundle.
+2.  Browser calls API (JSON).
+3.  Browser renders UI.
+
+In **LiveView**:
+1.  Browser downloads HTML (Instant).
+2.  Browser connects a WebSocket.
+3.  **Server** renders UI.
+4.  **Server** pushes tiny HTML updates to Browser.
+
+**You write code on the server, but it feels like it runs in the browser.**
+
+---
+
+## 2. The Lifecycle (How it starts)
+A LiveView goes through two stages when you visit a page:
+
+### Stage 1: The Dead Render (HTTP)
+*   **Request**: You type `localhost:4000/` in the bar.
+*   **Action**: `mount` runs. `render` runs.
+*   **Result**: Full HTML is sent. Search engines see this. Users see this instantly (First Paint).
+*   **Status**: Disconnected.
+
+### Stage 2: The Live Connection (WS)
+*   **Action**: A tiny JS file (`live.js`) wakes up. It opens a WebSocket to the server.
+*   **Action**: `mount` runs *again*. `render` runs *again*.
+*   **Result**: The page is now "Live".
+*   **Status**: Connected.
+
+> **Tip**: This is why `mount` runs twice! Don't perform expensive side-effects (like charging a credit card) in `mount` unless you check `connected?(socket)`.
+
+---
+
+## 3. The Loop (How it updates)
+Once connected, the process is simple:
+
+1.  **Event**: User clicks a button (`phx-click="inc"`).
+2.  **Network**: The click event is sent over the wire.
+3.  **Server**: The function `handle_event("inc", ...)` runs.
+4.  **State Change**: You update the data: `assign(socket, count: 2)`.
+5.  **Render**: LiveView re-runs `render`.
+6.  **Diff**: It compares the *new* HTML with the *old* HTML.
+    *   Old: `<div>Count is 1</div>`
+    *   New: `<div>Count is 2</div>`
+    *   Diff: `2` (It's that smart!)
+7.  **Patch**: The server sends just the string "2" to the browser.
+8.  **DOM**: The browser updates the text.
+
+---
+
+## 4. Key Concepts
+
+### The Socket (`socket`)
+The `socket` is your state container. It's a map that holds everything your view needs to know (`assigns`).
+In Elixir, data is immutable. You never change the socket; you create a *new* socket with updated data.
 ```elixir
-socket = assign(socket, count: 1)
+# Bad (Wont work)
+socket.assigns.count = 2
+
+# Good (Returns new socket)
+assign(socket, count: 2)
 ```
 
-### 2. Lifecycle Callbacks
-*   **`mount(params, session, socket)`**: The "Constructor". Runs twice (once for HTTP, once for WS). Initialize state here.
-*   **`handle_params(params, uri, socket)`**: runs after mount and whenever the URL updates (patch/navigate).
-*   **`render(assigns)`**: The "View". A pure function returning HEEx. Automatically called when assigns change.
+### The T-G-T Stack
+*   **Template (HEEx)**: The HTML with holes in it (`<div id={@id}>`).
+*   **Game (GenServer)**: The logic process running on the server.
+*   **Transport (WebSocket)**: The cable connecting them.
 
-### 3. Event Handling
-*   **`handle_event(name, params, socket)`**: Handles messages from the client (clicks, form changes).
-*   **`handle_info(msg, socket)`**: Handles messages from other Elixir processes (PubSub, Timers).
+---
 
-## Deep Dive: Change Tracking
-LiveView doesn't re-render the whole page. It uses explicit change tracking.
-```elixir
-<div id={@id} class="foo">{@count}</div>
-```
-If `@count` changes but `@id` doesn't, LiveView only sends the new number.
-**Rule**: Only parts of the template relying on changed assigns are re-evaluated.
+## 5. Attributes to Know
+*   `phx-click`: Handles click events.
+*   `phx-change`: Handles form input changes (keystrokes).
+*   `phx-submit`: Handles form submission (Enter key).
+*   `phx-value-*`: Passes data with events.
+    *   `<button phx-click="delete" phx-value-id="42">` sends `{"id": "42"}` to the server.
 
-## Common Pitfalls
+---
 
-1.  **Latency**: Every interaction is a round-trip. While fast (typically <50ms), it's not "instant". For instant interactions (toggling menus), use **JS Commands** or hooks.
-2.  **Memory**: Each user gets a process on the server. 100k users = 100k processes. While Erlang handles this well, storing huge datasets in `assigns` will consume RAM. Use `streams` for large lists (Kata 71).
-3.  **Data Fetching**: Don't fetch data in `render`. Fetch in `mount` or `handle_params`. `render` should be pure and fast.
+## 6. What's Next?
+You are now ready.
+*   **Kata 01**: Will let you write your first Render.
+*   **Kata 02**: Will let you handle your first Event.
 
-## Challenge
-There is no code challenge for this Kata.
-Proceed to **Kata 01** to write your first LiveView!
+Click **Next Kata** in the sidebar to begin your journey.
