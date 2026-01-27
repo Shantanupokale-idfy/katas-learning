@@ -14,6 +14,7 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
       
       |> assign(:countries, countries)
       |> assign(:cities, []) # Empty initially until country selected
+      |> assign(:city_disabled, true)
       |> assign(:form, to_form(%{"country" => "", "city" => ""}))
       |> assign(:submitted_data, nil)
 
@@ -29,7 +30,7 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
+          <.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself} class="space-y-6">
             
             <!-- Parent Input -->
             <div>
@@ -50,13 +51,13 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
               <select
                 id="city"
                 name="city"
-                disabled={@form[:country].value == "" || @form[:country].value == nil}
+                disabled={@city_disabled}
                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md disabled:bg-gray-100 disabled:text-gray-400"
               >
                 <option value="">Select a city</option>
                 <%= Phoenix.HTML.Form.options_for_select(@cities, @form[:city].value) %>
               </select>
-              <%= if @form[:country].value == "" || @form[:country].value == nil do %>
+              <%= if @city_disabled do %>
                  <p class="mt-1 text-xs text-gray-400">Please select a country first.</p>
               <% end %>
             </div>
@@ -93,31 +94,30 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
     """
   end
 
-  def handle_event("validate", %{"country" => country} = params, socket) do
-    # Check if country changed to update cities
-    current_country = socket.assigns.form[:country].value
+  def handle_event("validate", params, socket) do
+    country = params["country"] || ""
+    current_country = socket.assigns.form[:country].value || ""
     
-    cities = 
+    # 1. Update list of cities based on selected country
+    cities = get_cities(country)
+    
+    # 2. Check if we should reset the city selection
+    # (If country changed, the old city is likely invalid)
+    new_params = 
       if country != current_country do
-        get_cities(country)
+         Map.put(params, "city", "")
       else
-        socket.assigns.cities
+         params
       end
       
-    # If country changed, we should reset city.
-    city = if country != current_country, do: "", else: params["city"]
+    # 3. Calculate disabled state
+    disabled = country == ""
     
-    new_params = Map.put(params, "city", city)
-
     {:noreply, 
      socket
      |> assign(:cities, cities)
+     |> assign(:city_disabled, disabled)
      |> assign(:form, to_form(new_params))}
-  end
-  
-  # For completeness if only city changes (though standard html sends both)
-  def handle_event("validate", params, socket) do
-     {:noreply, assign(socket, :form, to_form(params))}
   end
 
   def handle_event("save", params, socket) do
