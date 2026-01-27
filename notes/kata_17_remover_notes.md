@@ -1,26 +1,33 @@
 # Kata 17: The Remover
 
-## The Goal
-Render a list of structured data (maps with IDs) and implement functionality to remove specific items.
+## Goal
+Implement a "Delete" function for items in a list. This requires uniquely identifying items.
 
-## Key Concepts
-- **Unique IDs**: When managing lists of data using map/structs, it is crucial to have a unique ID (`uuid`) to reliably identify which item to act upon.
-- **Phx-value-***: Passing data payload with events.
-- **Reject/Filter**: Using `Enum.reject/2` to create a new list excluding the target item.
+## Core Concepts
 
-## The Solution
-We pass the item's ID in the click event payload:
+### 1. Unique IDs
+When working with data that can be reordered or removed, using stable distinct IDs (like UUIDs) is crucial. Do not rely on index.
+
+### 2. Passing Values with Events
+Use `phx-value-*` attributes to attach data to an event.
 
 ```html
-<button phx-click="remove" phx-value-id={item.id}>X</button>
+<button phx-click="delete" phx-value-id={item.id}>Delete</button>
 ```
 
-And handle it by filtering the list:
+### 3. Rejecting Items
+Use `Enum.reject/2` to filter the list.
 
 ```elixir
-def handle_event("remove", %{"id" => id}, socket) do
-  # Remove item where ID matches
-  new_items = Enum.reject(socket.assigns.items, fn i -> i.id == id end)
-  {:noreply, assign(socket, items: new_items)}
-end
+Enum.reject(items, fn i -> i.id == target_id end)
 ```
+
+## Implementation Details
+
+1.  **State**: `items` (list of maps `%{id: ..., text: ...}`).
+2.  **UI**: Render list items with a "Delete" button next to each.
+3.  **Events**:
+    - `handle_event("delete", %{"id" => id}, socket)`: Remove the matching item from the list.
+
+## Tips
+- Using `phx-value-id` always sends the value as a **String**. If your IDs are integers in Elixir, remember to cast them or compare them as strings.

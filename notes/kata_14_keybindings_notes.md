@@ -1,20 +1,34 @@
 # Kata 14: Keybindings
 
-## The Goal
-Capture keyboard events globally (on the window object) to implement page-wide shortcuts, regardless of which element is focused.
+## Goal
+Implement **global keyboard shortcuts** that work regardless of where the focus is on the page.
 
-## Key Concepts
-- **Window Events**: Binding `phx-window-keydown` to a container (often the top-level div) allows intercepting keys even if no specific input is focused.
-- **Pattern Matching Keys**: Handling specific keys (like "j", "k", "Escape", "Enter") in the event handler.
+## Core Concepts
 
-## The Solution
+### 1. Window Binding
+Attach the event listener to the window object using `phx-window-keydown`. This captures key presses anywhere in the browser tab.
+
+```html
+<div phx-window-keydown="handle_key">...</div>
+```
+
+### 2. Pattern Matching Keys
+Match specific keys in your event handler to perform actions.
 
 ```elixir
-<div phx-window-keydown="keydown_event">...</div>
-
-def handle_event("keydown_event", %{"key" => "k"}, socket) do
-  # Increment logic
+def handle_event("handle_key", %{"key" => "Escape"}, socket) do
+  {:noreply, assign(socket, modal_open: false)}
 end
 ```
 
-This pattern is essential for power-user features like "press '/' to search" or "press 'Esc' to close modal".
+## Implementation Details
+
+1.  **State**: A counter or tracker to demonstrate the effect.
+2.  **UI**: Visual feedback of the last key pressed.
+3.  **Events**:
+    - `handle_event` matching on specific keys like "j" (down), "k" (up).
+    - A catch-all clause (`_`) to handle other keys gracefully without crashing.
+
+## Tips
+- Be careful not to override essential browser shortcuts (like Ctrl+P).
+- This is the standard way to implement power-user navigation (e.g., Gmail shortcuts).

@@ -1,28 +1,31 @@
 # Kata 18: The Editor
 
-## The Goal
-Implement inline editing functionality where a list item turns into an input field when clicked and saves changes on submit.
+## Goal
+Implement **Inline Editing**. Turn a text display into an input field when clicked, allowing immediate updates.
 
-## Key Concepts
-- **Conditional Rendering per Item**: Checking `item.id == @editing_id` inside the loop to determine whether to render text or an input.
-- **Autofocus**: Automatically focusing the input when it appears so the user can type immediately.
-- **Optimistic UI**: Swapping state instantly to "edit mode" feels responsive.
+## Core Concepts
 
-## The Solution
-We store an `editing_id`.
+### 1. Edit Mode State
+Track *which* item is being edited.
+- `editing_id: "123"` -> Item 123 is in edit mode.
+- `editing_id: nil` -> No item is being edited.
 
-```elixir
-<%= if @editing_id == item.id do %>
-  <!-- Render Form -->
-<% else %>
-  <!-- Render Text with phx-click="edit" -->
-<% end %>
-```
+### 2. Conditional Swapping
+Inside the loop, check if the current item is the one being edited.
+- **If yes**: Render a form with an input.
+- **If no**: Render the plain text with a click handler.
 
-On save, we map over the list to update specific item:
+### 3. Auto-Focus
+When swapping to an input, use the `autofocus` attribute (or a JS hook) so the user can type immediately.
 
-```elixir
-Enum.map(items, fn item -> 
-  if item.id == target_id, do: %{item | text: new_text}, else: item
-end)
-```
+## Implementation Details
+
+1.  **State**: `items`, `editing_id`.
+2.  **Events**:
+    - `edit`: Sets `editing_id` to the item's ID.
+    - `save`: Updates the item's text in the list and sets `editing_id` to `nil`.
+    - `cancel`: Sets `editing_id` to `nil` (e.g., on blur).
+
+## Tips
+- Swapping the UI instantly creates a very interactive "app-like" feel.
+- Using `phx-blur` on the input to trigger a "cancel" or "save" is a common pattern for inline editing.

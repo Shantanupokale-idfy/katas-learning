@@ -1,17 +1,31 @@
 # Kata 15: The Calculator
 
-## The Goal
-Build a functional basic calculator capable of addition, subtraction, multiplication, and division.
+## Goal
+Build a functional basic calculator. This challenges you to manage **interacting state** (accumulator, current operation, new entry flag) and implement a small state machine.
 
-## Key Concepts
-- **Complex State**: Managing multiple state pieces (`accumulator`, `operation`, `current display`, `new_entry_flag`) interacting with each other.
-- **State Machine**: The logic resembles a state machine (e.g., entering number -> entering operation -> entering number -> evaluating).
-- **Format Handling**: Handling Integer vs Float conversion and display formatting.
+## Core Concepts
 
-## The Solution
-We maintain the "accumulator" (the result of the previous operation) and the "current operation".
-When an operator is clicked:
-1. If we were already building a number (`!new_entry`), we treat this as a chain calculation and evaluate the *pending* operation first.
-2. We then store the result as the new accumulator and update the pending operator.
+### 1. State Machine
+A calculator has distinct modes:
+- **Entering Number**: Appending digits to the display.
+- **Operator Selected**: Getting ready to start a new number, while remembering the pending operation.
+- **Calculated**: Result displayed, next keypress starts fresh.
 
-This allows chaning like `2 + 3 * 4` (evaluating strictly left-to-right as `(2+3)*4` in this simple implementation, or one step at a time).
+### 2. Formatting
+Converting between String (display) and Number (calculation) logic.
+- Integers vs Floats differentiation.
+
+## Implementation Details
+
+1.  **State**:
+    - `display`: String shown on screen ("0").
+    - `acc`: Pending value (number or nil).
+    - `op`: Pending operator string ("+", "-", etc).
+    - `new_entry`: Boolean flag. If true, the next digit replaces the display instead of appending.
+2.  **Events**:
+    - `num`: Appends digit. Respects `new_entry` flag.
+    - `op`: calculating pending result (if any), updates `acc`, sets `op`, sets `new_entry = true`.
+    - `eval`: Calculates final result.
+
+## Tips
+- Simplicity first: evaluating strictly left-to-right (no order of operations) is acceptable for a basic calculator kata.

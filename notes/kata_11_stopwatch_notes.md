@@ -1,32 +1,34 @@
 # Kata 11: The Stopwatch
 
-## The Goal
-Build a working stopwatch that can be started, stopped, and reset. The display should update automatically while running, showing minutes, seconds, and tenths of a second.
+## Goal
+Build a working stopwatch that tracks time in minutes, seconds, and deciseconds. This introduces **server-driven intervals** and precise state updates.
 
-## Key Concepts
-- **Server-driven Interval**: Using `Process.send_after/3` to create a loop that sends messages to `self()`.
-- **Handling Info**: Using `handle_info/2` to react to internal process messages (like the tick) rather than user events (`handle_event/3`).
-- **Formatting**: Converting raw state (e.g., total ticks) into a human-readable string (MM:SS.d).
+## Core Concepts
 
-## The Solution
-We use a boolean flag `@running` to control the loop.
+### 1. The Tick Loop
+LiveView runs on the server. To create a loop, we send a message to ourself periodically.
+- `Process.send_after(pid, message, time_ms)`
 
 ```elixir
-# Start the loop
-def handle_event("start", _, socket) do
-  Process.send_after(self(), :tick, 100) # 100ms
-  {:noreply, assign(socket, running: true)}
-end
-
-# The Loop
-def handle_info(:tick, socket) do
-  if socket.assigns.running do
-    Process.send_after(self(), :tick, 100) # Schedule next
-    {:noreply, update(socket, :time, &(&1 + 1))}
-  else
-    {:noreply, socket} # Stop scheduling if not running
-  end
-end
+# In handle_info
+Process.send_after(self(), :tick, 100)
 ```
 
-By keeping the state on the server, we can ensure the timing logic is consistent, although for critical timing applications, one might compare against `DateTime.utc_now()` to account for any drift in message passing latency. For a simple stopwatch kata, this tick-based approach is sufficient and easier to reason about.
+### 2. Handling Info
+`handle_info/2` is the callback for internal Erlang messages (like our tick), whereas `handle_event/3` is for user interactions (clicks).
+
+### 3. Formatting
+Raw data (e.g., total deciseconds) should be stored in the state, but formatted into a human-readable string (MM:SS.d) only at render time.
+
+## Implementation Details
+
+1.  **State**: `time` (integer, starts at 0), `running` (boolean).
+2.  **Events**:
+    - **Start**: Sets `running: true` and triggers the first tick.
+    - **Stop**: Sets `running: false`.
+    - **Reset**: Resets `time` to 0.
+3.  **Loop**:
+    - `handle_info(:tick, socket)`: If running, increments time and schedules the next tick.
+
+## Tips
+- Always check if `@running` is true in `handle_info` before scheduling the next tick to ensure you can stop the loop cleanly.

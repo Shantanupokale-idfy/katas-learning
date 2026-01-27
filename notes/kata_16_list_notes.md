@@ -1,21 +1,35 @@
 # Kata 16: The List
 
-## The Goal
-Render a list of items and start understanding list manipulation in a functional way (appending items).
+## Goal
+Render a dynamic list of items and implement "Add" functionality. This introduces **Collections** (Lists) in LiveView.
 
-## Key Concepts
-- **List Comprehensions**: Using `<%= for item <- @items do %>` to iterate and render content.
-- **Immutability**: Appending to a list (`items ++ [new_item]`) creates a new list rather than mutating the old one.
+## Core Concepts
 
-## The Solution
-We maintain a list of strings in the assigns.
-When the form submits:
+### 1. Rendering Lists
+Use list comprehensions (`for`) inside your template to render HTML for each item.
+
 ```elixir
-def handle_event("add", %{"text" => text}, socket) do
-  # Append to end of list
-  new_items = socket.assigns.items ++ [text]
-  {:noreply, assign(socket, items: new_items)}
-end
+<%= for item <- @items do %>
+  <li>{item}</li>
+<% end %>
 ```
 
-Note: In Elixir, appending to a list is O(n). For very large lists, prepending `[text | items]` is O(1) and generally preferred, but for UI lists where order matters (top to bottom), appending is often more intuitive for beginners unless we reverse the list at render time.
+### 2. Immutability
+To add an item, you create a *new* list containing the old items plus the new one. Use `[new | old]` (prepend) or `old ++ [new]` (append).
+
+```elixir
+# Prepend is O(1) - faster
+new_list = [item | @items]
+```
+
+## Implementation Details
+
+1.  **State**: `items` (list of strings), `new_item` (for the input).
+2.  **UI**:
+    - A form with a text input.
+    - A `<ul>` rendering the items.
+3.  **Events**:
+    - `handle_event("add", params, socket)`: Extracts the value, appends it to the list, and clears the input.
+
+## Tips
+- For large lists, specialized features like `streams` (covered in advanced katas) are preferred over raw lists to optimize memory and DOM patching. For small lists, raw assigns are perfect.

@@ -1,31 +1,33 @@
 # Kata 20: The Sorter
 
-## The Goal
-Implement a table where clicking on column headers sorts the data by that field, toggling between ascending and descending order.
+## Goal
+Implement a data table with **sortable columns**. Clicking a header sorts by that field; clicking again reverses the order.
 
-## Key Concepts
-- **Sort State**: Tracking both the `sort_by` field and the `sort_order` (:asc or :desc).
-- **Toggle Logic**: If clicking the *same* field, flip the order. If clicking a *different* field, reset to default order (asc).
-- **Dynamic Sorting**: Using `Enum.sort_by/3` with dynamic field access (`Map.get(item, field)`).
+## Core Concepts
 
-## The Solution
-We use helper functions to keep the template and the logic clean.
+### 1. Sort State
+You need to track two things:
+- `sort_by`: The field currently being sorted (e.g., `:name`, `:age`).
+- `sort_order`: The direction (`:asc` or `:desc`).
 
-Logic:
+### 2. Dynamic Sorting
+Use `Enum.sort_by/3`.
 ```elixir
-new_order = 
-  if @sort_by == field and @sort_order == :asc do
-    :desc
-  else
-    :asc
-  end
+Enum.sort_by(items, &Map.get(&1, @sort_by), @sort_order)
 ```
 
-Representation:
-```elixir
-defp sort_indicator(current_field, order, target_field) do
-  if current_field == target_field do
-    if order == :asc, do: "▲", else: "▼"
-  end
-end
-```
+### 3. Toggle Logic
+- If the user clicks the *same* column -> Flip the order.
+- If the user clicks a *different* column -> Set new column, reset order to `:asc`.
+
+## Implementation Details
+
+1.  **State**: `items`, `sort_by`, `sort_order`.
+2.  **UI**:
+    - Table headers with `phx-click="sort"`.
+    - Visual indicator (arrow) next to the active column.
+3.  **Events**:
+    - `sort`: Apply the toggle logic and update state.
+
+## Tips
+- Sorting is usually fast enough to do on the server for page-sized datasets. For database-backed lists, you would pass these params to your Ecto query.

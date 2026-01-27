@@ -1,28 +1,28 @@
 # Kata 13: Events Mastery
 
-## The Goal
-Understand different types of events that can be bound to DOM elements, specifically Focus, Blur, and KeyUp.
+## Goal
+Understand different DOM events: **Focus**, **Blur**, and **KeyUp**. These are essential for rich form interactions, validation, and keyboard shortcuts within inputs.
 
-## Key Concepts
-- **Focus/Blur**: `phx-focus` triggers when an element gains focus, and `phx-blur` when it loses it. Useful for validation or UI hints.
-- **Key Events**: `phx-keyup` triggers whenever a key is released while the element has focus. It sends the `key` pressed in the payload.
-- **Payload Extraction**: Accessing `%{"key" => key}` or `%{"value" => value}` in the handle_event callback.
+## Core Concepts
 
-## The Solution
-We attach multiple bindings to the same input:
+### 1. Focus & Blur
+- `phx-focus`: Triggered when an element gains focus (user clicks in or tabs to it).
+- `phx-blur`: Triggered when an element loses focus (user tabs away or clicks elsewhere).
+Great for showing helper text or validating a field *after* the user is done typing.
 
-```html
-<input 
-  phx-focus="focus_event"
-  phx-blur="blur_event"
-  phx-keyup="keyup_event"
-/>
-```
+### 2. KeyUp
+- `phx-keyup`: Triggered when a keyboard key is released.
+- The payload contains the specific key: `%{"key" => "Enter"}`.
 
-And handle them separately:
+## Implementation Details
 
-```elixir
-def handle_event("keyup_event", %{"key" => key}, socket) do
-  # Log the specific key pressed
-end
-```
+1.  **UI**: A single input field with multiple bindings.
+    ```html
+    <input phx-focus="focus" phx-blur="blur" phx-keyup="keyup" ... />
+    ```
+2.  **Events**:
+    - Implement distinct `handle_event` callbacks for each binding.
+    - Log the events to a list in the state to visualize them in real-time.
+
+## Tips
+- `phx-key` (not used here, but related) is widely used to capture specific keys on the *window*, whereas `phx-keyup` on an input captures typing within that input.
