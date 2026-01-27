@@ -24,7 +24,7 @@ defmodule ElixirKatasWeb.Kata91MaskedInputLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <h3 class="text-lg font-medium mb-6">Masked Inputs</h3>
           
-          <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
+          <.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself} class="space-y-6">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number (US)</label>
               <.input 

@@ -22,7 +22,7 @@ defmodule ElixirKatasWeb.Kata32ComparisonValidationLive do
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
+          <.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself} class="space-y-6">
             
             <div>
               <label for="password" class="block text-sm font-medium text-gray-700">Password</label>

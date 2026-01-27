@@ -27,7 +27,7 @@ defmodule ElixirKatasWeb.Kata26TextInputLive do
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-4">
+          <.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself} class="space-y-4">
             <div>
               <label for="name" class="block text-sm font-medium text-gray-700">Enter your name</label>
               <div class="mt-1">
