@@ -1,37 +1,38 @@
-# Kata 34: Live Feedback
+# Kata 34: Live Feedback (Blur vs Change)
 
-## Overview
-Showing validation errors *instantly* (as the user types) is great, but showing them *too early* (before the user has even finished the first word) feels aggressive and broken.
+## Goal
+Improve user experience by controlling *when* errors are shown. Displaying "Invalid format" while the user is still typing the first character is annoying. Showing it on **Blur** (when leaving the field) is often better.
 
-**Live Feedback** manages this UX by tracking which fields have been "touched" (focused and blurred, or edited). We only show errors for fields that the user has interacted with or after a failed submit attempt.
+## Core Concepts
 
-## Key Concepts
+### 1. The `phx-blur` Binding
+Fires an event when an input loses focus. We can use this to mark a field as "touched".
 
-### 1. The `used_input?` pattern
-Phoenix `Phoenix.HTML.Form` utilizes the `used_input?` helper (often implicitly via `to_form`'s `:as` or `:action` logic) to decide when to show errors.
-However, in a manual LiveView context without Ecto Changesets, the easiest pattern is to explicitly track a set of `touched` fields.
+### 2. "Touched" State
+We track a `MapSet` of field names that the user has visited.
+- If a field is **Valid**: Show success immediately (optional).
+- If a field is **Invalid**: Show error *only if* it has been touched.
 
-### 2. Events: `phx-blur`
-We use `phx-blur` on inputs to detect when a user *leaves* a field. This is the classic "touched" signal.
-We accumulate these field names in a `MapSet` or list in `socket.assigns.touched`.
+## Implementation Details
 
-### 3. Logic
-- **Initial Load**: No errors shown.
-- **Typing (`phx-change`)**: Update value, run validation logic, but *don't* show errors unless field is already in `touched` set.
-- **Blur (`phx-blur`)**: Add field to `touched` set. Now errors for this field become visible.
-- **Submit**: Mark *all* fields as touched, so any remaining errors light up.
+1.  **State**: `touched` (MapSet).
+2.  **Events**:
+    *   `handle_event("blur", ...)`: Add field name to `touched`.
+    *   `handle_event("validate", ...)`: Run validation logic but don't change `touched`. (Standard `phx-change`).
 
-## The Code Structure
-```elixir
-def handle_event("blur", %{"name" => field}, socket) do
-  # Add field to touched set
-  touched = MapSet.put(socket.assigns.touched, field)
-  {:noreply, assign(socket, touched: touched, form: ...)} 
+## Tips
+- When the user hits "Submit", you should mark **all** fields as touched so that any remaining errors become visible.
+
+## Challenge
+Implement **Instant Fix Feedback**: If a field is currently showing an error (because it was touched), clear the error *immediately* as soon as the user starts typing valid data (on proper validation in `phx-change`), without waiting for another blur. (Note: The current implementation already mostly supports this via reactive updates, but explicitly try to ensure the error disappears instantly).
+
+**Harder Challenge**: Add a "Reset Form" button that clears all data AND resets the `touched` state so no errors are shown.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("reset", _, socket) do
+  {:noreply, assign(socket, form: ..., touched: MapSet.new())}
 end
-```
-In the template, we manually check:
-```elixir
-<%= if MapSet.member?(@touched, "username") and @form[:username].errors != [] do %>
-  <.error>...</.error>
-<% end %>
-```
+</code></pre>
+</details>

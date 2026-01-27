@@ -1,93 +1,32 @@
 # Kata 85: Scroll to Bottom
 
-## Overview
-Demonstrates auto-scroll functionality commonly used in chat interfaces and live feeds.
+## Goal
+Keep a chat window scrolled to the latest message.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Auto-Scroll Pattern
-Automatically scroll to bottom when new content appears.
+### 1. Scroll Hook
+A Hook `mounted()` and `updated()` can set `el.scrollTop = el.scrollHeight`.
 
-### 2. JavaScript Hook
-```javascript
-// assets/js/hooks.js
-let Hooks = {}
-
-Hooks.ScrollToBottom = {
-  mounted() {
-    this.el.scrollIntoView({ behavior: "smooth" })
-  },
-  updated() {
-    this.el.scrollIntoView({ behavior: "smooth" })
-  }
-}
-
-export default Hooks
-```
-
-### 3. Integration
-```elixir
-# In your endpoint or app.js
-let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: Hooks,
-  params: {_csrf_token: csrfToken}
-})
-```
+### 2. `phx-update="stream"`
+When new items append, the Hook triggers.
 
 ## Implementation Details
 
-### Scroll Anchor
-Place an element at the bottom that scrolls into view:
-```heex
-<div id="scroll-anchor" phx-hook="ScrollToBottom"></div>
-```
+1.  **Hook**: `ScrollToBottom`.
+2.  **Logic**: On every update to the list container, scroll down.
 
-### Conditional Auto-Scroll
-```elixir
-<%= if @auto_scroll do %>
-  <div id="scroll-anchor" phx-hook="ScrollToBottom"></div>
-<% end %>
-```
+## Tips
+- Only auto-scroll if the user was *already* at the bottom. If they scrolled up to read history, don't yank them back down.
 
-### Manual Scroll
-```elixir
-def handle_event("scroll_to_bottom", _, socket) do
-  {:noreply, push_event(socket, "scroll-to-bottom", %{})}
-end
-```
+## Challenge
+**Unread Indicator**. If the user is scrolled up and a new message arrives, don't auto-scroll. Instead, show a floating "⬇ New Message" button. Clicking it scrolls to bottom.
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Detect User Scroll
-```javascript
-Hooks.ChatScroll = {
-  mounted() {
-    this.el.addEventListener("scroll", () => {
-      const isAtBottom = 
-        this.el.scrollHeight - this.el.scrollTop === this.el.clientHeight
-      this.pushEvent("scroll-position", { atBottom: isAtBottom })
-    })
-  }
-}
-```
-
-### Preserve Scroll Position
-```elixir
-# Don't auto-scroll if user has scrolled up
-def handle_event("new_message", msg, socket) do
-  {:noreply,
-   socket
-   |> assign(:messages, [msg | socket.assigns.messages])
-   |> assign(:should_scroll, socket.assigns.at_bottom)}
-end
-```
-
-## Real-World Usage
-- Chat applications
-- Live feeds
-- Log viewers
-- Notification streams
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
+<pre><code class="elixir"># Hook needs to track `isAtBottom`.
+# If !isAtBottom on NewMsg, user event -> show badge.
+# (This is mostly JS Hook logic).
+</code></pre>
+</details>

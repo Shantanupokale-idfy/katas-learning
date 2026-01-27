@@ -1,15 +1,33 @@
-# Kata 55: The Slide-over
+# Kata 55: Slideover (Drawer)
 
-## Overview
-Drawer component with transitions
+## Goal
+Create a "Drawer" or "Slideover" that enters from the side of the screen, typically used for mobile menus or details panels.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Core Pattern
-This kata demonstrates drawer component with transitions.
+### 1. Transitions
+Animation is key for slide-overs. Without transition, it feels jarring.
+(Note: LiveView has `JS.transition`, but simpler CSS transitions on mounting elements work too).
 
-### 2. Implementation
-See the interactive example for a working demonstration.
+### 2. Fixed Positioning
+The panel uses `fixed right-0 top-0 h-full` to anchor to the side.
 
-### 3. Usage
-Check the source code tab for implementation details.
+## Implementation Details
+
+1.  Similar to Modal (backdrop checking).
+2.  Panel positioning is the main difference.
+
+## Tips
+- On mobile, slide-overs are often preferred over centered modals because they maximize vertical space.
+
+## Challenge
+Make the side **Configurable**. Add `attr :side, :string, default: "right"`. Allow the drawer to slide in from the **Left** if specified.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">class={
+  if @side == "left", do: "left-0 ...", else: "right-0 ..."
+}
+</code></pre>
+</details>

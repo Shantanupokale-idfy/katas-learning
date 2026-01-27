@@ -1,96 +1,32 @@
 # Kata 99: CSV Export
 
-## Overview
-Export table to CSV using LiveView and JavaScript interop.
+## Goal
+Export data lists to CSV format.
 
-## Key Concepts
+## Core Concepts
 
-### 1. CSV Export Integration
-This kata demonstrates how to integrate csv export functionality into a LiveView application.
+### 1. `NimbleCSV`
+Efficient CSV generation library.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.CSVExport = {
-  mounted() {
-    // Initialize csv export
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="csv-container" phx-hook="CSVExport">
-    <!-- CSV Export content -->
-  </div>
-  """
-end
-```
+### 2. Triggering Download
+Similar to PDF, easiest via a Controller.
+Or: Generate data in LiveView -> `Base64` encode -> Push event -> JS triggers download of Data URI (okay for small files).
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Link**: `<a href="/exports/csv">` triggers the controller action.
 
-### Event Handling
-```elixir
-def handle_event("csv_action", params, socket) do
-  # Process csv action
-  {:noreply, socket}
-end
-```
+## Tips
+- For large datasets, stream the CSV response chunk-by-chunk using `Plug.Conn.chunk`.
 
-### State Management
-- Track csv state in socket assigns
-- Sync state between client and server
-- Handle edge cases
+## Challenge
+**Column Selection**.
+Add checkboxes for "Include ID", "Include Role", etc.
+Pass these as query params to the export link: `/exports/csv?columns=id,role`.
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:csv_ready, false)
-   |> push_event("init_csv", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup csv resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Data export
-- Production-ready csv export integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full csv functionality
-3. Add error handling
-4. Test edge cases
+<pre><code class="elixir">href={"/exports/csv?columns=#{@selected_columns_joined}"}
+</code></pre>
+</details>

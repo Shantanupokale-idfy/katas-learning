@@ -1,96 +1,34 @@
-# Kata 91: Masked Input
+# Kata 91: Masked Inputs
 
-## Overview
-Phone/card number masking using LiveView and JavaScript interop.
+## Goal
+Format user input automatically as they type (e.g., phone numbers, dates, credit cards).
 
-## Key Concepts
+## Core Concepts
 
-### 1. Masked Input Integration
-This kata demonstrates how to integrate masked input functionality into a LiveView application.
+### 1. `InputMask` Hook
+A Hook that listens to `input` events and modifies `el.value` based on a pattern.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.MaskedInput = {
-  mounted() {
-    // Initialize masked input
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="masked-container" phx-hook="MaskedInput">
-    <!-- Masked Input content -->
-  </div>
-  """
-end
-```
+### 2. Data Attributes
+Pass the mask type via `data-mask="phone"`.
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Server**: Receives the *masked* value usually.
+2.  **Unmasking**: Often you want to save raw numbers. You might need a hidden input or strip formatting on the server.
 
-### Event Handling
-```elixir
-def handle_event("masked_action", params, socket) do
-  # Process masked action
-  {:noreply, socket}
-end
-```
+## Tips
+- Accessibility: Ensure the screen reader announces the mask format or the label explains it.
 
-### State Management
-- Track masked state in socket assigns
-- Sync state between client and server
-- Handle edge cases
+## Challenge
+Add a **ZIP Code** field.
+Format: `99999` (5 digits).
+Or `99999-9999` (ZIP+4).
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:masked_ready, false)
-   |> push_event("init_masked", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup masked resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Input formatting
-- Production-ready masked input integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full masked functionality
-3. Add error handling
-4. Test edge cases
+<pre><code class="html">
+<.input ... data-mask="zip" />
+<!-- Update JS Hook to handle "zip" case -->
+</code></pre>
+</details>

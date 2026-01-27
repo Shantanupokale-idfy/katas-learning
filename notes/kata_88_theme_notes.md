@@ -1,74 +1,35 @@
 # Kata 88: Theme Switcher
 
-## Overview
-Demonstrates theme switching (dark/light mode) with LiveView.
+## Goal
+Toggle between Light and Dark modes.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Theme State Management
-```elixir
-def mount(_params, _session, socket) do
-  theme = get_session(socket, :theme) || "light"
-  {:ok, assign(socket, :theme, theme)}
-end
-```
+### 1. `class` Toggle
+Simply swapping `bg-white text-black` for `bg-gray-900 text-white`.
 
-### 2. CSS Classes
-```heex
-<div class={if @theme == "dark", do: "bg-gray-900 text-white", else: "bg-white text-gray-900"}>
-  Content
-</div>
-```
+### 2. Persistence
+Ideally, save preference to cookie or localStorage (see Kata 87).
 
-### 3. Persistence
-```elixir
-def handle_event("toggle_theme", _, socket) do
-  new_theme = if socket.assigns.theme == "light", do: "dark", else: "light"
-  {:noreply,
-   socket
-   |> assign(:theme, new_theme)
-   |> put_session(:theme, new_theme)}
-end
-```
+## Implementation Details
 
-## Implementation Patterns
+1.  **State**: `theme` ("light" | "dark").
+2.  **Logic**: `if theme == "dark", do: "dark-classes", else: "light-classes"`.
 
-### Tailwind Dark Mode
-```javascript
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class',
-  // ...
+## Tips
+- Tailwind's `dark:` modifier works well if you set `darkMode: 'class'` in config and toggle a class on the `<html>` element.
+
+## Challenge
+**System Preference Detection**.
+Update the Hook to check `window.matchMedia('(prefers-color-scheme: dark)').matches`.
+On mount, send this preference to the server to set the initial theme automatically.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="javascript">mounted() {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  this.pushEvent("set_theme", {theme: isDark ? "dark" : "light"});
 }
-```
-
-```heex
-<html class={@theme}>
-  <!-- Content automatically uses dark: variants -->
-</html>
-```
-
-### System Preference
-```javascript
-// Detect system preference
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-```
-
-### LocalStorage Persistence
-```javascript
-Hooks.ThemeSwitcher = {
-  mounted() {
-    const theme = localStorage.getItem('theme') || 'light'
-    this.pushEvent("set-theme", {theme})
-    
-    this.handleEvent("save-theme", ({theme}) => {
-      localStorage.setItem('theme', theme)
-      document.documentElement.classList.toggle('dark', theme === 'dark')
-    })
-  }
-}
-```
-
-## Resources
-- [Tailwind Dark Mode](https://tailwindcss.com/docs/dark-mode)
-- [prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
+</code></pre>
+</details>

@@ -1,40 +1,40 @@
 # Kata 42: Path Params
 
-## Overview
-Dynamic route segments like `/user/:id` allow you to capture parts of the URL path as parameters.
-These are accessed in `handle_params/3` just like query params.
+## Goal
+Handle dynamic route segments (e.g., `/items/:id`) to display specific resources.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Dynamic Routes
-Define routes with `:param_name` syntax:
-```elixir
-live "/user/:id", UserLive
-live "/posts/:category/:slug", PostLive
-```
+### 1. Router Configuration
+In `router.ex`, routes are defined like `live "/items/:id", ItemLive`. The `:id` portion is captured and passed to `handle_params`.
 
-### 2. Accessing Path Params
-Path params appear in the `params` map in `handle_params/3`:
-```elixir
-def handle_params(%{"id" => id}, _uri, socket) do
-  user = get_user(id)
-  {:noreply, assign(socket, user: user)}
-end
-```
+### 2. Selecting Data
+Use the captured ID to look up the correct item from your data source (or assigns).
 
-### 3. Navigation with Path Params
-```elixir
-<.link navigate={~p"/user/#{user.id}"}>View User</.link>
-```
+## Implementation Details
 
-## The Code Structure
-```elixir
-# Router
-live "/items/:id", ItemLive
+1.  **Mount**: Load the full list of items.
+2.  **Handle Params**:
+    *   Pattern match on `%{"id" => id}`.
+    *   Set `@selected_item` based on the ID.
+    *   Handle the case where ID is missing (index page) or invalid.
 
-# LiveView
-def handle_params(%{"id" => id}, _uri, socket) do
-  item = Enum.find(socket.assigns.all_items, &(&1.id == String.to_integer(id)))
-  {:noreply, assign(socket, selected_item: item)}
-end
-```
+## Tips
+- Parse IDs to integers if your data uses integer IDs (`String.to_integer/1`).
+- Handle 404s or "Item not found" gracefully.
+
+## Challenge
+Add **Next / Previous** buttons that navigate to the next or previous item ID.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In key places:
+prev_id = @selected_item.id - 1
+next_id = @selected_item.id + 1
+
+# Render:
+&lt;.link patch={~p"/katas/42.../#{prev_id}"}&gt;Prev&lt;/.link&gt;
+&lt;.link patch={~p"/katas/42.../#{next_id}"}&gt;Next&lt;/.link&gt;
+</code></pre>
+</details>

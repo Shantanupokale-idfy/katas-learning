@@ -1,34 +1,36 @@
-# Kata 49: The Translator (i18n)
+# Kata 49: Translator (i18n)
 
-## Overview
-Internationalization (i18n) allows your app to support multiple languages.
-Phoenix uses Gettext for translations.
+## Goal
+Implement a simple internationalization system. Switch languages to see UI text update instantly.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Gettext Basics
-Define translations in `.po` files:
-```
-# priv/gettext/en/LC_MESSAGES/default.po
-msgid "welcome"
-msgstr "Welcome"
+### 1. Translation Map
+A simple Map `%{ "en" => %{"hello" => "Hello"}, "es" => ... }` simulates a real translation backend (like Gettext).
 
-# priv/gettext/es/LC_MESSAGES/default.po
-msgid "welcome"
-msgstr "Bienvenido"
-```
+### 2. Helper Function
+A `t(locale, key)` helper function looks up the string. If missing, it usually falls back to the key or a default language.
 
-### 2. Using Translations
-```elixir
-import MyAppWeb.Gettext
-gettext("welcome")  # => "Welcome" or "Bienvenido"
-```
+## Implementation Details
 
-### 3. Locale Switching
-Store locale in assigns and use it:
-```elixir
-Gettext.put_locale(MyAppWeb.Gettext, locale)
-```
+1.  **State**: `locale` (String "en", "es", ...).
+2.  **Render**: All text is wrapped in `<%= t(@locale, "key") %>`.
 
-### 4. Simplified Demo
-For this kata, we'll use a simple map-based approach instead of full Gettext setup.
+## Tips
+- Phoenix uses `Gettext` by default, which extracts strings to `.po` files. This kata simulates that mechanism in-memory.
+
+## Challenge
+Add a new language: **Italian** (`it`). Add the translations for "welcome" ("Benvenuto") and "greeting" ("Ciao, Mondo!").
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># Add to @translations map:
+"it" => %{
+  "welcome" => "Benvenuto",
+  "greeting" => "Ciao, Mondo!",
+  ...
+}
+# Add button in render
+</code></pre>
+</details>

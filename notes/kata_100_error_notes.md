@@ -1,96 +1,33 @@
-# Kata 100: Error Boundary
+# Kata 100: Error Boundaries
 
-## Overview
-Error recovery using LiveView and JavaScript interop.
+## Goal
+Handle crashes gracefully. If a LiveComponent or LiveView crashes, the Supervisor should restart it, and the client should reconnect.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Error Boundary Integration
-This kata demonstrates how to integrate error boundary functionality into a LiveView application.
+### 1. "Let it Crash"
+Elixir's philosophy. Don't code defensively against impossible states. If it happens, crash and reset to a known good state.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.ErrorBoundary = {
-  mounted() {
-    // Initialize error boundary
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="error-container" phx-hook="ErrorBoundary">
-    <!-- Error Boundary content -->
-  </div>
-  """
-end
-```
+### 2. Client Reconnect
+Phoenix JS client automatically attempts to rejoin the channel.
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Demo**: Requires a button that explicitly `raise "Error"`.
 
-### Event Handling
-```elixir
-def handle_event("error_action", params, socket) do
-  # Process error action
-  {:noreply, socket}
+## Tips
+- LiveComponents run in the *same* process as the Parent LiveView. A crash in a component crashes the *whole view*.
+
+## Challenge
+**The Crash Button**.
+Add a button "Simulate Crash".
+Clicking it raises an exception. Observe how the UI momentarily blinks/freezes and then reloads (resets to initial state).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("crash", _, _) do
+  raise "Simulated Crash!"
 end
-```
-
-### State Management
-- Track error state in socket assigns
-- Sync state between client and server
-- Handle edge cases
-
-## Common Patterns
-
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:error_ready, false)
-   |> push_event("init_error", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup error resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Crash handling
-- Production-ready error boundary integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full error functionality
-3. Add error handling
-4. Test edge cases
+</code></pre>
+</details>

@@ -1,37 +1,43 @@
-# Kata 36: Debounce & Throttle
+# Kata 36: Debounce
 
-## Overview
-When listening to keyboard events like `phx-change`, it's easy to overwhelm the server if we send a request for every single keystroke.
-**Debouncing** ensures that we only send a request after the user has *stopped* typing for a specified duration.
-**Throttling** ensures we send requests at most once every specified interval (e.g., for mouse movement or scroll events).
+## Goal
+Implement **Debouncing** to limit the rate of event handling. This is critical for search inputs to prevent flooding the server with requests on every keystroke.
 
-## Key Concepts
+## Core Concepts
 
 ### 1. `phx-debounce`
-LiveView makes this incredibly easy with the `phx-debounce` attribute on inputs.
-- `phx-debounce="300"`: Wait 300ms after the last keystroke before sending the event.
-- `phx-debounce="blur"`: Only send the event when the user leaves the field.
+A built-in attribute that delays the sending of an event.
+- `phx-debounce="300"`: Waits 300ms after the last keystroke before sending.
+- `phx-debounce="blur"`: Waits until the user leaves the field.
 
-### 2. Loading States
-When a search is triggered, it's polite to show a "Searching..." indicator.
-We can use `phx-change` to trigger the search and manage an `@loading` state, or rely on LiveView's generic loading classes (`phx-submit-loading`, etc.) if using a form submit.
+### 2. Loading State
+LiveView automatically applies CSS classes when an event is processing.
+- `phx-change-loading`: Applied to the form/input while waiting for the server response.
 
-## The Code Structure
-```html
-<form phx-change="search" phx-submit="search">
-  <input 
-    type="text" 
-    name="query" 
-    phx-debounce="500" 
-    placeholder="Search..." 
-  />
-</form>
-```
-In the LiveView:
-```elixir
-def handle_event("search", %{"query" => query}, socket) do
-  # This only fires after 500ms of inactivity
-  results = search(query) 
-  {:noreply, assign(socket, results: results)}
+## Implementation Details
+
+1.  **State**: `query` and `results`.
+2.  **UI**: Search input with `phx-debounce="500"`.
+3.  **Events**:
+    *   `handle_event("search", ...)`: Performs the actual search logic.
+
+## Tips
+- Use a spinner with CSS opacity toggled by `.phx-change-loading` class on the container for a smooth "Searching..." indicator.
+
+## Challenge
+Add a **Minimum Length** check. Do not perform the search (or searching for empty list) if the query is **less than 3 characters**.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("search", %{"query" => query}, socket) do
+  results = 
+    if String.length(query) >= 3 do
+      perform_search(query)
+    else
+      [] 
+    end
+  {:noreply, assign(socket, query: query, results: results)}
 end
-```
+</code></pre>
+</details>

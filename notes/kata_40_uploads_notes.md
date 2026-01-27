@@ -1,36 +1,39 @@
 # Kata 40: File Uploads
 
-## Overview
-LiveView has built-in support for reactive file uploads.
-It handles drag-and-drop, progress tracking, and constraints (size, type) out of the box.
+## Goal
+Implement client-side file previews and server-side handling of file uploads using LiveView's built-in `allow_upload`.
 
-## Key Concepts
+## Core Concepts
 
 ### 1. `allow_upload/3`
-In `mount`, we declare the upload configuration.
+Configures the upload capabilities (file types, max size, max entries).
 ```elixir
-allow_upload(socket, :avatar, accept: ~w(.jpg .jpeg .png), max_entries: 2)
+allow_upload(socket, :avatar, accept: ~w(.jpg .png), max_entries: 1)
 ```
 
-### 2. Input Binding
-In the template, we use specialized bindings:
-- `<.live_file_input upload={@uploads.avatar} />`: The file picker.
-- `<div phx-drop-target={@uploads.avatar.ref}>`: Area for drag/drop.
+### 2. `consume_uploaded_entries/3`
+The function used to process the files once standard form validation passes. Files are temporarily stored on the server until consumed.
 
-### 3. Previews
-We can render previews of selected files before they are uploaded to the server (client-side preview).
-```elixir
-<.live_img_preview entry={entry} width="75" />
-```
+## Implementation Details
 
-### 4. Consumption
-On submit, we "consume" the uploaded entries.
-```elixir
-consume_uploaded_entries(socket, :avatar, fn %{path: path}, _entry ->
-  # Move file from tmp path to permanent storage
-  dest = Path.join("priv/static/uploads", Path.basename(path))
-  File.cp!(path, dest)
-  {:ok, "/uploads/" <> Path.basename(path)}
-end)
-```
-*Note: In this specific kata environment, we'll verify the logical flow and maybe simulate "saving" by just acknowledging the file details, to avoid file permission complexities in the lab environment.*
+1.  **Mount**: Call `allow_upload`.
+2.  **Render**:
+    *   `<.live_file_input upload={@uploads.avatar} />`
+    *   Loop over `@uploads.avatar.entries` to show `<.live_img_preview />`.
+3.  **Events**:
+    *   `validate`: Required to trigger the upload flow.
+    *   `save`: Call `consume_uploaded_entries` to move files to permanent storage.
+
+## Tips
+- LiveView uploads are direct-to-server (or direct-to-cloud with presigned URLs).
+
+## Challenge
+Update the configuration to allow **PDF** files (`.pdf`) as well.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In mount/2
+allow_upload(socket, :avatar, accept: ~w(.jpg .png .pdf), ...)
+</code></pre>
+</details>

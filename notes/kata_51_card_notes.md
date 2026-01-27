@@ -1,41 +1,38 @@
-# Kata 51: The Card
+# Kata 51: Card Component
 
-## Overview
-Cards are versatile containers for grouping related content. Using named slots allows flexible composition.
+## Goal
+Design a flexible Card component using **Multiple Named Slots**. This allows consumers to inject varying content into defined areas (Header, Body, Footer).
 
-## Key Concepts
+## Core Concepts
 
-### 1. Named Slots
-Define multiple slots for different sections:
+### 1. `render_slot(@name)`
+Renders the content passed to a named slot.
 ```elixir
-slot :header
-slot :body
-slot :footer
-
-def card(assigns) do
-  ~H"""
-  <div class="card">
-    <div class="header"><%= render_slot(@header) %></div>
-    <div class="body"><%= render_slot(@body) %></div>
-    <div class="footer"><%= render_slot(@footer) %></div>
-  </div>
-  """
-end
+<:header>My Header</:header>
 ```
 
-### 2. Optional Slots
-Check if slot content exists:
+### 2. Conditional Slot Rendering
+Check if a slot argument is present (not empty list) before rendering its container to avoid empty divs with padding.
 ```elixir
-<%= if @header != [] do %>
-  <div class="header"><%= render_slot(@header) %></div>
-<% end %>
+<%= if @header != [] do %> ... <% end %>
 ```
 
-### 3. Usage
-```heex
-<.card>
-  <:header>Title</:header>
-  <:body>Content</:body>
-  <:footer>Actions</:footer>
-</.card>
-```
+## Implementation Details
+
+1.  **Slots**: `:header`, `:body`, `:footer`.
+2.  **Usage**: Call `<.card>` and provide slot entries.
+
+## Tips
+- Named slots make your components much more reusable than passing huge strings of HTML as attributes.
+
+## Challenge
+Add **Collapsibility**. Add an `attr :collapsible, :boolean, default: false`. If true, clicking the header should toggle the visibility of the body/footer.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># 1. Add state `expanded` to component (if LiveComponent) or use JS command.
+# 2. JS approach:
+# <div class="header" phx-click={JS.toggle(to: "#body")}>...</div>
+</code></pre>
+</details>

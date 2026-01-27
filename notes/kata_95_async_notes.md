@@ -1,96 +1,39 @@
 # Kata 95: Async Assigns
 
-## Overview
-Async data loading using LiveView and JavaScript interop.
+## Goal
+Load data asynchronously without blocking the initial UI render.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Async Assigns Integration
-This kata demonstrates how to integrate async assigns functionality into a LiveView application.
+### 1. `assign_async/3`
+Starts a task. The `render` function receives an `AsyncResult` struct.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.AsyncAssigns = {
-  mounted() {
-    // Initialize async assigns
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
+### 2. `<.async_result>`
+Component to handle `:loading`, `:failed`, and success states declarative-style.
 ```elixir
-def render(assigns) do
-  ~H"""
-  <div id="async-container" phx-hook="AsyncAssigns">
-    <!-- Async Assigns content -->
-  </div>
-  """
-end
+<.async_result :let={data} assign={@my_data}>
+  <:loading>Loading...</:loading>
+  <:failed :let={reason}>Error: <%= reason %></:failed>
+  <div><%= data %></div>
+</.async_result>
 ```
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Mount**: Call `assign_async`.
+2.  **Function**: Returns `{:ok, %{key: val}}` or `{:error, reason}`.
 
-### Event Handling
-```elixir
-def handle_event("async_action", params, socket) do
-  # Process async action
-  {:noreply, socket}
-end
-```
+## Tips
+- Great for dashboards where one slow widget shouldn't stall the whole page.
 
-### State Management
-- Track async state in socket assigns
-- Sync state between client and server
-- Handle edge cases
+## Challenge
+Simulate **Failure**. Modify the loading function to randomly return `{:error, "Service Unavailable"}`. Observe the `:failed` slot rendering.
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:async_ready, false)
-   |> push_event("init_async", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup async resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Non-blocking UI
-- Production-ready async assigns integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full async functionality
-3. Add error handling
-4. Test edge cases
+<pre><code class="elixir">assign_async(..., fn ->
+  if :rand.uniform(2) == 1, do: {:error, "Fail"}, else: {:ok, ...}
+end)
+</code></pre>
+</details>

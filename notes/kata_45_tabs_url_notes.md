@@ -1,30 +1,38 @@
-# Kata 45: Tabs with URL
+# Kata 45: URL Tabs
 
-## Overview
-Syncing tab state to URL query parameters allows users to bookmark or share specific tab views.
-This combines the tab pattern with URL state management.
+## Goal
+Implement a Tab interface where the active tab is controlled by the URL (`?tab=settings`).
 
-## Key Concepts
+## Core Concepts
 
-### 1. Tab State in URL
-Store the active tab in a query parameter:
-```
-?tab=profile
-?tab=settings
-```
+### 1. Link-Based Tabs
+Instead of `<button phx-click="set_tab">`, use `<.link patch={~p"...?tab=settings"}>`.
+This makes tabs linkable, bookmarkable, and "Back" button friendly.
 
-### 2. Syncing on Click
-When a tab is clicked, update the URL:
-```elixir
-def handle_event("switch_tab", %{"tab" => tab}, socket) do
-  {:noreply, push_patch(socket, to: "?tab=#{tab}")}
+### 2. Fallback
+If the `tab` parameter is missing, default to the first tab (e.g., "profile") in `handle_params`.
+
+## Implementation Details
+
+1.  **Handle Params**: Match `?tab=X` and update `@active_tab`.
+2.  **Render**: Highlight the link corresponding to `@active_tab`. Render content block.
+
+## Tips
+- This is superior to state-only tabs for almost all main application navigation.
+
+## Challenge
+If the user visits the page **without** a tab parameter, automatically update the URL to include `?tab=profile` (using `push_patch` in handle_params) so the URL is always explicit.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_params(params, _uri, socket) do
+  if params["tab"] do
+    {:noreply, assign(socket, active_tab: params["tab"])}
+  else
+    # Normalize URL
+    {:noreply, push_patch(socket, to: ~p"...?tab=profile")}
+  end
 end
-```
-
-### 3. Reading from URL
-In `handle_params/3`, set the active tab:
-```elixir
-def handle_params(%{"tab" => tab}, _uri, socket) do
-  {:noreply, assign(socket, active_tab: tab)}
-end
-```
+</code></pre>
+</details>

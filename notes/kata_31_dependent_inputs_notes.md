@@ -1,30 +1,43 @@
 # Kata 31: Dependent Inputs
 
-## Overview
-**Dependent Inputs** (or cascading dropdowns) are a classic LiveView use case. The set of options available in one input depends on the value selected in another.
+## Goal
+Build a form with cascading dropdowns, where options in one field depend on the selection in another (e.g., Country -> City).
 
-A common example: Selecting a **Country** filters the available **Cities**.
-
-## Key Concepts
+## Core Concepts
 
 ### 1. State-Driven Options
-The list of "Cities" is not static. It resides in `socket.assigns` (e.g., `@cities`).
-When the "Country" input changes (triggering `handle_event("validate", ...)`), the server:
-1.  Reads the new country ID.
-2.  Fetches/Calculates the relevant cities.
-3.  Updates `@cities` in the socket.
-4.  LiveView re-renders *only* the city dropdown with new options.
+The list of secondary options (Cities) is not static. It lives in `socket.assigns`. When the primary input (Country) changes, the server recalculates the available cities and pushes the update.
 
-### 2. Resetting Dependent Values
-When the parent input (Country) changes, the child input (City) usually becomes invalid. You should reset the child's value to empty or a default to prevent submitting a mismatched pair (e.g., Country: USA, City: Paris).
+### 2. Resetting Logic
+When the parent input changes, the child input usually becomes invalid. You must reset the child's value to prevent mismatched data (e.g., Country: USA, City: Berlin).
 
-## The Code Structure
-```elixir
-def handle_event("validate", %{"country" => country}, socket) do
-  cities = Cities.list_by_country(country)
-  {:noreply, assign(socket, cities: cities, form: to_form(%{"country" => country, "city" => ""}))}
-end
-```
+## Implementation Details
 
-## Optimizing with `phx-target`
-If your form is large, you might want to scope events. However, for dependent inputs, a standard `phx-change` on the form or the specific input works well. LiveView's diff tracking ensures only the changed parts (the dropdown options) are sent over the wire.
+1.  **State**: `countries` (fixed list), `cities` (dynamic list), and `form`.
+2.  **Events**:
+    *   `handle_event("validate", ...)`:
+        *   Detect if "country" changed.
+        *   If yes, update `cities` assign and reset `city` value to empty.
+        *   If no (only city changed), just update form state.
+
+## Tips
+- Use `Phoenix.HTML.Form.options_for_select/2` to easily generate `<option>` tags.
+- Disabling the child input when the parent is empty improves UX.
+
+## Challenge
+Add a third level: **District**. It should depend on the selected **City**.
+(You can mock the data, e.g., New York -> Manhattan, Brooklyn).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># 1. Add `districts` to assigns (default [])
+# 2. In handle_event "validate", if city changes, fetch districts.
+
+defp get_districts("New York"), do: ["Manhattan", "Brooklyn", "Queens"]
+defp get_districts(_), do: ["Downtown", "Uptown"]
+
+# 3. Add Select in template:
+# &lt;select name="district" disabled={@form[:city].value == ""} ...&gt;
+</code></pre>
+</details>

@@ -1,96 +1,33 @@
 # Kata 93: Sortable List
 
-## Overview
-Reorderable list items using LiveView and JavaScript interop.
+## Goal
+Reorder list items via Drag & Drop.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Sortable List Integration
-This kata demonstrates how to integrate sortable list functionality into a LiveView application.
+### 1. `SortableJS` (or similar lib) in a Hook
+The Hook initializes the library on the container.
+`onEnd`: Pushes the new index to the server.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.SortableList = {
-  mounted() {
-    // Initialize sortable list
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="sortable-container" phx-hook="SortableList">
-    <!-- Sortable List content -->
-  </div>
-  """
-end
-```
+### 2. Server Sync
+The server must receive `move_item` event and reorder the list in the assigns to match the client. If not synced, the next patch might jump items back.
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Event**: `push_event("reorder", %{from: old_idx, to: new_idx})`.
+2.  **Logic**: `List.pop_at` + `List.insert_at`.
 
-### Event Handling
-```elixir
-def handle_event("sortable_action", params, socket) do
-  # Process sortable action
-  {:noreply, socket}
+## Tips
+- Avoid `phx-update="stream"` for complex drag-and-drop unless relying entirely on the client library or using specialized stream support, as reordering streams can be tricky.
+
+## Challenge
+Add a **Reset Order** button. Restores the list to its initial state `["Item 1", "Item 2", ...]`.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("reset", _, socket) do
+  {:noreply, assign(socket, items: initial_items)}
 end
-```
-
-### State Management
-- Track sortable state in socket assigns
-- Sync state between client and server
-- Handle edge cases
-
-## Common Patterns
-
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:sortable_ready, false)
-   |> push_event("init_sortable", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup sortable resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Drag reordering
-- Production-ready sortable list integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full sortable functionality
-3. Add error handling
-4. Test edge cases
+</code></pre>
+</details>

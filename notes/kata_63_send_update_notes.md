@@ -1,15 +1,27 @@
 # Kata 63: Send Update
 
-## Overview
-Parent updating child state
+## Goal
+Demonstrate how to update a component from the outside (Parent -> Child) or how a component updates itself via `send_update` (though often internal assignment is easier).
 
-## Key Concepts
+## Core Concepts
 
-### 1. Core Pattern
-This kata demonstrates parent updating child state.
+### 1. `send_update(ComponentModule, id: "...", key: value)`
+The standard way for a Parent to push new data into a stateful child component. This triggers the child's `update/2` callback.
 
-### 2. Implementation
-See the interactive example for a working demonstration.
+## Implementation Details
 
-### 3. Usage
-Check the source code tab for implementation details.
+1.  **Code**: The demo handles internal updates.
+2.  **Concept**: In a real app, a Parent might call `send_update` when some global state changes.
+
+## Tips
+- `send_update` is asynchronous.
+
+## Challenge
+Add a **Character Count** display that updates as you type in the input.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"><div class="text-xs">Chars: <%= String.length(@message) %></div>
+</code></pre>
+</details>

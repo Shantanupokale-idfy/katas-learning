@@ -1,35 +1,36 @@
-# Kata 39: The Rating Input
+# Kata 39: Star Rating
 
-## Overview
-HTML doesn't have a `<input type="rating">` (yet). To build a 5-star rating component, we often use a hidden input for the actual form submission, and separate UI buttons (stars) to update that hidden input's value.
+## Goal
+Build a custom form control (Star Rating) that updates a hidden input field. This demonstrates how to build rich UI components that still play nicely with standard HTML forms.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Hidden Inputs
-The "source of truth" for the form should usually be a standard input, even if hidden.
-```html
-<input type="hidden" name="rating" value={@rating} />
-```
+### 1. Visual vs Value
+The user interacts with Button elements (Star icons), but the *data* is sent via a `<input type="hidden" name="rating">`.
 
-### 2. UI Synchronization
-We render 5 buttons (SVG stars). When a star is clicked:
-1.  `phx-click="rate" phx-value-score="3"` fires.
-2.  LiveView updates `socket.assigns.rating` to 3.
-3.  Re-renders: The hidden input updates to `value="3"`, and the UI highlights 3 stars.
+### 2. Interactive Feedback
+Highlight stars up to the current rating.
 
-### 3. Styling
-We can visually distinguish the "active" stars (filled yellow) from "inactive" stars (gray outline) based on whether their index is `<= @rating`.
+## Implementation Details
 
-## The Code Structure
-```elixir
-def render(assigns) do
-  ~H\"\"\"
-    <%= for i <- 1..5 do %>
-      <button phx-click="rate" phx-value-score={i}>
-        <.star filled={i <= @rating} />
-      </button>
-    <% end %>
-    <input type="hidden" name="rating" value={@rating} />
-  \"\"\"
+1.  **State**: `rating` (Integer 1-5).
+2.  **UI**: 5 Loop buttons.
+    *   If index <= rating, render Filled Star.
+    *   Else, render Empty Star.
+3.  **Events**:
+    *   `rate`: Sets the rating state.
+
+## Tips
+- Use CSS `:hover` on a parent container to create a "preview" effect where stars light up under the mouse (advanced CSS trick: `flex-direction: row-reverse`).
+
+## Challenge
+Add a **"Reset"** button to clear the rating back to 0.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("reset", _, socket) do
+  {:noreply, assign(socket, rating: 0)}
 end
-```
+</code></pre>
+</details>

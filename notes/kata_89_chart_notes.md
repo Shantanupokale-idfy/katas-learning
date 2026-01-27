@@ -1,96 +1,35 @@
-# Kata 89: Chart.js
+# Kata 89: Chart.js Integration
 
-## Overview
-Chart display with sample data using LiveView and JavaScript interop.
+## Goal
+Render interactive charts using a 3rd party JS library.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Chart.js Integration
-This kata demonstrates how to integrate chart.js functionality into a LiveView application.
+### 1. `phx-update="ignore"`
+Crucial. The container `<canvas>` is managed by Chart.js. LiveView should never touch it after initial render, or it will destroy the chart instance.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.Chart.js = {
-  mounted() {
-    // Initialize chart.js
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="chart-container" phx-hook="Chart.js">
-    <!-- Chart.js content -->
-  </div>
-  """
-end
-```
+### 2. Data Updates
+To update the chart, the server pushes an event (`socket |> push_event("update_points", points)`).
+The Hook listens (`handleEvent(...)`) and calls `chart.update()`.
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Hook**: `ChartJS`.
+2.  **Server**: `assign(socket, :data, ...)` (for initial) + `push_event`.
 
-### Event Handling
-```elixir
-def handle_event("chart_action", params, socket) do
-  # Process chart action
-  {:noreply, socket}
-end
-```
+## Tips
+- Never re-render the canvas element itself from the server.
 
-### State Management
-- Track chart state in socket assigns
-- Sync state between client and server
-- Handle edge cases
+## Challenge
+Change **Chart Type**. Add a select menu or buttons to switch between "bar" and "line" charts.
+You will need to destroy the old Chart instance in the Hook and create a new one with the new `type`.
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:chart_ready, false)
-   |> push_event("init_chart", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup chart resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Data visualization
-- Production-ready chart.js integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full chart functionality
-3. Add error handling
-4. Test edge cases
+<pre><code class="javascript">handleEvent("change_type", ({type}) => {
+  this.chart.destroy();
+  this.chart = new Chart(ctx, {type: type, ...});
+})
+</code></pre>
+</details>

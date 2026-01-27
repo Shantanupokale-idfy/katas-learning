@@ -1,31 +1,41 @@
-# Kata 56: The Tooltip
+# Kata 56: Tooltip
 
-## Overview
-Create a tooltip that appears when hovering over an element, using **pure CSS** (no JavaScript or LiveView events).
+## Goal
+Create a Tooltip component that reveals extra information when hovering over an element.
 
-## Key Concepts
+## Core Concepts
 
-### 1. The Group Pattern
-To control the visibility of a child element (the tooltip) based on the state of a parent element (the button/container), we use Tailwind's group modifier.
-
-- Add `group` to the parent container.
-- Add `group-hover:visible` (and `group-hover:opacity-100`) to the child tooltip.
+### 1. Group Hover (Tailwind)
+Use the `group` class on the parent and `group-hover:visible` (or `group-hover:opacity-100`) on the child. This allows purely CSS-based toggling without server roundtrips.
 
 ### 2. Positioning
-The tooltip needs to be positioned relative to the trigger element.
+Absolute positioning relative to the parent (`relative inline-block`) places the tooltip precisely.
 
-- Parent: `relative`
-- Tooltip: `absolute`, `bottom-full`, `left-1/2`, `-translate-x-1/2` (centers it above).
+## Implementation Details
 
-### 3. Transitions
-For a polished feel, add a fade-in effect.
+1.  **Structure**:
+    ```html
+    <div class="relative group">
+      <button>Target</button>
+      <div class="absolute ... invisible group-hover:visible">Tooltip</div>
+    </div>
+    ```
 
-- Base state: `invisible`, `opacity-0`, `transition-all`, `duration-200`
-- Hover state: `group-hover:visible`, `group-hover:opacity-100`
+## Tips
+- Ensure the tooltip has a higher `z-index` if it overlaps other content.
+- `whitespace-nowrap` prevents the tooltip text from wrapping awkwardly.
 
-## Implementation Steps
+## Challenge
+Add configurable **Positioning**. Add `attr :position, :string, default: "top"`. Support "top" vs "bottom" by changing the CSS classes (e.g., `bottom-full` vs `top-full`).
 
-1.  Wrap the button and the tooltip div in a container with `relative inline-block group`.
-2.  Style the tooltip div to be hidden by default (`invisible opacity-0`).
-3.  Add the hover classes to the tooltip (`group-hover:visible group-hover:opacity-100`).
-4.  Add a small arrow using a rotated square or a border hack for extra flair.
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">class={
+  case @position do
+    "top" -> "bottom-full mb-2"
+    "bottom" -> "top-full mt-2"
+  end
+}
+</code></pre>
+</details>

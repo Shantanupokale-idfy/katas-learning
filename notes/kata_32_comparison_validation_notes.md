@@ -1,31 +1,42 @@
 # Kata 32: Comparison Validation
 
-## Overview
-Comparing two fields is a standard requirement for "Confirm Password" or "Confirm Email" scenarios.
-We need to ensure `password == password_confirmation`.
+## Goal
+Validate that two inputs match (e.g., Password and Confirmation) and provide specific error messages when they don't.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Manual Validation vs Changeset
-While `Ecto.Changeset.validate_confirmation/3` is the standard way to do this in production apps, we can understand the logic by implementing it manually in `handle_event("validate", ...)`.
+### 1. Cross-Field Validation
+Validation often depends on multiple fields. You can't just check `password` in isolation; you must compare it to `confirmation`.
 
-### 2. Error Feedback
-We only want to show the mismatch error if:
-- The user has typed into *both* fields.
-- Or specifically, if `password_confirmation` is not empty and doesn't match.
+### 2. Manual Error Injection
+Phoenix forms usually get errors from Ecto Changesets. However, for simple LiveViews without schemas, you can manually inject errors into the `to_form(params, errors: ...)` function.
 
-## The Code Structure
 ```elixir
-def handle_event("validate", %{"user" => params}, socket) do
-  errors = []
-  
-  errors = if params["password"] != params["confirmation"] do
-    [confirmation: "Passwords do not match"] ++ errors
-  else
-    errors
-  end
-  
-  {:noreply, assign(socket, form: to_form(params, errors: errors))}
-end
+errors = if pass != confirm, do: [confirmation: {"Mismatch", []}], else: []
+to_form(params, errors: errors)
 ```
-Using `to_form(params, errors: ...)` allows standard `<.error>` components to render automatically if utilizing `Phoenix.Component.form`.
+
+## Implementation Details
+
+1.  **State**: Form with `password` and `confirmation`.
+2.  **Events**:
+    *   `handle_event("validate", ...)`: compare the two values.
+    *   If they differ, add an error to the `confirmation` field.
+
+## Tips
+- Don't show the "Mismatch" error while the user is still typing the *first* field. Maybe wait until `confirmation` is not empty.
+
+## Challenge
+Add a **"Show Password"** checkbox that toggles the input type between `password` and `text` for both fields.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># State: show_password (bool)
+# Template: type={if @show_password, do: "text", else: "password"}
+
+def handle_event("toggle_visibility", _, socket) do
+  {:noreply, update(socket, :show_password, &(!&1))}
+end
+</code></pre>
+</details>

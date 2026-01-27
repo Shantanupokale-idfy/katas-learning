@@ -1,51 +1,54 @@
-# Kata 50: Functional Components
+# Kata 50: Components
 
-## Overview
-Function components are reusable UI building blocks defined with `attr` and `slot`.
-They're the foundation of component-based architecture in Phoenix LiveView.
+## Goal
+Build reusable **Function Components** using `attr` and `slot`.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Defining Attributes
-Use `attr` to declare component props:
+### 1. Attributes (`attr`)
+Define inputs for your component.
 ```elixir
-attr :title, :string, required: true
 attr :variant, :string, default: "primary"
-
-def button(assigns) do
-  ~H"""
-  <button class={button_class(@variant)}>
-    <%= @title %>
-  </button>
-  """
-end
 ```
 
-### 2. Slots
-Slots allow passing content blocks:
+### 2. Slots (`slot`)
+Define areas where content can be injected.
 ```elixir
 slot :inner_block, required: true
-
-def card(assigns) do
-  ~H"""
-  <div class="card">
-    <%= render_slot(@inner_block) %>
-  </div>
-  """
-end
-```
-
-### 3. Named Slots
-```elixir
 slot :header
-slot :footer
+```
+Render with `<%= render_slot(@header) %>`.
 
-def panel(assigns) do
+## Implementation Details
+
+1.  **Define**: `defp my_comp(assigns)`.
+2.  **Use**: `<.my_comp variant="danger">Content</.my_comp>`.
+
+## Tips
+- Components are the building blocks of Phoenix 1.7+. Keep them stateless (functional) when possible.
+
+## Challenge
+Create a **<.alert>** component.
+- `attr :type` (info, warning, error) - affects color.
+- `slot :inner_block` - message content.
+- Render it in the demo view.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">attr :type, :string, default: "info"
+slot :inner_block
+defp alert(assigns) do
+  color = case @type do
+    "error" -> "bg-red-100 text-red-800"
+    _ -> "bg-blue-100 text-blue-800"
+  end
+  assigns = assign(assigns, :color, color)
   ~H"""
-  <div>
-    <div class="header"><%= render_slot(@header) %></div>
-    <div class="footer"><%= render_slot(@footer) %></div>
-  </div>
+  &lt;div class={"p-4 rounded " <> @color}&gt;
+    &lt;%= render_slot(@inner_block) %&gt;
+  &lt;/div&gt;
   """
 end
-```
+</code></pre>
+</details>

@@ -1,46 +1,41 @@
-# Kata 41: URL Params
+# Kata 41: URL Params (Query String)
 
-## Overview
-LiveView provides `handle_params/3` to react to URL changes, including query string parameters.
-This is essential for deep linking, shareable URLs, and maintaining state in the URL.
+## Goal
+Synchronize UI state with the URL Query String (e.g., `?filter=...`). This allows users to share links that preserve the application state.
 
-## Key Concepts
+## Core Concepts
 
 ### 1. `handle_params/3`
-This callback is invoked:
-- On initial mount (after `mount/3`)
-- When the URL changes via `push_patch` (same LiveView)
-- When navigating with query params
-
-```elixir
-def handle_params(params, _uri, socket) do
-  # params is a map of query string parameters
-  # Example: ?page=2&sort=name becomes %{"page" => "2", "sort" => "name"}
-  {:noreply, assign(socket, page: params["page"] || "1")}
-end
-```
+This callback is invoked after `mount` and whenever the URL changes (via `push_patch` or browser navigation). It is the ideal place to decode URL parameters into socket assigns.
 
 ### 2. `push_patch/2`
-Updates the URL without remounting the LiveView:
-```elixir
-{:noreply, push_patch(socket, to: "/path?page=2")}
-```
+Updates the URL without reloading the page or remounting the LiveView. It triggers `handle_params`.
 
-### 3. URL State Management
-Query params are perfect for:
-- Pagination (`?page=2`)
-- Sorting (`?sort=name&order=asc`)
-- Filtering (`?category=elixir`)
-- Tab selection (`?tab=profile`)
+## Implementation Details
 
-## The Code Structure
-```elixir
-def handle_params(%{"filter" => filter}, _uri, socket) do
-  items = filter_items(socket.assigns.all_items, filter)
-  {:noreply, assign(socket, items: items, current_filter: filter)}
+1.  **Events**:
+    *   `set_filter`: Calls `push_patch(to: ~p"...?filter=X")`.
+2.  **Callbacks**:
+    *   `handle_params`: Reads separate `params["filter"]`, updates `@items`.
+
+## Tips
+- Always use `handle_params` for state that should be URL-addressable.
+- Avoid updating `@items` in the click handler; let `handle_params` doing it ensures consistency even on "Back" button presses.
+
+## Challenge
+Add a **Sort Order** parameter (`?sort=asc` or `?sort=desc`) that sorts the items by name.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># 1. Update push_patch to include current filter AND new sort
+# 2. In handle_params, read sort param and sort @items
+
+def handle_params(params, _uri, socket) do
+  sort = params["sort"] || "asc"
+  # ... filtering ...
+  sorted_items = if sort == "desc", do: Enum.sort(..., &>=/2), else: Enum.sort(...)
+  {:noreply, assign(socket, items: sorted_items, sort: sort)}
 end
-
-def handle_event("change_filter", %{"filter" => filter}, socket) do
-  {:noreply, push_patch(socket, to: "?filter=#{filter}")}
-end
-```
+</code></pre>
+</details>

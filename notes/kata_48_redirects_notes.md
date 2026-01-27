@@ -1,31 +1,39 @@
-# Kata 48: Live Redirects
+# Kata 48: Redirects
 
-## Overview
-LiveView provides two navigation functions: `push_navigate` and `push_patch`.
-Understanding when to use each is crucial for optimal UX.
+## Goal
+Understand the difference between `push_patch` and `push_navigate`.
 
-## Key Concepts
+## Core Concepts
 
-### 1. `push_patch/2`
-- Stays within the same LiveView
-- Triggers `handle_params/3`
-- Fast, no remount
-- Use for: tabs, filters, pagination
+### 1. `push_patch`
+- **Same LiveView**.
+- Updates URL.
+- Calls `handle_params`.
+- **Fast**. Use for tabs, filters, specific resource IDs in the same list.
 
-```elixir
-{:noreply, push_patch(socket, to: "?page=2")}
-```
+### 2. `push_navigate`
+- **Different LiveView** (or force reload).
+- Unmounts current view, mounts new one.
+- **Slower** (comparatively). Use for changing pages.
 
-### 2. `push_navigate/2`
-- Navigates to a different LiveView
-- Full mount cycle
-- Use for: different pages, different contexts
+## Implementation Details
 
-```elixir
-{:noreply, push_navigate(socket, to: "/other-page")}
-```
+1.  **Events**: Buttons triggering both types of navigation.
+2.  **Observation**:
+    *   `push_patch`: Counter increments, socket PID stays same.
+    *   `push_navigate`: Page flashes/reloads content, socket PID changes.
 
-### 3. When to Use Which
-- **Same LiveView, different state**: `push_patch`
-- **Different LiveView**: `push_navigate`
-- **External URL**: `redirect` (not covered here)
+## Tips
+- If you `push_patch` to a route handled by a *different* LiveView, it will crash or fail. You *must* use `push_navigate` for that.
+
+## Challenge
+Add a button that uses `push_patch` with `replace: true`. Verify that clicking it updates the URL but **does not** add a new entry to the browser's Back history stack (i.e., clicking Back takes you comfortably to the page before).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("replace_demo", _, socket) do
+  {:noreply, push_patch(socket, to: ~p"...", replace: true)}
+end
+</code></pre>
+</details>

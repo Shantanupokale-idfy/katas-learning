@@ -1,96 +1,34 @@
 # Kata 98: PDF Generation
 
-## Overview
-Generate PDF documents using LiveView and JavaScript interop.
+## Goal
+Generate PDF documents from HTML content using `wkhtmltopdf` (via `pdf_generator` or similar lib).
 
-## Key Concepts
+## Core Concepts
 
-### 1. PDF Generation Integration
-This kata demonstrates how to integrate pdf generation functionality into a LiveView application.
+### 1. LiveView vs Controller
+LiveView cannot "stream" a file download directly in the WebSocket.
+Instead, you typically:
+a) Generate the PDF to a temp path and redirect to a controller serving it `local_path`.
+b) Submit a regular form (non-phx) to a controller that returns raw PDF binary with `send_download`.
 
-### 2. JavaScript Hooks
-```javascript
-// assets/js/hooks.js
-Hooks.PDFGeneration = {
-  mounted() {
-    // Initialize pdf generation
-    this.setup()
-  },
-  
-  updated() {
-    // Handle updates
-  },
-  
-  destroyed() {
-    // Cleanup
-  }
-}
-```
-
-### 3. LiveView Integration
-```elixir
-def render(assigns) do
-  ~H"""
-  <div id="pdf-container" phx-hook="PDFGeneration">
-    <!-- PDF Generation content -->
-  </div>
-  """
-end
-```
+### 2. The Demo
+Uses a standard HTML `<form action="/exports/pdf" method="post">` to bypass WebSocket and do a standard POST.
 
 ## Implementation Details
 
-### Setup
-1. Add JavaScript library (if needed)
-2. Create LiveView hook
-3. Handle events between JS and LiveView
+1.  **Controller endpoint**: Handles the POST, renders HTML layout, converts to PDF, sends response.
 
-### Event Handling
-```elixir
-def handle_event("pdf_action", params, socket) do
-  # Process pdf action
-  {:noreply, socket}
-end
-```
+## Tips
+- Styling PDFs is hard. Using a specific simplistic CSS file for the print layout often works best.
 
-### State Management
-- Track pdf state in socket assigns
-- Sync state between client and server
-- Handle edge cases
+## Challenge
+**Markdown Support**.
+Use `Earmark` to convert the "Body" textarea from Markdown to HTML before generating the PDF. (This logic goes in the Controller, but conceptually it's part of the feature).
+**UI Challenge**: Add a "Preview" tab that renders the Markdown as HTML in the browser so the user can see what it will look like.
 
-## Common Patterns
+<details>
+<summary>View Solution</summary>
 
-### Initialization
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, 
-   socket
-   |> assign(:pdf_ready, false)
-   |> push_event("init_pdf", %{})}
-end
-```
-
-### Cleanup
-```elixir
-def terminate(_reason, socket) do
-  # Cleanup pdf resources
-  :ok
-end
-```
-
-## Real-World Usage
-- Document generation
-- Production-ready pdf generation integration
-- Error handling and validation
-- Performance optimization
-
-## Resources
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
-- [Phoenix Hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#module-js-interop-and-client-hooks)
-- External library documentation (if applicable)
-
-## Next Steps
-1. Add proper JavaScript library integration
-2. Implement full pdf functionality
-3. Add error handling
-4. Test edge cases
+<pre><code class="elixir"><%= Earmark.as_html!(@form[:body].value) |> raw() %>
+</code></pre>
+</details>

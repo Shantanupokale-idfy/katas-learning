@@ -1,31 +1,34 @@
 # Kata 47: Protected Routes
 
-## Overview
-Use `on_mount` callbacks to protect routes and redirect unauthenticated users.
-This is a common pattern for authentication in LiveView apps.
+## Goal
+Simulate authentication logic in LiveView. Show different content based on user state (`authenticated: true/false`).
 
-## Key Concepts
+## Core Concepts
 
-### 1. `on_mount` Hook
-Define a module that implements `on_mount/4`:
-```elixir
-defmodule MyAppWeb.UserAuth do
-  def on_mount(:require_auth, _params, session, socket) do
-    if session["user_id"] do
-      {:cont, socket}
-    else
-      {:halt, redirect(socket, to: "/login")}
-    end
-  end
-end
-```
+### 1. Conditional Rendering
+Use `<%= if @authenticated do %>` to swap entire UI blocks.
 
-### 2. Applying to Routes
-```elixir
-live_session :authenticated, on_mount: MyAppWeb.UserAuth do
-  live "/dashboard", DashboardLive
-end
-```
+### 2. Real World Security
+In a real app, this logic belongs in `on_mount` hooks in `router.ex`. If a user is not logged in, you `redirect` them to a login page *before* the LiveView even mounts.
 
-### 3. Simulated Auth
-For this kata, we'll simulate authentication with a simple toggle.
+## Implementation Details
+
+1.  **State**: `authenticated` (Boolean).
+2.  **Events**:
+    *   `login`: Set true.
+    *   `logout`: Set false.
+
+## Tips
+- Always check permissions on the server. Hiding a button via CSS is not security.
+
+## Challenge
+Add a **Role** check. Add a "Login as Admin" button. Only show a specific "Admin Panel" section if the user is authenticated AND has the role `:admin`.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># State: role (:user or :admin)
+# Render:
+# <%= if @role == :admin do %> ... <% end %>
+</code></pre>
+</details>

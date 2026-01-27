@@ -1,15 +1,34 @@
-# Kata 54: The Modal
+# Kata 54: Modal Dialog
 
-## Overview
-Global UI state with JS commands
+## Goal
+Implement a generic Modal component that can overlay content and handle closing interactions.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Core Pattern
-This kata demonstrates global ui state with js commands.
+### 1. Z-Index and Overlay
+The modal needs a high `z-index` and a semi-transparent backdrop (`bg-black bg-opacity-50`).
 
-### 2. Implementation
-See the interactive example for a working demonstration.
+### 2. Event Bubbling
+Clicking the backdrop should close the modal. Clicking the *content* card should **not**.
+Use `phx-click="prevent_close"` on the content container to stop the event from bubbling up to the backdrop's close handler.
 
-### 3. Usage
-Check the source code tab for implementation details.
+## Implementation Details
+
+1.  **State**: `show_modal` (boolean).
+2.  **Events**:
+    *   `close_modal`: Sets state to false.
+    *   `prevent_close`: No-op (returns `{:noreply, socket}`).
+
+## Tips
+- Always provide a focus trap and accessibility attributes (ARIA) for real modals.
+
+## Challenge
+Support **Escape Key**. Add a window-level keydown listener to close the modal when `Esc` is pressed.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># On the modal container
+&lt;div phx-window-keydown="close_modal" phx-key="Escape" ...&gt;
+</code></pre>
+</details>

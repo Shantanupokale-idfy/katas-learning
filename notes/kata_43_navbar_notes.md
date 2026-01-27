@@ -1,51 +1,36 @@
-# Kata 43: The Nav Bar
+# Kata 43: Navbar Integration
 
-## Overview
-Active link highlighting helps users understand their current location in the app.
-We can use the current URI from `handle_params/3` to determine which link is active.
+## Goal
+Build a navigation bar where the **active state** of links is determined by the current URL parameters.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Current URI
-The second parameter in `handle_params/3` is the current URI:
-```elixir
-def handle_params(_params, uri, socket) do
-  {:noreply, assign(socket, current_uri: uri)}
-end
-```
+### 1. Active Class Helper
+Create a helper function (e.g., `active_class/2`) that takes the current page (from assigns) and the link target. If they match, return "active" CSS classes (bold, colored). If not, return "inactive" classes.
 
-### 2. Active Link Styling
-Compare the link's path with the current URI:
-```elixir
-class={if String.contains?(@current_uri, "/dashboard"), do: "active", else: ""}
-```
+### 2. `patch` vs `navigate`
+- `.link patch={...}`: updates URL, fires `handle_params`, keeps state.
+- `.link navigate={...}`: full page transition (unmounts and remounts LiveView). Use this for major context switches.
 
-### 3. Using `@socket.view`
-You can also check the current LiveView module:
-```elixir
-active={@socket.view == ElixirKatasWeb.DashboardLive}
-```
+## Implementation Details
 
-## The Code Structure
-```elixir
-def render(assigns) do
-  ~H"""
-  <nav>
-    <.link navigate="/home" class={nav_link_class(@current_path, "/home")}>
-      Home
-    </.link>
-    <.link navigate="/about" class={nav_link_class(@current_path, "/about")}>
-      About
-    </.link>
-  </nav>
-  """
-end
+1.  **State**: `current_page` (derived from params).
+2.  **UI**: List of links. Call `active_class(@current_page, "home")` etc.
 
-defp nav_link_class(current, target) do
-  if String.starts_with?(current, target) do
-    "text-indigo-600 font-bold"
-  else
-    "text-gray-600"
-  end
-end
-```
+## Tips
+- Encapsulate navigation logic in a reusable Functional Component (`<.nav_link ... />`) for consistency.
+
+## Challenge
+Add a **"Notifications"** badge that appears on the "Contact" link if the URL contains `?notify=true`.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># 1. In handle_params, track `notify` param.
+# 2. In render:
+&lt;.link ...&gt;
+  Contact
+  &lt;%= if @show_badge, do: &lt;span class="badge"&gt;1&lt;/span&gt; %&gt;
+&lt;/.link&gt;
+</code></pre>
+</details>

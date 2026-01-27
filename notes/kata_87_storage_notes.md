@@ -1,62 +1,34 @@
-# Kata 87: Local Storage
+# Kata 87: LocalStorage Persistence
 
-## Overview
-Demonstrates browser local storage for persisting data across sessions.
+## Goal
+Persist data in the browser's `localStorage` so it survives page reloads.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Local Storage API
-```javascript
-// JavaScript Hook
-Hooks.LocalStorage = {
-  mounted() {
-    this.handleEvent("store", ({key, value}) => {
-      localStorage.setItem(key, value)
-    })
-    this.handleEvent("load", ({key}) => {
-      const value = localStorage.getItem(key)
-      this.pushEvent("loaded", {key, value})
-    })
+### 1. Hook: `LocalStorage`
+- `mounted()`: Read from storage, push to server (`pushEvent`).
+- `handleEvent("save", ...)`: Write to storage.
+
+## Implementation Details
+
+1.  **Server**: `push_event("store", %{key: k, val: v})`.
+2.  **Client**: `window.localStorage.setItem(key, val)`.
+
+## Tips
+- LiveView is server-side; it doesn't know about localStorage until the client tells it.
+
+## Challenge
+**Sync Across Tabs**.
+In your Hook, add a `window.addEventListener("storage", ...)` listener.
+When another tab updates storage, this event fires. Push the new data to the server so the UI updates instantly in all open tabs.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="javascript">window.addEventListener("storage", e => {
+  if (e.key === "my_app_data") {
+    this.pushEvent("storage_updated", {val: e.newValue})
   }
-}
-```
-
-### 2. LiveView Integration
-```elixir
-def handle_event("save", %{"key" => key, "value" => value}, socket) do
-  {:noreply, push_event(socket, "store", %{key: key, value: value})}
-end
-```
-
-### 3. Data Persistence
-- Survives page reloads
-- Per-domain storage
-- String-based key-value pairs
-
-## Implementation Patterns
-
-### Save Data
-```elixir
-def handle_event("save_preferences", prefs, socket) do
-  {:noreply, push_event(socket, "store", %{
-    key: "user_prefs",
-    value: Jason.encode!(prefs)
-  })}
-end
-```
-
-### Load on Mount
-```elixir
-def mount(_params, _session, socket) do
-  {:ok, push_event(socket, "load", %{key: "user_prefs"})}
-end
-
-def handle_event("loaded", %{"value" => value}, socket) when not is_nil(value) do
-  prefs = Jason.decode!(value)
-  {:noreply, assign(socket, :preferences, prefs)}
-end
-```
-
-## Resources
-- [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
-- [LiveView JS Interop](https://hexdocs.pm/phoenix_live_view/js-interop.html)
+})
+</code></pre>
+</details>
