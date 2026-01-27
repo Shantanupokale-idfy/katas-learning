@@ -46,7 +46,7 @@ defmodule ElixirKatasWeb.Kata25TreeLive do
         <div class="mt-6 p-4 bg-white border rounded-lg shadow-sm">
           <ul class="space-y-1">
             <%= for node <- @tree do %>
-              <.tree_node node={node} expanded_ids={@expanded_ids} />
+              <.tree_node node={node} expanded_ids={@expanded_ids} myself={@myself} />
             <% end %>
           </ul>
         </div>
@@ -57,6 +57,9 @@ defmodule ElixirKatasWeb.Kata25TreeLive do
             We use a functional component <code>.tree_node</code> that recursively calls itself if the node has children and is expanded.
             The state <code>expanded_ids</code> tracks which folders are open.
           </p>
+          <p class="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+            <strong>Note:</strong> We must pass <code>myself={@myself}</code> to the recursive component so that the toggle buttons can target the parent LiveComponent correctly.
+          </p>
         </div>
       </div>
     
@@ -66,6 +69,8 @@ defmodule ElixirKatasWeb.Kata25TreeLive do
   # Recursive component
   attr :node, :map, required: true
   attr :expanded_ids, MapSet, required: true
+  
+  attr :myself, :any, required: true
   
   def tree_node(assigns) do
     ~H"""
@@ -100,7 +105,7 @@ defmodule ElixirKatasWeb.Kata25TreeLive do
       <%= if MapSet.member?(@expanded_ids, @node.id) and length(@node.children) > 0 do %>
         <ul class="ml-6 mt-1 border-l pl-2 space-y-1">
           <%= for child <- @node.children do %>
-            <.tree_node node={child} expanded_ids={@expanded_ids} />
+            <.tree_node node={child} expanded_ids={@expanded_ids} myself={@myself} />
           <% end %>
         </ul>
       <% end %>

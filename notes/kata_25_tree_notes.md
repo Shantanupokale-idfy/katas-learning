@@ -18,6 +18,13 @@ def tree_node(assigns) do
 end
 ```
 
+### 2. Event Targeting
+When a LiveComponent renders a recursive function component, the `@myself` assign is **not** automatically available in the child scope. You must explicitly pass it down:
+```elixir
+<.tree_node node={child} myself={@myself} />
+```
+This ensures `phx-target={@myself}` works for nested toggle buttons.
+
 ### 2. State for Expansion
 Track which nodes are expanded using a `MapSet` of IDs (`expanded_ids`).
 - Do not mutate the tree data structure itself (e.g., adding `expanded: true` to every node map). Keeping UI state separate from data is cleaner.
