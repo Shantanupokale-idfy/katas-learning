@@ -1,34 +1,34 @@
 # Kata 59: Skeleton Loading
 
-## Goal
-Display a **Skeleton Screen** (placeholder shapes) while data is loading. This reduces perceived latency compared to a blank screen or a spinner.
+## The Concept
+**Perceived Performance**. A blank screen feels broken. A spinner feels slow. A Skeleton (gray placeholders) feels like "it's working and almost ready".
 
-## Core Concepts
+## The Elixir Way
+*   **Conditionals**: We simply swap the component based on `@loading`.
+*   **AsyncResult**: In Phoenix 1.8+, using `<.async_result>` combined with `assign_async` handles this "loading state" swap automatically!
 
-### 1. Pulse Animation
-Taiwind's `animate-pulse` class creates a subtle fading effect that indicates activity.
+## Deep Dive
 
-### 2. Layout Matching
-The skeleton should roughly match the layout of the final content (header bar, image block, text lines) to minimize layout shift.
+### 1. Layout Stability (CLS)
+The goal of a Skeleton is to occupy the **exact same space** as the final content.
+If your list items are 64px high, your skeleton bars should be 64px high.
+This prevents the page from jumping around when data loads (Cumulative Layout Shift).
 
-## Implementation Details
+### 2. `animate-pulse`
+Tailwind provides this utility class which changes opacity from 1.0 to 0.5 and back.
+It mimics a "breathing" state, indicating activity.
 
-1.  **State**: `loading` (Boolean).
-2.  **Render**: `if @loading, do: <Skeleton>, else: <Content>`.
+### 3. Usage with `assign_async`
+```elixir
+<.async_result :let={data} assign={@my_data}>
+  <:loading><.skeleton_list /></:loading>
+  <:failed>Error!</:failed>
+  <.real_list items={data} />
+</.async_result>
+```
+The future of Phoenix loading states relies heavily on this pattern.
 
-## Tips
-- Use gray backgrounds (`bg-gray-200`) with rounded corners to simulate text and image blocks.
+## Common Pitfalls
 
-## Challenge
-Add a **Fade In** transition. When `@loading` switches to `false`, the content should fade in opacity (e.g., `opacity-0` -> `opacity-100` transition). You can use a CSS class or `JS.transition`.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"><div class={if !@loading, do: "animate-fade-in", else: ""}>
-  ...
-</div>
-# Or simple CSS transition utility
-<div class={"transition-opacity duration-500 " <> if(@loading, do: "opacity-0", else: "opacity-100")}>
-</code></pre>
-</details>
+1.  **Over-engineering**: Building a pixel-perfect skeleton replica of a complex card is wasted effort. Abstract representations (a box for an image, lines for text) are sufficient.
+2.  **Jank**: If data loads in 50ms, showing a skeleton for 50ms then flashing to content is jarring. Sometimes it's better to show nothing for < 200ms, then the skeleton. (Debounced loading states).

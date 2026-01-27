@@ -1,39 +1,31 @@
 # Kata 48: Redirects
 
-## Goal
-Understand the difference between `push_patch` and `push_navigate`.
+## The Concept
+Moving the user to a different page. LiveView has specific functions for different types of movement.
 
-## Core Concepts
+## The Elixir Way
+*   **push_patch**: Same LiveView, new URL. (Lightweight).
+*   **push_navigate**: Different LiveView. (Medium weight).
+*   **redirect**: Different Application/External URL. (Full Reload).
 
-### 1. `push_patch`
-- **Same LiveView**.
-- Updates URL.
-- Calls `handle_params`.
-- **Fast**. Use for tabs, filters, specific resource IDs in the same list.
+## Deep Dive
 
-### 2. `push_navigate`
-- **Different LiveView** (or force reload).
-- Unmounts current view, mounts new one.
-- **Slower** (comparatively). Use for changing pages.
+### 1. `replace: true`
+By default, navigation adds a new entry to the browser History (Back button works).
+Sometimes (e.g., after a form error correction), you want to **replace** the current entry so the Back button skips the bad state.
+`push_patch(..., replace: true)`.
 
-## Implementation Details
+### 2. Flash Messages
+Redirects often occur after an action ("Item created!").
+We use **Flash** messages (ephemeral notifications) to pass this context to the next page.
+```elixir
+socket
+|> put_flash(:info, "Welcome back!")
+|> push_navigate(to: "/dashboard")
+```
+The new LiveView reads the flash from the connection info on mount.
 
-1.  **Events**: Buttons triggering both types of navigation.
-2.  **Observation**:
-    *   `push_patch`: Counter increments, socket PID stays same.
-    *   `push_navigate`: Page flashes/reloads content, socket PID changes.
+## Common Pitfalls
 
-## Tips
-- If you `push_patch` to a route handled by a *different* LiveView, it will crash or fail. You *must* use `push_navigate` for that.
-
-## Challenge
-Add a button that uses `push_patch` with `replace: true`. Verify that clicking it updates the URL but **does not** add a new entry to the browser's Back history stack (i.e., clicking Back takes you comfortably to the page before).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("replace_demo", _, socket) do
-  {:noreply, push_patch(socket, to: ~p"...", replace: true)}
-end
-</code></pre>
-</details>
+1.  **Redirect Loops**: If `mount` redirects to `/login` and `/login` redirects to `/dashboard` which redirects to `/login`... ensure your router guards are correct.
+2.  **Dead Views**: `redirect` (external) kills the WebSocket. `push_navigate` keeps the WebSocket usage efficient (if navigating to another LiveView in the same app).

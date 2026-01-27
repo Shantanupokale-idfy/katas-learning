@@ -1,40 +1,34 @@
 # Kata 46: Search URL
 
-## Goal
-Combine Debounce with URL updates to create a search interface that is shareable. Type in the box -> Wait -> URL updates -> Results update.
+## The Concept
+**Shareable Search Results**.
+Combining `phx-debounce` (client-side delay) with `push_patch` (server-side URL update) creates the "Google-like" experience where typing updates the URL and results live.
 
-## Core Concepts
+## The Elixir Way
+1.  **Input**: `<input phx-keyup="search" phx-debounce="300">`.
+2.  **Event**: "`search`" handler calls `push_patch(to: ~p"?q=#{query}")`.
+3.  **Update**: `handle_params` performs the actual search logic.
 
-### 1. Debounce + Push Patch
-We want to update the URL, but not on *every* keystroke (too noisy).
-- Input `phx-debounce="300"`.
-- Event `search` calls `push_patch`.
-- `handle_params` performs the search.
+## Deep Dive
+
+### 1. Why Round Trip?
+Why not just search in the event handler?
+If we search in `handle_event`, the URL doesn't update. If the user copies the link, they get an empty page.
+By only updating the URL in the event, and searching in `handle_params`, we guarantee that **State == URL**.
 
 ### 2. URI Encoding
-Always encode parameters (`URI.encode/1`) when constructing URLs manually.
+When putting user input into a URL, special characters (`&`, `?`, space) break things.
+*   **Verified Routes (`~p`)**: Automatically encodes interpolation. `~p"/?q=#{query}"` handles spaces correctly (`%20`).
+*   **Manual**: If building strings manually, use `URI.encode_query/1`.
 
-## Implementation Details
+### 3. Cleaning the URL
+If query is empty, we usually want to remove the param entirely, not show `?q=`.
+```elixir
+query_params = if query == "", do: %{}, else: %{q: query}
+push_patch(to: ~p"/search?#{query_params}")
+```
 
-1.  **State**: `query`, `results`, `all_items`.
-2.  **handle_params**:
-    *   Read `q` param.
-    *   Filter `all_items`.
-    *   Assign `results`.
+## Common Pitfalls
 
-## Tips
-- Verify that refreshing the page with the URL parameter keeps the search results active.
-
-## Challenge
-Add a **"Clear"** button (X) inside or next to the search input. It should clear the input AND remove the `?q=` parameter from the URL.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("clear", _, socket) do
-  # Remove param by setting it to nil or empty? Usually omit it.
-  {:noreply, push_patch(socket, to: ~p"/katas/46...")}
-end
-# In handle_params, handle missing "q" by showing all.
-</code></pre>
-</details>
+1.  **Race Conditions**: Fast typing might trigger multiple events. LiveView serializes them, but `handle_params` might run multiple times. Database queries should be optimized.
+2.  **Focus Loss**: As with all inputs, if you replace the input DOM element during update, focus is lost. Keep the input distinct from the search results container.

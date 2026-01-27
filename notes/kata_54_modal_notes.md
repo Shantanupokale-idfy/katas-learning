@@ -1,34 +1,38 @@
-# Kata 54: Modal Dialog
+# Kata 54: The Modal Dialog
 
-## Goal
-Implement a generic Modal component that can overlay content and handle closing interactions.
+## The Concept
+A crucial UI pattern for interruptions. It covers the entire screen, focuses attention, and traps interaction.
 
-## Core Concepts
+## The Elixir Way
+*   **JS Commands**: We prefer `Phoenix.LiveView.JS` for opening/closing modals. Pure CSS/JS toggle is faster than a server roundtrip.
+*   **Server State (Optional)**: Only track `show_modal` on the server if the modal *content* needs to be loaded on demand (e.g., fetching details).
 
-### 1. Z-Index and Overlay
-The modal needs a high `z-index` and a semi-transparent backdrop (`bg-black bg-opacity-50`).
+## Deep Dive
 
-### 2. Event Bubbling
-Clicking the backdrop should close the modal. Clicking the *content* card should **not**.
-Use `phx-click="prevent_close"` on the content container to stop the event from bubbling up to the backdrop's close handler.
+### 1. The Backdrop Trap
+The backdrop covers the screen.
+```html
+<div phx-click={hide_modal()}>
+  <div class="modal-content" phx-click-away={hide_modal()}>
+    ...
+  </div>
+</div>
+```
+Closing on backdrop click is standard. `phx-key="Escape"` is also expected.
 
-## Implementation Details
+### 2. `phx-remove` Animations
+When an element is removed from the DOM (modal closes), it usually vanishes instantly.
+To animate the exit (fade out):
+```elixir
+<div phx-remove={JS.transition("fade-out", time: 200)}>
+```
+This instructs LiveView to *wait* 200ms (running the animation) before actually killing the DOM node.
 
-1.  **State**: `show_modal` (boolean).
-2.  **Events**:
-    *   `close_modal`: Sets state to false.
-    *   `prevent_close`: No-op (returns `{:noreply, socket}`).
+### 3. Focus Management
+Accessibility is hard here. When a modal opens, focus should move *into* the modal. When it closes, it should return to the button that opened it.
+`LiveView.JS.focus()` and `focus_first()` helpers assist with this.
 
-## Tips
-- Always provide a focus trap and accessibility attributes (ARIA) for real modals.
+## Common Pitfalls
 
-## Challenge
-Support **Escape Key**. Add a window-level keydown listener to close the modal when `Esc` is pressed.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># On the modal container
-&lt;div phx-window-keydown="close_modal" phx-key="Escape" ...&gt;
-</code></pre>
-</details>
+1.  **Z-Index Wars**: Ensure your modal z-index is higher than your navbar or toaster notifications.
+2.  **Scroll Locking**: When a modal is open, the `<body>` should have `overflow: hidden` to prevent the background page from scrolling. You can toggle this class using `JS.add_class("overflow-hidden", to: "body")`.

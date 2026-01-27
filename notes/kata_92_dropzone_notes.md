@@ -1,34 +1,25 @@
-# Kata 92: File Dropzone
+# Kata 92: Dropzone
 
-## Goal
-A drag-and-drop area for file uploads.
+## The Concept
+**Drag and Drop**. Improving UX by allowing users to drop files anywhere (or in a specific box).
 
-## Core Concepts
+## The Elixir Way
+*   `phx-drop-target={@uploads.files.ref}`.
+    *   This attribute turns any `div` into a drop zone.
+    *   When files are dropped, it triggers the same flow as `<.live_file_input>`.
 
-### 1. `phx-drop-target`
-Points to the upload ref (`@uploads.files.ref`). LiveView handles the drag events (adding a `phx-drop-target` class on hover).
+## Deep Dive
 
-### 2. Styling
-Use `.phx-drop-target` class to style the drop zone when a file is hovering over it (e.g., `border-indigo-500 bg-indigo-50`).
+### 1. Styling the Drop Zone
+You want the zone to highlight when a file is dragged over it.
+Tailwind doesn't support "dragover" natively easily. Use a custom CSS class or a tiny JS Hook if you need advanced "Active" states, but usually `cursor-pointer` and static styling is enough.
 
-## Implementation Details
+### 2. Cancelling Uploads
+If a user drops the wrong file, they need a way to remove it *before* upload completes.
+`cancel_upload(socket, :files, entry.ref)`
+Pass the `entry.ref` (a unique string) to identify the file.
 
-1.  **Upload Config**: `allow_upload(..., accept: :any)`.
-2.  **Interactive**: Drag over -> Visual feedback -> Drop -> Show preview list.
+## Common Pitfalls
 
-## Tips
-- Always validate `max_file_size` on the server.
-
-## Challenge
-**Image Preview**.
-If the user drops an image, show a preview using standard `live_img_preview`.
-You need to update `allow_upload` to accept `~w(.jpg .jpeg .png)` first.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">allow_upload(..., accept: ~w(.jpg .jpeg .png))
-# Render:
-<.live_img_preview entry={entry} />
-</code></pre>
-</details>
+1.  **Hidden Input**: You still need the `<.live_file_input>` logic in the DOM for the drop zone to work, even if you hide the actual input element with `class="hidden"`.
+2.  **Max Entries**: If `max_entries: 3` is set, dropping 5 files typically rejects *all* of them or accepts the first 3. Showing a clear error message `too_many_files` is robust.

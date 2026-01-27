@@ -1,43 +1,40 @@
 # Kata 31: Dependent Inputs
 
-## Goal
-Build a form with cascading dropdowns, where options in one field depend on the selection in another (e.g., Country -> City).
+## The Concept
+This kata explores **Dependent Validation**: when changing one form input (Parent) drastically alters the available options or state of another input (Child). A classic example is Country -> City selection.
 
-## Core Concepts
+## The Elixir Way
+In client-side frameworks (React/Vue), you often wire `onChange` handlers to local state variables.
+In LiveView, **the Server is the Source of Truth**. Even UI interactions like "picking a country" go to the server, which recalculates the state and pushes down the specific DOM patch (the new list of cities).
+*   **Latency**: LiveView is optimized to make this round-trip feel instant (ms latency).
+*   **Safety**: Validation logic lives in one place (the server), so you can't bypass business rules.
 
-### 1. State-Driven Options
-The list of secondary options (Cities) is not static. It lives in `socket.assigns`. When the primary input (Country) changes, the server recalculates the available cities and pushes the update.
+## Deep Dive
 
-### 2. Resetting Logic
-When the parent input changes, the child input usually becomes invalid. You must reset the child's value to prevent mismatched data (e.g., Country: USA, City: Berlin).
+### 1. The `_target` Parameter
+When a form sends a `change` event, LiveView includes a special `_target` parameter in the payload. This tells you exactly which input triggered the event.
 
-## Implementation Details
+```elixir
+def handle_event("validate", %{"_target" => ["country"], "country" => country} = params, socket) do
+  # Code that runs ONLY when Country changes
+end
+```
+**Why this matters**: A generic `validate` handler runs on *every* keystroke or change. If you have expensive logic (like fetching cities from a DB), you only want to run it when the relevant input changes, not when the user is typing their name.
 
-1.  **State**: `countries` (fixed list), `cities` (dynamic list), and `form`.
-2.  **Events**:
-    *   `handle_event("validate", ...)`:
-        *   Detect if "country" changed.
-        *   If yes, update `cities` assign and reset `city` value to empty.
-        *   If no (only city changed), just update form state.
+### 2. State synchronization
+When the Country changes, two things must happen atomically:
+1.  **Load Data**: The `cities` list must update.
+2.  **Reset Child**: The `city` selection must be cleared (because "Paris" is not in "USA").
 
-## Tips
-- Use `Phoenix.HTML.Form.options_for_select/2` to easily generate `<option>` tags.
-- Disabling the child input when the parent is empty improves UX.
+If you forget step 2, the UI might show "USA" selected but the value remaining as "Paris", creating an invalid state.
 
-## Challenge
-Add a third level: **District**. It should depend on the selected **City**.
-(You can mock the data, e.g., New York -> Manhattan, Brooklyn).
+### 3. The "Disabled" Attribute
+Logic for disabling inputs should be explicit in your assigns (`@city_disabled`), calculated from the data.
+*   **Bad**: `<select disabled={@form[:country].value == ""}>`. This relies on the form struct which can be complex.
+*   **Good**: `<select disabled={@city_disabled}>`. This is a derived state calculated in your update function. It is testable and explicit.
 
-<details>
-<summary>View Solution</summary>
+## Common Pitfalls
 
-<pre><code class="elixir"># 1. Add `districts` to assigns (default [])
-# 2. In handle_event "validate", if city changes, fetch districts.
-
-defp get_districts("New York"), do: ["Manhattan", "Brooklyn", "Queens"]
-defp get_districts(_), do: ["Downtown", "Uptown"]
-
-# 3. Add Select in template:
-# &lt;select name="district" disabled={@form[:city].value == ""} ...&gt;
-</code></pre>
-</details>
+1.  **Race Conditions**: If you use a generic handler without `_target`, typing in a different field might accidentally reset your dependent fields if your logic is flawed.
+2.  **Missing `phx-target`**: If this form lives in a Component, forgetting `phx-target={@myself}` sends the event to the parent LiveView, which will likely ignore it or crash.
+3.  **Form Library Quirks**: `Phoenix.HTML.Form` and `to_form` can be tricky. Always inspect your `@form` params to see exactly what string/atom keys are being passed.

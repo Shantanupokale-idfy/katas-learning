@@ -1,33 +1,26 @@
-# Kata 82: Distributed Notifications (Toast)
+# Kata 82: Notifications
 
-## Goal
-A notification system that can be triggered from anywhere in the cluster.
+## The Concept
+**System-wide Alerts**. "Server going down for maintenance", "New Order Received".
+Notifications that originate from *outside* the current user's workflow.
 
-## Core Concepts
+## The Elixir Way
+*   **PubSub Topic**: `user_notifications:{user_id}`.
+*   **Broadcast**: Can be triggered from a Cron job, a Controller, or another LiveView.
+*   **UI**: A "Toast" component that subscribes to the topic.
 
-### 1. PubSub
-Subscribe to `"notifications"`. Any process can `broadcast` a message here.
+## Deep Dive
 
-### 2. Auto Dismiss
-Timers remove alerts after a few seconds.
+### 1. Decoupled Architecture
+The Navbar (or Layout) subscribes to the topic. The Page doesn't need to know about it.
+This allows "Global" features to be implemented cleanly in the root layout.
 
-## Implementation Details
+### 2. Transient vs Persistent
+*   **PubSub**: Transient. If the user is offline, they miss the message.
+*   **Database**: Persistent. Save to `notifications` table first, *then* broadcast. On connect, load unread from DB.
 
-1.  **State**: List of notifications `[{id, type, msg}]`.
-2.  **Render**: Fixed position list (e.g., top-right).
+## Common Pitfalls
 
-## Tips
-- Use unique IDs for notifications to ensure you dismiss the correct one.
-
-## Challenge
-Add **Actionable Notifications**. Support a notification that includes an action button, e.g., "Item Deleted. [Undo]".
-You'll need to pass an event name or callback ref in the payload and handle the click.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># Payload: %{msg: "...", action: "undo_delete"}
-# Render:
-# if notif.action, do: <button phx-click={notif.action}>Undo</button>
-</code></pre>
-</details>
+1.  **Multiple Tabs**: If a user has 5 tabs open, all 5 receive the broadcast and show the toast.
+    *   *Solution*: This is usually desired! If not, use SharedWorkers (advanced JS) or Leader Election logic.
+2.  **Security**: Ensure users can only subscribe to their own topics. Validate topics in `mount`.

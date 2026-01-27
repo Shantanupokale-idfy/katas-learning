@@ -1,32 +1,37 @@
 # Kata 85: Scroll to Bottom
 
-## Goal
-Keep a chat window scrolled to the latest message.
+## The Concept
+**Chat UI Behavior**. When a new message arrives, the view should scroll to reveal it.
 
-## Core Concepts
+## The Elixir Way
+*   **The Problem**: LiveView updates the DOM, but doesn't change scroll position.
+*   **The Solution**: A Hook `ScrollToBottom`.
 
-### 1. Scroll Hook
-A Hook `mounted()` and `updated()` can set `el.scrollTop = el.scrollHeight`.
+## Deep Dive
 
-### 2. `phx-update="stream"`
-When new items append, the Hook triggers.
+### 1. `updated()` Callback
+The Hook's `updated()` lifecycle method fires *after* LiveView has applied DOM patches.
+```javascript
+updated() {
+  this.el.scrollTop = this.el.scrollHeight;
+}
+```
+This ensures we scroll *after* the new message is inserted.
 
-## Implementation Details
+### 2. Conditional Scrolling
+User experience nuance: If the user has scrolled *up* to read history, DO NOT yank them back to the bottom when a new message comes.
+Logic:
+```javascript
+updated() {
+  const isAtBottom = this.el.scrollTop + this.el.clientHeight >= this.el.scrollHeight - 50;
+  if (isAtBottom) {
+    this.el.scrollTop = this.el.scrollHeight;
+  }
+}
+```
 
-1.  **Hook**: `ScrollToBottom`.
-2.  **Logic**: On every update to the list container, scroll down.
+## Common Pitfalls
 
-## Tips
-- Only auto-scroll if the user was *already* at the bottom. If they scrolled up to read history, don't yank them back down.
-
-## Challenge
-**Unread Indicator**. If the user is scrolled up and a new message arrives, don't auto-scroll. Instead, show a floating "⬇ New Message" button. Clicking it scrolls to bottom.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># Hook needs to track `isAtBottom`.
-# If !isAtBottom on NewMsg, user event -> show badge.
-# (This is mostly JS Hook logic).
-</code></pre>
-</details>
+1.  **Smooth Scrolling**: `behavior: "smooth"` is nice but can be buggy if multiple messages arrive fast. Snap scrolling is safer for high-traffic chats.
+2.  **Image Loading**: If a message contains an image, its height is 0 initially. When it loads, the scroll height changes. The Hook runs too early!
+    *   **Fix**: Use `ResizeObserver` or explicit image dimensions.

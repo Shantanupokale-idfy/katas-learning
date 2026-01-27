@@ -1,41 +1,41 @@
 # Kata 41: URL Params (Query String)
 
-## Goal
-Synchronize UI state with the URL Query String (e.g., `?filter=...`). This allows users to share links that preserve the application state.
+## The Concept
+**Deep Linking**. The ability to bookmark or share a specific state of the application (e.g., "Page 2, sorted by Date").
+In LiveView, we synchronize the server state with the URL query string (`?filter=...`).
 
-## Core Concepts
+## The Elixir Way
+*   **Reactive URL**: usage of `push_patch` updates the URL without reloading.
+*   **Callback**: `handle_params/3` is the standard callback to parse URL changes.
+*   **Lifecycle**: `handle_params` runs *after* `mount`, so you can use it to override default state.
+
+## Deep Dive
 
 ### 1. `handle_params/3`
-This callback is invoked after `mount` and whenever the URL changes (via `push_patch` or browser navigation). It is the ideal place to decode URL parameters into socket assigns.
+This function is invoked when:
+1.  The user first loads the page (HTTP request).
+2.  The user clicks a `<.link patch={...}>`.
+3.  The user clicks browser Back/Forward (popstate).
+It is the **Single Source of Truth** for URL-driven state.
 
-### 2. `push_patch/2`
-Updates the URL without reloading the page or remounting the LiveView. It triggers `handle_params`.
+### 2. Params Decoding
+Params are always strings.
+```elixir
+%{"page" => "1", "sort" => "desc"}
+```
+You must cast them manually (`String.to_integer`) or use Ecto embedded schemas to cast/validate them safely.
 
-## Implementation Details
+### 3. Updates via `push_patch`
+To change the URL, we don't allow `window.history.pushState` in client JS.
+We tell the server:
+```elixir
+{:noreply, push_patch(socket, to: ~p"/items?sort=asc")}
+```
+The server sends a message to the client -> Client updates URL -> Client sends "params changed" message back to Server -> Server calls `handle_params`.
 
-1.  **Events**:
-    *   `set_filter`: Calls `push_patch(to: ~p"...?filter=X")`.
-2.  **Callbacks**:
-    *   `handle_params`: Reads separate `params["filter"]`, updates `@items`.
+## Common Pitfalls
 
-## Tips
-- Always use `handle_params` for state that should be URL-addressable.
-- Avoid updating `@items` in the click handler; let `handle_params` doing it ensures consistency even on "Back" button presses.
-
-## Challenge
-Add a **Sort Order** parameter (`?sort=asc` or `?sort=desc`) that sorts the items by name.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># 1. Update push_patch to include current filter AND new sort
-# 2. In handle_params, read sort param and sort @items
-
-def handle_params(params, _uri, socket) do
-  sort = params["sort"] || "asc"
-  # ... filtering ...
-  sorted_items = if sort == "desc", do: Enum.sort(..., &>=/2), else: Enum.sort(...)
-  {:noreply, assign(socket, items: sorted_items, sort: sort)}
-end
-</code></pre>
-</details>
+1.  **Multiple Sources of Truth**: If you update `socket.assigns.sort` in a click handler *AND* in `handle_params`, you have duplicated logic.
+    *   **Fix**: Click handler should *only* `push_patch`. `handle_params` should allow the assign update.
+2.  **Mount vs Params**: Setting defaults in `mount` and then overwriting in `handle_params` works, but be careful not to trigger double database queries.
+3.  **LiveComponent Limitations**: As mentioned before, `handle_params` is **never called** on a LiveComponent. The parent LiveView must pass the params down.

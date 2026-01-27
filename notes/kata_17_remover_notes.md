@@ -1,43 +1,35 @@
 # Kata 17: The Remover
 
-## Goal
-Implement a "Delete" function for items in a list. This requires uniquely identifying items.
+## The Concept
+Removing items from a collection highlights the importance of **Identity**. You can't just delete "the 3rd item" safely in a concurrent system; you need to delete "Item ID 42".
 
-## Core Concepts
+## The Elixir Way
+*   **Immutable Deletion**: `Enum.reject/2`. We don't splice the array. We return a new list containing everything *except* the target.
+*   **Pattern Matching**: We extract the ID directly from the event payload.
 
-### 1. Unique IDs
-When working with data that can be reordered or removed, using stable distinct IDs (like UUIDs) is crucial. Do not rely on index.
+## Deep Dive
 
-### 2. Passing Values with Events
-Use `phx-value-*` attributes to attach data to an event.
-
+### 1. `phx-value-*`
+Standard HTML buttons don't hold data. LiveView allows you to attach metadata to any event.
 ```html
 <button phx-click="delete" phx-value-id={item.id}>Delete</button>
 ```
+The server receives: `params = %{"id" => "123"}`.
+**Note**: All values are **Strings**. Even if `item.id` was the integer `1`, the payload will be `"1"`.
 
-### 3. Rejecting Items
-Use `Enum.reject/2` to filter the list.
+### 2. Optimistic UI
+When you verify deletion on the server, you remove it from assigns. LiveView re-renders the list.
+Because of **DOM Diffing**, LiveView knows exactly which `<li>` to remove from the DOM without repainting the whole list.
 
-```elixir
-Enum.reject(items, fn i -> i.id == target_id end)
-```
+## Common Pitfalls
 
-## Implementation Details
-
-1.  **State**: `items` (list of maps `%{id: ..., text: ...}`).
-2.  **UI**: Render list items with a "Delete" button next to each.
-3.  **Events**:
-    - `handle_event("delete", %{"id" => id}, socket)`: Remove the matching item from the list.
-
-## Tips
-- Using `phx-value-id` always sends the value as a **String**. If your IDs are integers in Elixir, remember to cast them or compare them as strings.
-
-## Challenge
-Add an **Undo** feature. When an item is deleted, show a temporary "Undo" button that restores it.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># 1. Store deleted item in assign `last_deleted`
-# 2. On "undo", prepend `last_deleted` back to `items` and set `last_deleted` to nil.</code></pre>
-</details>
+1.  **String vs Integer IDs**: A classic bug.
+    ```elixir
+    # Bug!
+    def handle_event("delete", %{"id" => id}, socket) do
+      # id represents "1" (string), but item.id is 1 (integer)
+      items = Enum.reject(items, & &1.id == id) # Fails to match
+    end
+    ```
+    **Fix**: Always `String.to_integer(id)` if your data uses integers.
+2.  **Race Conditions**: If two admins delete the same item at the same time, the second one might crash if your logic assumes existence. `Enum.reject` is safe (it just does nothing if ID not found).

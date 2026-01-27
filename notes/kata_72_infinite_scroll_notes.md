@@ -1,38 +1,39 @@
 # Kata 72: Infinite Scroll
 
-## Goal
-Load data incrementally as the user scrolls down, creating an "infinite" feed experience.
+## The Concept
+Loading data as the user scrolls. A common pattern that replaces Pagination.
 
-## Core Concepts
+## The Elixir Way
+*   **IntersectionObserver**: A JavaScript API (via Hooks) that tells us when a target element (sentinel) enters the viewport.
+*   **Streams**: We use streams to append new pages efficiently without re-rendering the top 1000 items.
 
-### 1. Intersection Observer
-A JavaScript API (via a Hook) that detects when a specific element (the "sentinel") enters the viewport.
+## Deep Dive
 
-### 2. Flow
-1. User scrolls to bottom.
-2. Hook detects visibility of sentinel.
-3. Hook sends `load-more` event to server.
-4. Server appends new items to stream.
+### 1. Client Hooks (`phx-hook`)
+Hooks connect Elixir Lifecycle to JavaScript logic.
+```javascript
+Hooks.InfiniteScroll = {
+  mounted() {
+    this.observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        this.pushEvent("load-more", {})
+      }
+    })
+    this.observer.observe(this.el)
+  }
+}
+```
 
-## Implementation Details
+### 2. The Sentinel
+We place a `div` at the bottom of the list. When the user scrolls down and sees this div, the JS Hook fires.
+The server responds by appending more items to the stream and moving the sentinel down.
 
-1.  **Hook**: `InfiniteScroll` (defined in `assets/js/app.js` or similar).
-2.  **Event**: `handle_event("load-more", ...)` appends data using `stream_insert`.
+### 3. Memory Management
+Infinite scroll can still crash the browser if you load 10,000 items.
+Advanced technique: **Virtual Scrolling** (Kata 139) removes items from the DOM that scrolled off-screen.
 
-## Tips
-- Ensure you have a "Stop" condition (`has_more: false`) to prevent infinite requests when data runs out.
+## Common Pitfalls
 
-## Challenge
-Add a **Reset** button that clears the stream, sets the page back to 1, and scrolls the container to the top.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("reset", _, socket) do
-  {:noreply, 
-   socket 
-   |> assign(page: 1, has_more: true) 
-   |> stream(:items, initial_items, reset: true)} # reset: true clears DOM
-end
-</code></pre>
-</details>
+1.  **Duplicate Loading**: If the user scrolls fast or network is slow, the observer might fire multiple times.
+    *   **Fix**: Track `loading` state on the server and ignore "load-more" events while already loading.
+2.  **Layout Shift**: Ensure the Sentinel has a defined height/spinner so it doesn't flicker in and out of view instantly.

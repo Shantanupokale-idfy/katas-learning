@@ -1,47 +1,30 @@
 # Kata 16: The List
 
-## Goal
-Render a dynamic list of items and implement "Add" functionality. This introduces **Collections** (Lists) in LiveView.
+## The Concept
+Rendering a dynamic list of items is the cornerstone of any application. This kata introduces **Collection Rendering**, **Immutability**, and how LiveView tracks changes in a loop.
 
-## Core Concepts
+## The Elixir Way
+*   **No Mutating Arrays**: You cannot `items.push("new")`. You must create a *new* list: `[new_item | old_items]`.
+*   **Comprehensions**: We use `for` comprehensions (not `.map` loops) to generate HTML.
+    ```elixir
+    # Efficiently builds a list of IO data
+    for item <- @items, do: <li>{item}</li>
+    ```
 
-### 1. Rendering Lists
-Use list comprehensions (`for`) inside your template to render HTML for each item.
+## Deep Dive
 
-```elixir
-<%= for item <- @items do %>
-  <li>{item}</li>
-<% end %>
-```
+### 1. Prepending is Fast (O(1))
+Elixir Lists are Linked Lists.
+*   **Prepend**: `[new | list]` is constant time. It just points the new head to the old list.
+*   **Append**: `list ++ [new]` is linear time O(n). It must traverse the whole list to find the end.
+*   **Lesson**: Always prepend if order doesn't matter (or reverse at render time).
 
-### 2. Immutability
-To add an item, you create a *new* list containing the old items plus the new one. Use `[new | old]` (prepend) or `old ++ [new]` (append).
+### 2. Rendering Large Lists (Streams)
+For small lists (like this kata), `assign(socket, items: list)` is fine.
+For large lists (1000+ rows) or infinite scroll, sending the whole list on every update is too heavy.
+**Production Solution**: Use `stream(socket, :items, list)`. This tells LiveView to manage the DOM on the client side and only send distinct "inserts" or "deletes" over the wire, keeping the server state minimal. (See Kata 71).
 
-```elixir
-# Prepend is O(1) - faster
-new_list = [item | @items]
-```
+## Common Pitfalls
 
-## Implementation Details
-
-1.  **State**: `items` (list of strings), `new_item` (for the input).
-2.  **UI**:
-    - A form with a text input.
-    - A `<ul>` rendering the items.
-3.  **Events**:
-    - `handle_event("add", params, socket)`: Extracts the value, appends it to the list, and clears the input.
-
-## Tips
-- For large lists, specialized features like `streams` (covered in advanced katas) are preferred over raw lists to optimize memory and DOM patching. For small lists, raw assigns are perfect.
-
-## Challenge
-Add a **Prepend** button that adds the new item to the **top** of the list instead of the bottom.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("prepend", %{"text" => text}, socket) do
-  # [new | old] is O(1)
-  {:noreply, update(socket, :items, fn items -> [text | items] end)}
-end</code></pre>
-</details>
+1.  **Duplicate Keys**: When rendering lists, React requires a `key`. LiveView *infers* keys in simple lists but requires `phx-update="stream"` and DOM IDs for complex localized updates.
+2.  **Memory Bloat**: Storing 100,000 items in `socket.assigns` will eat server RAM because every process holds a copy. Always paginate or use streams for large datasets.

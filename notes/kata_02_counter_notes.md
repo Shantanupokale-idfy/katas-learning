@@ -1,50 +1,47 @@
 # Kata 02: The Counter
 
-## Goal
-Build a counter with increment, decrement, and reset functionality. This teaches basic **State Management** and arithmetic operations on state.
+## The Concept
+The "Counter" is the "Hello World" of State Management. It demonstrates how to persist and mutate data over time. In LiveView, this teaches us about **Immutability** and **socket transforms**.
 
-## Core Concepts
-
-### 1. Updating State
-State in LiveView is immutable. We use `update/3` to efficiently modify a value based on its previous state.
-
+## The Elixir Way
+In JavaScript: `this.count++`. You mutate the object in place.
+In Elixir: Data is **Immutable**. You cannot change the number 5 to 6. You must create a *new* socket state that contains the new number.
 ```elixir
-# Increment count by 1
-update(socket, :count, &(&1 + 1))
+# Bad (Impossible in Elixir)
+socket.assigns.count = socket.assigns.count + 1
+
+# Good
+assign(socket, count: socket.assigns.count + 1)
 ```
+This guarantees thread safety. No matter how many events flood in, each state transition is calculated cleanly from the previous one.
 
-### 2. Multiple Events
-You can define multiple `phx-click` bindings, each pointing to a different event name (`inc`, `dec`, `reset`).
+## Deep Dive
 
-### 3. Binding to UI
-Display the state using `{@count}`. LiveView automatically tracks this dependency and only updates this part of the DOM when `count` changes.
+### 1. `update/3` vs `assign/2`
+*   `assign(socket, count: 5)`: "Set the value to 5." (clobbering previous value).
+*   `update(socket, :count, &(&1 + 1))`: "Take the *current* value and add 1."
+Preferred pattern for counters, lists, or toggles where the next state depends on the previous state.
 
-## Implementation Details
+### 2. The Diff Payload
+When you click "+", the server does NOT send a new HTML page. It calculates the diff.
+**Initial Render**:
+```javascript
+{ 0: "0", static: ["<div>Count: ", "</div>"] }
+```
+**Update**:
+```javascript
+{ 0: "1" }
+```
+This generic JSON payload is extremely small (bytes), making LiveView performant even on slow 3G networks.
 
-1.  **State**: Initialize `count` to `0` in `mount/3`.
-2.  **UI**:
-    - Display the current count prominently.
-    - Add buttons for `+`, `-`, and `Reset`.
-3.  **Events**:
-    - `handle_event("inc", ...)`: Adds 1 to count.
-    - `handle_event("dec", ...)`: Subtracts 1 from count.
-    - `handle_event("reset", ...)`: Sets count to 0.
+### 3. Multiple Event Bindings
+You can attach multiple listeners to a single element, or even the window.
+*   `phx-click`: Mouse click.
+*   `phx-window-keydown`: Global keyboard shortcuts (great for accessibility).
+*   `phx-throttle="500"`: Prevents users from spamming the button faster than 2 times a second.
 
-## Tips
-- Pattern match on the event name in `handle_event/3` to keep your code clean.
-- Use `phx-window-keydown` (covered in later katas) if you wanted keyboard support.
+## Common Pitfalls
 
-## Challenge
-Add a button labeled **"+5"** that increments the count by 5 at once.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># In render
-&lt;button phx-click="inc_5"&gt; +5 &lt;/button&gt;
-
-# In module
-def handle_event("inc_5", _, socket) do
-  {:noreply, update(socket, :count, &(&1 + 5))}
-end</code></pre>
-</details>
+1.  **State vs Data**: Don't put *everything* in assigns. Only put what the UI needs for rendering. Large user structs shouldn't be in assigns if you only need the display name.
+2.  **Integer Overflow**: Elixir integers are arbitrary precision (they don't overflow like 32-bit ints), so your counter can go as high as memory allows!
+3.  **Concurrency**: If you have two users on two different computers, they each have their *own* counter (own process). This is not a global shared counter (State is per-process).

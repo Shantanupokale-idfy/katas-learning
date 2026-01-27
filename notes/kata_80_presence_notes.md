@@ -1,36 +1,34 @@
 # Kata 80: Presence (Who is Online?)
 
-## Goal
-Track and display currently connected users using `Phoenix.Presence`.
+## The Concept
+Tracking "Who is here". In a distributed system with multiple servers, this is hard (no single source of truth).
+Phoenix Presence uses a **CRDT** (Conflict-free Replicated Data Type) to sync lists across the cluster with no central database.
 
-## Core Concepts
+## The Elixir Way
+*   `Presence.track(self(), topic, key, meta)`: "I am here."
+*   `handle_info(%{event: "presence_diff"}, ...)`: "Someone joined/left."
 
-### 1. `Presence.track`
-Registers the current process (user) under a key (username/ID).
-Meta map stores extra info (online_at, device_type).
+## Deep Dive
 
-### 2. `Presence.list`
-Returns the current list of online users.
+### 1. The Meta Map
+You don't just track a User ID. You track metadata:
+```elixir
+%{
+  online_at: DateTime.utc_now(),
+  device: "Mobile",
+  status: "Away"
+}
+```
+This allows rich UI ("User is typing...", "User is on mobile").
 
-### 3. `handle_info(%{event: "presence_diff"})`
-Called whenever someone joins or leaves.
+### 2. List vs Track
+*   `list(topic)`: Returns the current state.
+*   `track(...)`: Registers a process. When that process crashes or disconnects, Presence detects it and automatically broadcasts a "leave" event.
 
-## Implementation Details
+### 3. Bubble-up Events
+Presence batches updates. If 100 users join at once, you might receive one large diff instead of 100 small messages, saving CPU.
 
-1.  **Mount**: Call `Presence.track`.
-2.  **Info**: On diff, re-fetch list with `Presence.list` and update UI.
+## Common Pitfalls
 
-## Tips
-- Presence is eventually consistent and highly scalable (CRDT based).
-
-## Challenge
-**Sort by Join Time**. Ensure the list is sorted so the newest users appear at the top (or bottom).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># Get the map of presence info, convert to list, and sort
-users = Phoenix.Presence.list(socket) |> Enum.map(fn {k, v} -> v end)
-sorted = Enum.sort_by(users, & &1.joined_at, :desc)
-</code></pre>
-</details>
+1.  **Tracking in Mount**: Always wrap `Presence.track` in `if connected?(socket)` to avoid tracking the static HTTP render (which creates "ghost" users that disappear immediately).
+2.  **Key Collisions**: The `key` (3rd arg) identifies the user. If a user has 2 tabs open, and you use `user.id` as the key, Presence groups them under one entry with 2 `metas`. If you want strictly separate entries, use a unique ref.

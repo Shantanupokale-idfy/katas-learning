@@ -1,44 +1,34 @@
 # Kata 19: The Filter
 
-## Goal
-Implement **real-time filtering** (search). As the user types, the list should instantly shrink to show only matching results.
+## The Concept
+**Real-time Search**. As the user types, the list shrinks. This introduces the concept of **Derived State**: computing the view from the raw data + parameters.
 
-## Core Concepts
+## The Elixir Way
+*   **Source of Truth**: `@items` (the full list from DB).
+*   **Parameter**: `@query` (what the user typed).
+*   **View**: `filter(items, query)`.
+We **never** delete items from `@items` during a search. We only hide them. If we deleted them, backspacing the search query wouldn't restore them!
 
-### 1. Source of Truth
-Keep the *full* list of items in the state (`items`). Do not delete items from the state when filtering; just hide them.
+## Deep Dive
 
-### 2. Derived Rendering
-Perform the filtering at render time (or in a computed assign).
+### 1. Computed Computations
+Where do we run the filter logic?
+1.  **In Render**: `<%= for item <- filter(@items, @query) do %>`. Simple, prevents state duplication. Best for small lists.
+2.  **In Assigns**: `assign(socket, display_items: filter(...))`. Updates `display_items` whenever `query` changes. Better for complex logic to keep `render` clean.
+
+### 2. Case Insensitivity
+Users expect "alice" to match "Alice".
 ```elixir
-filtered_items = Enum.filter(@items, fn i -> ... end)
+String.contains?(String.downcase(name), String.downcase(query))
 ```
-This ensures that if the user clears the search, all items reappear.
+Always normalize both sides of the comparison.
 
-### 3. Filtering Logic
-Use `String.contains?/2` and `String.downcase/1` for case-insensitive partial matching.
+### 3. Debouncing
+Filtering 10,000 items on every keystroke freezes the UI.
+`phx-debounce="300"`
+This tells the client: "Wait until the user stops typing for 300ms before sending the event." The server does work 10x less often.
 
-## Implementation Details
+## Common Pitfalls
 
-1.  **State**: `items` (full list), `query` (search string).
-2.  **UI**:
-    - Search input bound with `phx-change`.
-    - Loop over the *result* of the filter function, not the raw `@items`.
-3.  **Events**:
-    - `handle_event("search", %{"query" => q}, socket)`: Update the query state.
-
-## Tips
-- For large lists, filtering on every keystroke might be slow. Use `phx-debounce="300"` on the input.
-
-## Challenge
-Add a **Clear** button (x) inside the search input that clears the query and resets the list.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">&lt;button phx-click="clear" class="absolute right-2 top-2"&gt;x&lt;/button&gt;
-
-def handle_event("clear", _, socket) do
-  {:noreply, assign(socket, query: "")}
-end</code></pre>
-</details>
+1.  **Destructive Filtering**: Modifying the original list `socket.assigns.items`. Once filtered, the original data is lost. Always keep the original list separate or fetch fresh from DB.
+2.  **Empty Queries**: `String.contains?("anything", "")` is always true. Ensure your logic handles empty strings gracefully (usually by returning the full list).

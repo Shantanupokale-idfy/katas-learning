@@ -1,37 +1,32 @@
 # Kata 58: Flash Messages
 
-## Goal
-Display temporary feedback messages (Success, Error) to the user.
+## The Concept
+Ephemeral feedback ("Saved successfully", "Error uploading").
+Typically used after a form redirect.
 
-## Core Concepts
+## The Elixir Way
+*   **Process.send_after**: Since LiveView is a long-running process, we can queue a message to ourselves to auto-clear the flash.
+    ```elixir
+    Process.send_after(self(), :clear_flash, 3000)
+    ```
+*   **Flash Assigns**: `put_flash` writes to a special area in the socket/conn.
 
-### 1. `put_flash/3`
-Standard Phoenix function to store messages in the connection/socket. LiveView handles rendering them (usually in a layout, but here locally).
+## Deep Dive
 
-### 2. Dismissal
-Allow the user to manually close the message.
+### 1. Functional Component Implementation
+Centralize the Flash UI in your Layout (`app.html.heex`) using `<.flash_group flash={@flash}>`.
+Inside, iterate over `:info` and `:error` keys.
 
-## Implementation Details
+### 2. Animation (Enter/Leave)
+Toast messages need to slide in/out.
+*   **Enter**: `phx-mounted={JS.transition(...)}`.
+*   **Leave**: `phx-click="close" phx-value-key="info"`.
 
-1.  **State**: `show_flash` (boolean) or check `flash` assigns directly if using standard flash.
-2.  **UI**: A noticeable banner with a close button.
+### 3. The `clear_flash` Pattern
+When the timer fires, we receive `handle_info(:clear_flash, socket)`.
+We must then `assign(socket, flash: %{})` (or clear specific keys) to remove it from the UI, triggering the exit animation.
 
-## Tips
-- For better UX, messages should often disappear automatically after a few seconds.
+## Common Pitfalls
 
-## Challenge
-Implement **Auto-Dismiss**. When the flash is shown, schedule a message to self (`Process.send_after`) to clear it after 3 seconds.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("show_message", _, socket) do
-  Process.send_after(self(), :clear_flash, 3000)
-  {:noreply, assign(socket, show_flash: true)}
-end
-
-def handle_info(:clear_flash, socket) do
-  {:noreply, assign(socket, show_flash: false)}
-end
-</code></pre>
-</details>
+1.  **Race Conditions w/ Navigation**: If you navigate away *before* the timer fires, the message is lost (good) but the timer message might arrive to the dead process (harmless).
+2.  **Persistent Connectivity**: If the user disconnects and reconnects, standard flash messages might persist or disappear depending on session store. LiveView handles this recovery mostly transparently.

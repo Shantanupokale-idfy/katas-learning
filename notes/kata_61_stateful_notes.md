@@ -1,32 +1,35 @@
 # Kata 61: Stateful Components
 
-## Goal
-Understand how `LiveComponent` manages its own isolated state, independent of the parent LiveView.
+## The Concept
+A **LiveComponent** can have its own isolated state (`@count`) that is independent of the parent LiveView.
+This allows for encapsulated logic (like a self-contained Counter or Form).
 
-## Core Concepts
+## The Elixir Way
+*   **PID**: Returns the *same* PID as the parent LiveView. It runs in the same process.
+*   **State**: Stored in the component's own socket struct, separate from the parent's assigns.
+*   **Lifecycle**: Init -> Update -> Render. `handle_event` stays inside the component if `phx-target={@myself}` is used.
 
-### 1. `mount/1` and `update/2`
-LiveComponents have their own lifecycle. `mount` is called once (if stateful). `update` is called whenever the parent re-renders or `send_update` is used.
+## Deep Dive
 
-### 2. `@myself`
-The specialized target that ensures events are sent to *this specific instance* of the component.
+### 1. `update(assigns, socket)`
+This callback is the "constructor" and "updater" rolled into one.
+It runs:
+1.  On initial mount.
+2.  Whenever the parent changes the attributes passed to the component (`<.live_component id="x" count={@count} />`).
+3.  When `send_update` is called.
 
-## Implementation Details
+### 2. ID is Mandatory
+Stateful components **must** have an `:id`.
+This ID allows LiveView to find the component state in memory when an event arrives.
 
-1.  **State**: `count`.
-2.  **ID**: Crucial. Example uses `id="kata-61"`. Without an ID, a component is stateless.
+### 3. Cost of State
+While convenient, stateful components add memory overhead tracking diffs for each ID.
+Use **Function Components** (stateless) by default. Use **LiveComponents** (stateful) only when you need:
+*   `handle_event` (self-managed events).
+*   `mount`/`update` (data fetching on init).
+*   `check_errors` (form recovery).
 
-## Tips
-- Use stateful components for complex UI widgets (date pickers, rich text editors) that have internal logic not relevant to the page.
+## Common Pitfalls
 
-## Challenge
-Add a **Reset** button that sets the count back to 0.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("reset", _, socket) do
-  {:noreply, assign(socket, count: 0)}
-end
-</code></pre>
-</details>
+1.  **Missing ID**: LiveView will raise an error if you define a `render` function but forget to pass `id` when calling `live_component`.
+2.  **Parent Communication**: The component cannot simple `assign(socket, parent_val: 1)`. Use `send(self(), {:updated, 1})` to talk to the parent (since `self()` is the same process).

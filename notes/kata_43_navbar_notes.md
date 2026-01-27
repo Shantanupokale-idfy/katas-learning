@@ -1,36 +1,32 @@
 # Kata 43: Navbar Integration
 
-## Goal
-Build a navigation bar where the **active state** of links is determined by the current URL parameters.
+## The Concept
+A persistent navigation bar that highlights the current page. This introduces **Conditional Class Rendering** based on state.
 
-## Core Concepts
+## The Elixir Way
+*   **Functional Components**: We define `<.nav_link>` to encapsulate the logic of "am I active?".
+*   **Verified Routes**: We use `~p"/path"` to ensure compile-time safety of all links.
 
-### 1. Active Class Helper
-Create a helper function (e.g., `active_class/2`) that takes the current page (from assigns) and the link target. If they match, return "active" CSS classes (bold, colored). If not, return "inactive" classes.
+## Deep Dive
 
-### 2. `patch` vs `navigate`
-- `.link patch={...}`: updates URL, fires `handle_params`, keeps state.
-- `.link navigate={...}`: full page transition (unmounts and remounts LiveView). Use this for major context switches.
+### 1. Calculating Active State
+How do we know we are on "Home"?
+*   **Option A**: Check URI path.
+*   **Option B (Preferred)**: Set `@current_page` assign in the Router's `live_session` via `on_mount` hooks.
+In this basic kata, we manually calculate it from `handle_params`.
 
-## Implementation Details
+### 2. `.link` Component
+Phoenix provides `<.link>`. It replaces `<a>`, `<live_patch>`, and `<live_redirect>`.
+*   `navigate`: Full page transition (stops current LiveView, starts new one).
+*   `patch`: Same LiveView, updates params.
+*   `href`: Standard HTTP request (full browser reload). use for external links or login/logout.
 
-1.  **State**: `current_page` (derived from params).
-2.  **UI**: List of links. Call `active_class(@current_page, "home")` etc.
+### 3. Layouts
+Navbars usually live in `app.html.heex` (the Layout), not the individual LiveView.
+However, the Layout *wraps* the LiveView. This means the Layout shares the `@socket` assigns.
+If you update `assign(socket, active_tab: :home)` in the LiveView, the Layout can read `@active_tab`.
 
-## Tips
-- Encapsulate navigation logic in a reusable Functional Component (`<.nav_link ... />`) for consistency.
+## Common Pitfalls
 
-## Challenge
-Add a **"Notifications"** badge that appears on the "Contact" link if the URL contains `?notify=true`.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># 1. In handle_params, track `notify` param.
-# 2. In render:
-&lt;.link ...&gt;
-  Contact
-  &lt;%= if @show_badge, do: &lt;span class="badge"&gt;1&lt;/span&gt; %&gt;
-&lt;/.link&gt;
-</code></pre>
-</details>
+1.  **Nested Active States**: "Settings" is active, but so should be the parent "Profile" dropdown. Logic can get complex.
+2.  **Patching Config**: Using `patch` to go to a different LiveView (e.g. Home to Settings) effectively degrades to a `navigate` or crashes, depending on router setup. Use `navigate` for different pages.

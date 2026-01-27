@@ -1,42 +1,42 @@
 # Kata 18: The Editor
 
-## Goal
-Implement **Inline Editing**. Turn a text display into an input field when clicked, allowing immediate updates.
+## The Concept
+**Inline Editing** (CRUD in place). Instead of navigating to a separate "Edit Page", we swap the static text for an input field on the fly.
 
-## Core Concepts
+## The Elixir Way
+We use **Conditional Rendering** inside the loop.
+```elixir
+<%= if @editing_id == item.id do %>
+  <.form ...> <input ...> </.form>
+<% else %>
+  <span>{item.text}</span>
+<% end %>
+```
+The state `editing_id` determines which row is "hot".
 
-### 1. Edit Mode State
-Track *which* item is being edited.
-- `editing_id: "123"` -> Item 123 is in edit mode.
-- `editing_id: nil` -> No item is being edited.
+## Deep Dive
 
-### 2. Conditional Swapping
-Inside the loop, check if the current item is the one being edited.
-- **If yes**: Render a form with an input.
-- **If no**: Render the plain text with a click handler.
+### 1. State: `editing_id`
+We track a single ID.
+*   `nil`: View mode.
+*   `"123"`: Row 123 is editable.
+This implicitly enforcing that **only one row** can be edited at a time (which simplifies things greatly).
 
-### 3. Auto-Focus
-When swapping to an input, use the `autofocus` attribute (or a JS hook) so the user can type immediately.
+### 2. Focus Management
+When the input appears, the user expects to type immediately.
+HTML5 `<input autofocus>` works for the *initial* page load, but sometimes fails in dynamic updates.
+**Solution**: A simple Client Hook (JS) or strict `autofocus` attribute usage is often needed to ensure the cursor lands in the new input.
 
-## Implementation Details
+### 3. Escape Hatches (`phx-click-away`)
+To cancel editing when clicking outside, you can use `phx-click-away`.
+```html
+<div phx-click-away="cancel">
+  <input ... />
+</div>
+```
+This requires a wrapping container to detect the "outside" click.
 
-1.  **State**: `items`, `editing_id`.
-2.  **Events**:
-    - `edit`: Sets `editing_id` to the item's ID.
-    - `save`: Updates the item's text in the list and sets `editing_id` to `nil`.
-    - `cancel`: Sets `editing_id` to `nil` (e.g., on blur).
+## Common Pitfalls
 
-## Tips
-- Swapping the UI instantly creates a very interactive "app-like" feel.
-- Using `phx-blur` on the input to trigger a "cancel" or "save" is a common pattern for inline editing.
-
-## Challenge
-Trigger edit mode on **Double Click** (`phx-dblclick`) of the text items, instead of using a specific "Edit" button/icon.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">&lt;div phx-dblclick="edit" phx-value-id={item.id}&gt;
-  {item.text}
-&lt;/div&gt;</code></pre>
-</details>
+1.  **Loss of Focus**: As you type, if the server validates and re-renders the list, the input might be replaced by a *fresh* input element, causing the caret to jump to the start or lose focus.
+    *   **Fix**: Maintain a stable DOM ID for the input (`id={"input-#{item.id}"}`) so LiveView can patch it intelligently instead of replacing it.

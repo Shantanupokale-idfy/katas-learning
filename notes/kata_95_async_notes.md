@@ -1,39 +1,37 @@
-# Kata 95: Async Assigns
+# Kata 95: Async Data (Phoenix 1.8+)
 
-## Goal
-Load data asynchronously without blocking the initial UI render.
+## The Concept
+**Non-blocking UIs**.
+If a database query takes 2 seconds, we don't want to block the entire page load (TTFB).
+We want to render the skeleton immediately, then stream in the data when ready.
 
-## Core Concepts
-
-### 1. `assign_async/3`
-Starts a task. The `render` function receives an `AsyncResult` struct.
-
-### 2. `<.async_result>`
-Component to handle `:loading`, `:failed`, and success states declarative-style.
+## The Elixir Way
+**`assign_async`**.
 ```elixir
-<.async_result :let={data} assign={@my_data}>
-  <:loading>Loading...</:loading>
-  <:failed :let={reason}>Error: <%= reason %></:failed>
-  <div><%= data %></div>
+socket
+|> assign_async(:users, fn -> {:ok, %{users: fetch_users()}} end)
+```
+This spawns a Task. When the Task completes, it sends a message to the LiveView, which updates the `@users` assign.
+
+## Deep Dive
+
+### 1. `<.async_result>` Component
+This handles the state machine (loading -> ok | failed).
+```elixir
+<.async_result :let={users} assign={@users}>
+  <:loading><Spinner /></:loading>
+  <:failed>Error!</:failed>
+  <table>...</table>
 </.async_result>
 ```
 
-## Implementation Details
+### 2. Fast vs Slow
+You can change *multiple* async assigns.
+*   `assign_async(:fast_stats, ...)` (Loads in 50ms).
+*   `assign_async(:slow_reports, ...)` (Loads in 2s).
+The UI updates incrementally.
 
-1.  **Mount**: Call `assign_async`.
-2.  **Function**: Returns `{:ok, %{key: val}}` or `{:error, reason}`.
+## Common Pitfalls
 
-## Tips
-- Great for dashboards where one slow widget shouldn't stall the whole page.
-
-## Challenge
-Simulate **Failure**. Modify the loading function to randomly return `{:error, "Service Unavailable"}`. Observe the `:failed` slot rendering.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">assign_async(..., fn ->
-  if :rand.uniform(2) == 1, do: {:error, "Fail"}, else: {:ok, ...}
-end)
-</code></pre>
-</details>
+1.  **Over-fetching**: Don't wrap *everything* in async. Standard `assign` is faster for cheap data. Only use async for IO-heavy operations.
+2.  **Flash of Content**: Ensure your `<:loading>` state matches the height of the final content (Skeleton) to avoid layout shift.

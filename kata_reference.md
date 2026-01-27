@@ -56,12 +56,14 @@ To add a new kata (e.g., Kata 99: New Feature):
 2.  **Create the Notes File**:
     *   Path: `notes/kata_99_new_feature_notes.md`
     *   Path: `notes/kata_99_new_feature_notes.md`
-    *   Content: Markdown description of the task. Standard sections:
-        *   **Goal**: What the user will build.
-        *   **Core Concepts**: Theory and snippets.
-        *   **Implementation Details**: Steps to build it.
-        *   **Tips**: Helpful advice.
-        *   **Challenge**: An extra task for the user.
+    *   Content: Markdown description of the task.
+    *   **Standard Structure** (Textbook Style):
+        1.  **# Kata XX: Title**
+        2.  **## The Concept**: Quick summary of the *why* (e.g. "Why do we use Streams?").
+        3.  **## The Elixir Way**: How Phoenix/Elixir handles this differently from other frameworks (e.g. "No client-side state").
+        4.  **## Deep Dive**: Technical implementation details (Mechanics, Function signatures, Edge cases).
+        5.  **## Common Pitfalls**: What goes wrong? (Race conditions, Security, Performance).
+        6.  **## Challenge**: Use the `<details>` block for the solution.
             *   **View Solution**: Use the following HTML structure for hidden solutions:
                 ```html
                 <details>

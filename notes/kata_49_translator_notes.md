@@ -1,36 +1,39 @@
 # Kata 49: Translator (i18n)
 
-## Goal
-Implement a simple internationalization system. Switch languages to see UI text update instantly.
+## The Concept
+**Internationalization (i18n)**. Serving the same UI in multiple human languages.
 
-## Core Concepts
+## The Elixir Way
+Phoenix uses **Gettext** as the industry standard.
+*   **Extraction**: You write code `gettext("Welcome")`.
+*   **Tasks**: `mix gettext.extract` scans code and finds strings.
+*   **Translation**: You edit `.po` files to provide "Benvenuto".
 
-### 1. Translation Map
-A simple Map `%{ "en" => %{"hello" => "Hello"}, "es" => ... }` simulates a real translation backend (like Gettext).
+## Deep Dive
 
-### 2. Helper Function
-A `t(locale, key)` helper function looks up the string. If missing, it usually falls back to the key or a default language.
+### 1. LiveView `handle_info`
+Switching languages dynamically usually involves:
+1.  Updating the user's session/cookie.
+2.  Updating the `Gettext` locale for the current process.
+3.  Re-rendering the page.
 
-## Implementation Details
+```elixir
+Gettext.put_locale(MyAppWeb.Gettext, "fr")
+```
+Since LiveView is a long-running process, changing the locale affects all future renders for *that process*.
 
-1.  **State**: `locale` (String "en", "es", ...).
-2.  **Render**: All text is wrapped in `<%= t(@locale, "key") %>`.
-
-## Tips
-- Phoenix uses `Gettext` by default, which extracts strings to `.po` files. This kata simulates that mechanism in-memory.
-
-## Challenge
-Add a new language: **Italian** (`it`). Add the translations for "welcome" ("Benvenuto") and "greeting" ("Ciao, Mondo!").
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># Add to @translations map:
-"it" => %{
-  "welcome" => "Benvenuto",
-  "greeting" => "Ciao, Mondo!",
-  ...
+### 2. Implementation in this Kata
+We simulate Gettext with a simple Map for educational clarity.
+```elixir
+@translations %{
+  "en" => %{"hello" => "Hello"},
+  "es" => %{"hello" => "Hola"}
 }
-# Add button in render
-</code></pre>
-</details>
+```
+In real apps, use proper `.po` files to support pluralization rules ("1 item" vs "2 items"), which Gettext handles mathematically correctly for languages with complex plural rules (like Russian).
+
+## Common Pitfalls
+
+1.  **Interpolation**: Never concatenate strings for translation (`"Hello " <> name`). This prevents translators from moving the variable (some languages say "Alice Hello").
+    *   **Bad**: `"Hello " <> name`
+    *   **Good**: `gettext("Hello %{name}", name: name)`

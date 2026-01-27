@@ -1,35 +1,37 @@
 # Kata 81: Live Cursors
 
-## Goal
-Track and display mouse cursors from other users in real-time.
+## The Concept
+Showing other users' mouse positions.
+This is the ultimate stress test for latency and throughput.
 
-## Core Concepts
+## The Elixir Way
+*   **Client**: Hook sends `mousemove` (throttled).
+*   **Server**: Broadcasts pos to Topic.
+*   **Subscribers**: Update `socket.assigns.cursors`.
 
-### 1. Hook Throttling
-Sending every `mousemove` event to the server will kill performance. The Hook **must** throttle/debounce the valid events (e.g., every 50ms).
+## Deep Dive
 
-### 2. Coordinate System
-Map screen coordinates to percentage (0-100%) or absolute pixels if the container is fixed size.
+### 1. Throttling is Critical
+Mouse events fire every pixel. Sending 1000 events/sec will kill the server.
+**Client Hook**:
+```javascript
+this.el.addEventListener("mousemove", throttle(e => {
+  this.pushEvent("move", {x: e.pageX, y: e.pageY})
+}, 50)) // 20 updates per second max
+```
 
-## Implementation Details
+### 2. SVG Overlay
+Rendering cursors using absolute `div`s or `svg` elements. `pointer-events-none` is essential so the cursors don't block clicks on the underlying content.
 
-1.  **Hook**: `CursorTracker` (sends `cursor-move`).
-2.  **Broadcast**: PubSub sends `{:cursor_update, ...}`.
+### 3. Latency Compensation
+Even with 10ms latency, cursors look jerky.
+**CSS Transition**:
+```css
+.cursor { transition: top 0.1s linear, left 0.1s linear; }
+```
+This interpolates the movement between updates, making it look 60fps smooth.
 
-## Tips
-- Use `pointer-events-none` on the cursor elements so they don't block clicks on the underlying UI.
+## Common Pitfalls
 
-## Challenge
-Broadcast **Clicks**. When a user clicks, show a "Ping" or Ripple animation at that location.
-Add a `phx-click` or Hook listener for mousedown, broadcast `{:click, x, y}`.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"># On click event:
-Phoenix.PubSub.broadcast(..., {:click, x, y})
-# On handle_info:
-assign(socket, clicks: [new_click | clicks])
-# Render a temporary div that animates and disappears (use JS.hide/remove after X ms)
-</code></pre>
-</details>
+1.  **Broadcasting to Self**: You typically don't need to see your own "network cursor". Filter it out in `handle_info` or use `broadcast_from`.
+2.  **Bandwidth**: Each packet is small, but `(NumUsers * NumUsers * UpdateRate)` grows quadratically. For > 50 users, consider filtering broadcasts (only to nearby users) or getting a bigger server!

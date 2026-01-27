@@ -1,39 +1,34 @@
 # Kata 60: Progress Bar
 
-## Goal
-Visualize the status of a long-running background task.
+## The Concept
+Visualizing long-running tasks. This Kata simulates a task using a recursive loop on the server.
 
-## Core Concepts
+## The Elixir Way
+*   **The Loop**: A GenServer pattern. "Do work -> Report Progress -> Schedule next chunk".
+*   **Smoothness**: The server reports progress in discrete steps (10%, 20%). CSS transitions smooth the gap between 10% and 20%.
 
-### 1. Component State Loop
-The component sends messages to itself (`Process.send_after`) to simulate progress over time.
+## Deep Dive
 
-### 2. Visual Width
-Map the integer percentage (0-100) to a CSS width style (`style="width: #{@progress}%"`).
-
-## Implementation Details
-
-1.  **State**: `progress` (Integer).
-2.  **Events**:
-    *   `start`: Kick off the loop.
-    *   `handle_info`: Increment progress, re-schedule if < 100.
-
-## Tips
-- Use a transition (`transition-all duration-300`) on the width property to make the movement smooth instead of jumpy.
-
-## Challenge
-Add a **Pause/Resume** button. You'll need to track a `status` (`:idle`, `:running`, `:paused`). If paused, `handle_info` should not schedule the next tick.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("pause", _, socket) do
-  {:noreply, assign(socket, status: :paused)}
+### 1. The Recursive Loop (`send_after`)
+```elixir
+def handle_info(:tick, socket) do
+  new_val = socket.assigns.val + 10
+  if new_val < 100, do: Process.send_after(self(), :tick, 500)
+  {:noreply, assign(socket, val: new_val)}
 end
+```
+This is how simpler internal jobs work. For real heavy jobs, you would use a separate Task or Oban worker, and use **PubSub** to broadcast progress back to the LiveView.
 
-# In handle_info:
-if socket.assigns.status == :running do
-   Process.send_after(...)
-end
-</code></pre>
-</details>
+### 2. CSS Smoothing
+Updating the DOM 60 times a second from the server is inefficient.
+Instead, update every 500ms (10%, 20%...) and let CSS interpolate:
+```css
+width: 20%;
+transition: width 0.5s linear;
+```
+The user sees a continuous 60fps animation, but the server only sent 2 messages.
+
+## Common Pitfalls
+
+1.  **Blocking**: Never `Process.sleep` in the `handle_info`. It blocks the LiveView from handling other user events (like "Cancel"). Always return quickly and schedule the next tick.
+2.  **Memory Leaks**: If the user navigates away, the LiveView process dies and the timer is cancelled automatically. (One of the great benefits of the Actor model—no need to manually cleanup intervals like in JavaScript).

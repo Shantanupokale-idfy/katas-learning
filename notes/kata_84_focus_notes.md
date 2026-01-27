@@ -1,34 +1,38 @@
 # Kata 84: Accessible Focus
 
-## Goal
-Manage keyboard focus for accessibility, especially after dynamic updates (e.g., opening a modal, deleting an item).
+## The Concept
+**Focus Management**.
+When building accessible apps (WCAG), managing keyboard focus is non-negotiable.
+LiveView needs help from the client to move focus after DOM updates.
 
-## Core Concepts
+## The Elixir Way
+We use `phx-hook` because modifying `document.activeElement` is purely a client-side side-effect.
+*   **Hook**: `FocusElement`.
+*   **Event**: `pushEvent("moved_focus", ...)` is usually not needed. We just need to receive commands.
 
-### 1. `JS.focus`
-`Phoenix.LiveView.JS.focus(to: "#id")`.
-Use this to move focus programmatically.
+## Deep Dive
 
-### 2. `sr-only` Live Regions
-Use `ria-live="polite"` elements to announce changes to screen readers.
+### 1. `handleEvent` in Hooks
+The server can push a specific event to a hook.
+```javascript
+// Client
+this.handleEvent("focus_element", ({id}) => {
+  const el = document.getElementById(id)
+  if (el) el.focus()
+})
+```
+```elixir
+# Server
+push_event(socket, "focus_element", %{id: "btn-1"})
+```
+This is robust.
 
-## Implementation Details
+### 2. `phx-key="Enter"`
+For buttons, simple `phx-click` works with Space/Enter.
+For custom widgets (like a custom dropdown), you must handle `phx-window-keydown` or specific key bindings yourself.
 
-1.  **Event**: When action finishes, call `JS.focus`.
-2.  **Example**: Clicking "Edit" moves focus to the input field.
+## Common Pitfalls
 
-## Tips
-- Never leave focus "lost" (reset to `body`) after a modal closes; return it to the trigger button.
-
-## Challenge
-Implement **Looping Focus**. Add a "Next" button that cycles focus through 3 distinct inputs `input-a`, `input-b`, `input-c` in order.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("next_focus", _, socket) do
-  next_id = get_next(socket.assigns.current_focus) # Logic
-  {:noreply, push_event(socket, "js-focus", %{id: next_id})}
-end
-</code></pre>
-</details>
+1.  **Focus Loss**: If you replace the element that has focus (update its ID or remove it), focus resets to `<body>`. This destroys accessibility.
+    *   **Fix**: Always keep stable DOM IDs. Use `phx-preserve-focus` if needed (though rare).
+2.  **Timing**: If you show a modal and try to focus an input inside it *immediately*, it might fail if the transition hasn't finished. Use `requestAnimationFrame` in the hook.

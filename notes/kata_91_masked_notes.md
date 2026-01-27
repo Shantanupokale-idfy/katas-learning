@@ -1,34 +1,27 @@
-# Kata 91: Masked Inputs
+# Kata 91: Masked Input
 
-## Goal
-Format user input automatically as they type (e.g., phone numbers, dates, credit cards).
+## The Concept
+Formatting text as the user types (e.g. `(123) 456-7890`).
+Doing this server-side introduces lag (cursor jumping). It works best on the client.
 
-## Core Concepts
+## The Elixir Way
+We wrap a library like `Inputmask` or `Cleave.js` in a Hook.
+The library modifies the input value locally.
+The `phx-change` event sends the *formatted* value to the server (or unformatted, depending on library settings).
 
-### 1. `InputMask` Hook
-A Hook that listens to `input` events and modifies `el.value` based on a pattern.
+## Deep Dive
 
-### 2. Data Attributes
-Pass the mask type via `data-mask="phone"`.
+### 1. `phx-update="ignore"` usage?
+Usually **No**. Input fields benefit from server sync.
+However, if the server re-renders the input while the user is typing, the cursor position might reset.
+*   **Hybrid Approach**: The Hook handles the keystrokes. The Server validates on blur or via debounce.
 
-## Implementation Details
+### 2. Data Integrity
+If the user types `(555` and stops, the library might show `(555) ___-____`.
+What does the server receive? `(555) ___-____` or `555`.
+Decide on a canonical format (usually raw numbers) and strip characters in `handle_event`.
 
-1.  **Server**: Receives the *masked* value usually.
-2.  **Unmasking**: Often you want to save raw numbers. You might need a hidden input or strip formatting on the server.
+## Common Pitfalls
 
-## Tips
-- Accessibility: Ensure the screen reader announces the mask format or the label explains it.
-
-## Challenge
-Add a **ZIP Code** field.
-Format: `99999` (5 digits).
-Or `99999-9999` (ZIP+4).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="html">
-<.input ... data-mask="zip" />
-<!-- Update JS Hook to handle "zip" case -->
-</code></pre>
-</details>
+1.  **Latency Fights**: If server attempts to format "555" -> "(555)" and sends it back *while* the user types the next digit, the mask library might break.
+    *   **Fix**: Rely on the client library for visual formatting. Use the server for validation only.

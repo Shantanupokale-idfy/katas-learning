@@ -1,33 +1,24 @@
-# Kata 100: Error Boundaries
+# Kata 100: Error Recovery
 
-## Goal
-Handle crashes gracefully. If a LiveComponent or LiveView crashes, the Supervisor should restart it, and the client should reconnect.
+## The Concept
+**Let it Crash**. But don't break the whole app.
+If a single LiveComponent crashes, it shouldn't take down the entire Page.
 
-## Core Concepts
+## The Elixir Way
+*   **Process Isolation**: LiveViews are isolated. If User A crashes, User B is unaffected.
+*   **Supervisors**: If a LiveView crashes, the client automatically attempts to reconnect (`phx-disconnected`).
 
-### 1. "Let it Crash"
-Elixir's philosophy. Don't code defensively against impossible states. If it happens, crash and reset to a known good state.
+## Deep Dive
 
-### 2. Client Reconnect
-Phoenix JS client automatically attempts to rejoin the channel.
+### 1. Error Boundaries in Components
+Standard LiveComponents run in the *same* process as the parent. If they crash, the parent crashes.
+**Solution**: To isolate a component, it must be a separate LiveView (fetched via `live_render`) or manage its risky operations in a separate `Task`.
 
-## Implementation Details
+### 2. The "Something went wrong" UI
+When a crash occurs, the standard behavior is the page hangs or reloads.
+You can customize the specific 500/404 pages in `ErrorHTML`.
 
-1.  **Demo**: Requires a button that explicitly `raise "Error"`.
+## Common Pitfalls
 
-## Tips
-- LiveComponents run in the *same* process as the Parent LiveView. A crash in a component crashes the *whole view*.
-
-## Challenge
-**The Crash Button**.
-Add a button "Simulate Crash".
-Clicking it raises an exception. Observe how the UI momentarily blinks/freezes and then reloads (resets to initial state).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">def handle_event("crash", _, _) do
-  raise "Simulated Crash!"
-end
-</code></pre>
-</details>
+1.  **Infinite Loops**: If `mount` raises an error, the client will reload, `mount` will raise again... loop.
+    *   **Fix**: Be defensive in `mount`. Handle potential nil values or DB connection errors gracefully.

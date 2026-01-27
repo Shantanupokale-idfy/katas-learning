@@ -1,34 +1,33 @@
-# Kata 87: LocalStorage Persistence
+# Kata 87: LocalStorage
 
-## Goal
-Persist data in the browser's `localStorage` so it survives page reloads.
+## The Concept
+**Client-Side Persistence**. Maintaining state across browser refreshes without a database.
+Useful for: Dark mode preference, Drafts, collapsed sidebar state.
 
-## Core Concepts
+## The Elixir Way
+LiveView runs on the server. LocalStorage is on the client.
+We must bridge them.
+1.  **Mount**: Hook reads LS and sends to server.
+2.  **Update**: Server sends `push_event` to Hook to write LS.
 
-### 1. Hook: `LocalStorage`
-- `mounted()`: Read from storage, push to server (`pushEvent`).
-- `handleEvent("save", ...)`: Write to storage.
+## Deep Dive
 
-## Implementation Details
+### 1. The "Flash" on Mount
+Since we can't read LS until the socket matches, the initial HTTP render knows nothing about the user's preference.
+*   **Solution**: Use a tiny inline script in `root.html.heex` to set a class on `<body>` before LiveView loads (for Dark Mode).
+*   **For Data**: Render a loading state until the Hook reports back.
 
-1.  **Server**: `push_event("store", %{key: k, val: v})`.
-2.  **Client**: `window.localStorage.setItem(key, val)`.
+### 2. `handle_event("restore", ...)`
+The hook sends:
+```javascript
+mounted() {
+  const data = localStorage.getItem("key")
+  this.pushEvent("restore", {data})
+}
+```
+The LiveView receives this and updates internal state.
 
-## Tips
-- LiveView is server-side; it doesn't know about localStorage until the client tells it.
+## Common Pitfalls
 
-## Challenge
-**Sync Across Tabs**.
-In your Hook, add a `window.addEventListener("storage", ...)` listener.
-When another tab updates storage, this event fires. Push the new data to the server so the UI updates instantly in all open tabs.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="javascript">window.addEventListener("storage", e => {
-  if (e.key === "my_app_data") {
-    this.pushEvent("storage_updated", {val: e.newValue})
-  }
-})
-</code></pre>
-</details>
+1.  **JSON Limits**: LocalStorage is synchronous and size-limited (5MB). Don't store large datasets.
+2.  **Security**: Never store JWTs or sensitive user data in LocalStorage (XSS vulnerable). Use Cookies (HttpOnly) for auth.

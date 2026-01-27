@@ -1,33 +1,34 @@
-# Kata 55: Slideover (Drawer)
+# Kata 55: The Slideover (Drawer)
 
-## Goal
-Create a "Drawer" or "Slideover" that enters from the side of the screen, typically used for mobile menus or details panels.
+## The Concept
+A panel sliding in from the edge (Right/Left). Commonly used for "context" details or mobile navigation menus.
 
-## Core Concepts
+## The Elixir Way
+Very similar to the Modal, but the **Transition** logic is different.
+*   **Enter**: `translate-x-full` (offscreen right) ➔ `translate-x-0` (onscreen).
+*   **Leave**: The reverse.
 
-### 1. Transitions
-Animation is key for slide-overs. Without transition, it feels jarring.
-(Note: LiveView has `JS.transition`, but simpler CSS transitions on mounting elements work too).
+## Deep Dive
 
-### 2. Fixed Positioning
-The panel uses `fixed right-0 top-0 h-full` to anchor to the side.
+### 1. CSS Transforms
+Moving elements with `transform: translateX(...)` is GPU-accelerated and smooth.
+Avoid animating `left` or `margin` properties, which trigger CPU layout repaints (slow).
 
-## Implementation Details
+### 2. LiveView JS Transitions
+```elixir
+JS.transition(
+  {"ease-out duration-300", "translate-x-full", "translate-x-0"},
+  to: "#drawer"
+)
+```
+LiveView handles applying the classes for the start, active, and end states of the animation.
 
-1.  Similar to Modal (backdrop checking).
-2.  Panel positioning is the main difference.
+### 3. Mobile Considerations
+On mobile, a slideover usually takes 100% width. On desktop, fixed width (e.g. `w-96`).
+Tailwind: `w-full md:w-96`.
 
-## Tips
-- On mobile, slide-overs are often preferred over centered modals because they maximize vertical space.
+## Common Pitfalls
 
-## Challenge
-Make the side **Configurable**. Add `attr :side, :string, default: "right"`. Allow the drawer to slide in from the **Left** if specified.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">class={
-  if @side == "left", do: "left-0 ...", else: "right-0 ..."
-}
-</code></pre>
-</details>
+1.  **Click-Outside**: If you use a backdrop, ensure it doesn't block the slideover itself. The slideover should sit *on top* of the backdrop in the Z-stack.
+2.  **State Sync**: If you close the drawer via JS (clicking X), but the server thinks it's open, the next patch might re-open it.
+    *   **Fix**: Use `JS.push("close")` alongside the visual hide, so the server state stays in sync.

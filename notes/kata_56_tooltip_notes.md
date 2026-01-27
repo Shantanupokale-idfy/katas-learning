@@ -1,41 +1,39 @@
-# Kata 56: Tooltip
+# Kata 56: The Tooltip
 
-## Goal
-Create a Tooltip component that reveals extra information when hovering over an element.
+## The Concept
+Revealing auxiliary information when hovering over an element.
+This demonstrates **Pure CSS Interactions** where server roundtrips are unnecessary (and undesirable).
 
-## Core Concepts
+## The Elixir Way
+We use **CSS Group Hover** instead of `phx-mouseenter` because:
+1.  **Latency**: A tooltip should appear instantly. 50ms latency feels broken.
+2.  **Traffic**: Hovering triggers thousands of events. The server doesn't need to know you hovered a help icon.
 
-### 1. Group Hover (Tailwind)
-Use the `group` class on the parent and `group-hover:visible` (or `group-hover:opacity-100`) on the child. This allows purely CSS-based toggling without server roundtrips.
+## Deep Dive
 
-### 2. Positioning
-Absolute positioning relative to the parent (`relative inline-block`) places the tooltip precisely.
+### 1. The `group` and `group-hover` Pattern
+Tailwind allows parent-child interaction style.
+```html
+<div class="relative group">
+  <button>Hover Me</button>
+  <div class="invisible group-hover:visible absolute ...">
+    Tooltip Content
+  </div>
+</div>
+```
+The child (`tooltip`) reacts to the state of the parent (`group`).
 
-## Implementation Details
+### 2. Positioning Logic
+Absolute positioning requires a `relative` container.
+*   `bottom-full`: Pushes the tooltip above the element.
+*   `mb-2`: Adds spacing.
+*   `left-1/2 -translate-x-1/2`: Centers it horizontally.
 
-1.  **Structure**:
-    ```html
-    <div class="relative group">
-      <button>Target</button>
-      <div class="absolute ... invisible group-hover:visible">Tooltip</div>
-    </div>
-    ```
+### 3. Z-Index
+Tooltips battle with other elements (like cards or headers) for visibility.
+Adding `z-50` ensures it floats above everything else in that stacking context.
 
-## Tips
-- Ensure the tooltip has a higher `z-index` if it overlaps other content.
-- `whitespace-nowrap` prevents the tooltip text from wrapping awkwardly.
+## Common Pitfalls
 
-## Challenge
-Add configurable **Positioning**. Add `attr :position, :string, default: "top"`. Support "top" vs "bottom" by changing the CSS classes (e.g., `bottom-full` vs `top-full`).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">class={
-  case @position do
-    "top" -> "bottom-full mb-2"
-    "bottom" -> "top-full mt-2"
-  end
-}
-</code></pre>
-</details>
+1.  **Clipping**: If the parent container has `overflow-hidden`, the tooltip will get cut off. You may need to move the tooltip code higher in the DOM (portals) if your layout is strict, but for simple apps, removing `overflow-hidden` is easier.
+2.  **Mobile**: There is no "hover" on touch screens. Tooltips are often inaccessible on mobile. Consider showing them on `focus` (tabbing) as well for better accessibility.

@@ -1,35 +1,33 @@
-# Kata 89: Chart.js Integration
+# Kata 89: Charts (3rd Party Libs)
 
-## Goal
-Render interactive charts using a 3rd party JS library.
+## The Concept
+Integrating heavyweight JS libraries (Chart.js, Maps, D3) that manipulate the DOM themselves.
 
-## Core Concepts
+## The Elixir Way
+**`phx-update="ignore"`**.
+This is the most important attribute. It tells LiveView: "I will render this `div` once, but after that, I promise never to touch its children. You (the Hook) own this DOM subtree."
 
-### 1. `phx-update="ignore"`
-Crucial. The container `<canvas>` is managed by Chart.js. LiveView should never touch it after initial render, or it will destroy the chart instance.
+## Deep Dive
 
-### 2. Data Updates
-To update the chart, the server pushes an event (`socket |> push_event("update_points", points)`).
-The Hook listens (`handleEvent(...)`) and calls `chart.update()`.
+### 1. Passing Data
+We don't render HTML. We pass JSON data attributes.
+```html
+<canvas phx-hook="Chart" data-points={Jason.encode!(@points)} ...>
+```
+The Hook reads `dataset.points`, decodes it, and updates the Chart instance.
 
-## Implementation Details
+### 2. `push_event` for Updates
+For real-time charts, passing huge JSON strings in attributes is slow.
+Better pattern:
+```elixir
+push_event(socket, "new_point", %{y: 10})
+```
+The Hook subscribes:
+```javascript
+this.handleEvent("new_point", pt => this.chart.data.datasets[0].push(pt))
+```
 
-1.  **Hook**: `ChartJS`.
-2.  **Server**: `assign(socket, :data, ...)` (for initial) + `push_event`.
+## Common Pitfalls
 
-## Tips
-- Never re-render the canvas element itself from the server.
-
-## Challenge
-Change **Chart Type**. Add a select menu or buttons to switch between "bar" and "line" charts.
-You will need to destroy the old Chart instance in the Hook and create a new one with the new `type`.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="javascript">handleEvent("change_type", ({type}) => {
-  this.chart.destroy();
-  this.chart = new Chart(ctx, {type: type, ...});
-})
-</code></pre>
-</details>
+1.  **Memory Leaks**: You **must** destroy the Chart instance in the `destroyed()` callback of the hook. If the element is removed from DOM, the JS object hangs around.
+2.  **Resize**: Canvas often struggles with resizing. Ensure the container has relative positioning.

@@ -9,8 +9,6 @@ defmodule ElixirKatasWeb.Kata71StreamsLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
       |> assign(:next_id, 21)
       |> stream(:items, items)
 

@@ -1,34 +1,32 @@
-# Kata 53: Icon System
+# Kata 53: The Icon System
 
-## Goal
-Encapsulate SVG icons into a component to avoid repeating verbose SVG code throughout your templates.
+## The Concept
+ managing 1,000 SVGs. Copy-pasting `<svg>...</svg>` bloats templates.
+We need a clean `<.icon name="hero-user" />` API.
 
-## Core Concepts
+## The Elixir Way
+Phoenix 1.7 ships with a native `CoreComponents.icon/1` that reads icons from the filesystem at compile time!
+*   **Source**: `/assets/vendor/heroicons`.
+*   **Embed**: The SVG content is injected directly into the HTML (not an `<img>` tag), allowing CSS styling (fill/stroke) to work.
 
-### 1. Icon Library
-Store the SVG paths in function pattern matching (as seen in `Function Component` approach) or load from a sprite sheet.
+## Deep Dive
 
-### 2. Passing Class
-Allow consumers to pass `class` to size or color the icon.
-```elixir
-<.icon name="home" class="w-8 h-8 text-red-500" />
+### 1. Tailwind Integration
+Modern icons often use `currentColor`.
+```html
+<svg class="w-6 h-6 text-red-500" ...>
 ```
+The `text-red-500` class sets the CSS `color` property. The SVG `stroke="currentColor"` inherits this. This allows you to color icons easily with utility classes.
 
-## Implementation Details
+### 2. Pattern Matching in Render
+If building manually:
+```elixir
+defp icon(%{name: "user"} = assigns), do: ~H"<svg>...</svg>"
+defp icon(%{name: "cog"} = assigns), do: ~H"<svg>...</svg>"
+```
+This works but is tedious. The "Heroicons" pattern (loading from disk) is scalable.
 
-1.  **Attr**: `:name` (required), `:class` (optional).
-2.  **Render**: Choose the SVG path based on `@name`.
+## Common Pitfalls
 
-## Tips
-- Use `Heroicons` or `Lucide` as content sources.
-
-## Challenge
-Add a **Rotation** prop. `attr :rotate, :integer, default: 0`. Apply a transform style or class to rotate the icon by that many degrees (e.g. 90, 180).
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir">style={"transform: rotate(#{@rotate}deg);"}
-# or Tailwind: class={"rotate-#{@rotate}"}
-</code></pre>
-</details>
+1.  **Flash of Unstyled Content**: SVGs with no size dimensions can blow up to huge sizes before CSS loads. Always set default `w-5 h-5` classes.
+2.  **Accessibility**: Decorative icons should have `aria-hidden="true"`. Semantic icons (like a standalone "Save" floppy disk) need a screen-reader label (`aria-label` or `<span class="sr-only">`).

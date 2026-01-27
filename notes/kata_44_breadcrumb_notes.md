@@ -1,35 +1,45 @@
-# Kata 44: Breadcrumbs
+# Kata 44: URL Parameters (Deep Linking)
 
-## Goal
-Dynamically generate a **Breadcrumb Trail** (Home > Section > Page) based on the current URL state.
+## The Concept
+**Deep Linking** is the ability to restore the exact state of a UI (tabs selected, filters applied, modal open) purely from the URL. This makes your application sharable and bookmarkable.
 
-## Core Concepts
+## The Elixir Way
+In Single Page Apps (SPAs), URL routing is often a client-side library concern.
+In LiveView, the **URL is a first-class citizen**. The server parses the URL and invokes specific callbacks (`handle_params`) to give your LiveView a chance to set up state *before* rendering. This ensures the initial HTML payload (standard HTTP) and the WebSocket connection (LiveView) are perfectly synced.
 
-### 1. State Derivation
-Breadcrumbs are purely a function of the current parameters. You don't need to store them in the database; just calculate them in `handle_params`.
+## Deep Dive
 
-### 2. List Construction
-Build a list of tuples `[{Label, Path}]`. Iterate over this list to render the trail, separating items with a slash `/`.
+### 1. `handle_params/3` Lifecycle
+This is a special callback invoked:
+1.  After `mount` (initial load).
+2.  Whenever the URL changes during a live navigation (`patch`).
 
-## Implementation Details
+It is the perfect place to **decode** URL strings into application state.
+```elixir
+def handle_params(params, _uri, socket) do
+  # URL: ?tab=settings&sort=desc
+  {:noreply, assign(socket, active_tab: params["tab"], sort: params["sort"])}
+end
+```
 
-1.  **Handle Params**:
-    *   Start with `[{"Home", path}]`.
-    *   If `section` exists, append it.
-    *   If `page` exists, append it.
-2.  **Render**: Loop and render links. The last item is usually just text (not a link).
+### 2. LiveComponent Blind Spot
+**Crucial Architectural Concept**:
+*   `handle_params` is **ONLY called on the parent LiveView**.
+*   **LiveComponents DO NOT receive `handle_params`**.
 
-## Tips
-- Capitalize labels (`String.capitalize/1`) for better presentation.
-- Ensure paths in the breadcrumb use `patch` to maintain SPA feel.
+If a component needs to know about the URL (like a Breadcrumb component), the **Parent** must capture the params and pass them down as assigns.
+```elixir
+# Parent LiveView
+<.live_component module={Breadcrumb} params={@params} />
+```
+The component then reacts via `update/2`, not `handle_params`. *Forgetting this is a major source of bugs.*
 
-## Challenge
-Allow a **Custom Root Name**. If the URL is `?root=Dashboard`, the first crumb should say "Dashboard" instead of "Home".
+### 3. `push_patch` vs `push_navigate`
+*   `push_patch`: Updates the URL but **maintains the current LiveView process**. It is fast and preserves ephemeral state (like scrolled position). It triggers `handle_params`.
+*   `push_navigate`: Tears down the current LiveView and mounts a new one (even if it's the same module). It is a full reset. Use this only when changing contexts completely.
 
-<details>
-<summary>View Solution</summary>
+## Common Pitfalls
 
-<pre><code class="elixir">root_label = params["root"] || "Home"
-base = [{root_label, ~p"/katas/44..."}]
-</code></pre>
-</details>
+1.  **Component "Magic"**: expecting a nested component to magically know the URL "id". It won't. You must pass it down from the top.
+2.  **String vs Integers**: URL params are *always strings*. You must explicitly cast them (`String.to_integer/1`) before using them in logic or DB queries. Ecto casting handles this automatically, but manual casting is manual.
+3.  **Encoding**: Always use `~p"/path?q=#{val}"` (verified routes) or `URI.encode_query` when building links to handle special characters correctly.

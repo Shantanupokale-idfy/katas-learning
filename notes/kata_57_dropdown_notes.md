@@ -1,37 +1,35 @@
-# Kata 57: Dropdown Menu
+# Kata 57: The Dropdown
 
-## Goal
-Build a toggleable Dropdown menu for actions or navigation.
+## The Concept
+A toggleable menu. Unlike tooltips (hover), dropdowns toggle on **Click** and persist until dismissed.
 
-## Core Concepts
+## The Elixir Way
+*   **State**: Track `show_dropdown` (boolean) on the server.
+*   **Dismissal**: `phx-click-away` handles the complexity of "clicking anywhere else".
 
-### 1. Toggle State
-A simple boolean (`show_dropdown`) determines whether the menu `<div>` is rendered.
+## Deep Dive
 
-### 2. Click Away (Out)
-A common requirement is closing the menu when the user clicks *outside* of it.
-LiveView provides `phx-click-away`.
+### 1. `phx-click-away`
+This event fires when a click occurs *outside* the bound element.
+```html
+<div class="relative" phx-click-away="close_dropdown">
+   <button phx-click="toggle">Menu</button>
+   <%= if @show_dropdown do %>
+     <div class="absolute ...">Items</div>
+   <% end %>
+</div>
+```
+**Crucial**: The `phx-click-away` listener must be on the *container* that wraps both the button and the menu.
 
-## Implementation Details
+### 2. Keyboard Accessibility
+Users should be able to:
+1.  Tab to the button.
+2.  Hit Enter to open.
+3.  Tab through menu items.
+4.  Hit Escape to close.
+Use `phx-window-keydown="close_dropdown" phx-key="Escape"` when the menu is open to support step 4.
 
-1.  **State**: `show_dropdown` (Boolean).
-2.  **Events**:
-    *   `toggle`: Flip state.
-    *   `close`: Set false.
+## Common Pitfalls
 
-## Tips
-- Use `phx-click-away="close_dropdown"` on the dropdown container to handle the "click outside" behavior cleanly.
-
-## Challenge
-Implement **Click Away**. Add the `phx-click-away` binding to the dropdown container so that it closes if the user clicks anywhere else on the page.
-
-<details>
-<summary>View Solution</summary>
-
-<pre><code class="elixir"><div class="absolute ..." phx-click-away="close_dropdown">...</div>
-
-def handle_event("close_dropdown", _, socket) do
-  {:noreply, assign(socket, show_dropdown: false)}
-end
-</code></pre>
-</details>
+1.  **Z-Indexing**: Dropdowns inside "Cards" often get clipped or covered by the next card in grid layouts. `relative` context resets the stack. ensure your dropdown has a high `z-index`.
+2.  **JS Transition**: Using `JS.toggle` is more efficient than a server round trip for pure UI toggles, but verifying state (e.g. "is user admin?") requires the server trip.
