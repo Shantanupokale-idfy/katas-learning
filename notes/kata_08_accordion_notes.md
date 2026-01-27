@@ -1,33 +1,40 @@
 # Kata 08: The Accordion
 
 ## Goal
-The goal of this kata is to manage state for a **collection of items**, where only one item can be active at a time.
+Manage the state for a **collection of items** where only one can be open at a time (mutually exclusive).
 
 ## Core Concepts
 
 ### 1. Active ID Pattern
-Instead of storing a boolean for every item, store a single `active_id` in the socket assigns.
+Instead of storing a boolean for *every* item (which gets messy), store a single `active_id` in the socket.
+
+- `active_id: "faq-1"` -> Item 1 is open.
+- `active_id: nil` -> All items are closed.
+
+### 2. Derived State in Template
+In the template, we check if the current item's ID matches the active one.
+
 ```elixir
-socket |> assign(active_id: "item-1")
+is_open = @active_id == item.id
+class={if is_open, do: "h-auto opacity-100", else: "h-0 opacity-0"}
 ```
 
-### 2. Comparison Logic
-In the template, check if the current item's ID matches the active ID to determine visibility.
-```elixir
-:if={@active_id == item.id}
+### 3. Event Parameters
+Use `phx-value-*` to pass data (like an ID) to your event handler.
+
+```html
+<button phx-click="toggle" phx-value-id={item.id}>...</button>
 ```
 
-## Steps to Create
+## Implementation Details
 
-1.  **Define state**: Initialize `active_id` to `nil` (all closed).
-2.  **Render UI**:
-    *   A list of questions/answers.
-    *   Clicking a question toggles its answer.
-    *   Opening one closes others.
-3.  **Handle interaction**: 
-    *   If clicking the already open item -> set `active_id` to `nil`.
-    *   Otherwise -> set `active_id` to the clicked item's ID.
+1.  **State**: `active_id` (default `nil`).
+2.  **UI**: Render a list of items (e.g., FAQs).
+3.  **Logic**:
+    - When an item is clicked:
+        - If it is already active -> Set `active_id` to `nil` (close it).
+        - If it is different -> Set `active_id` to the new ID (open it).
 
 ## Tips
-- This pattern scales better than maintaining a list of booleans.
-- Use `phx-value-id` to pass arguments to your event handler.
+- This pattern scales to lists of any size without increasing memory usage for state.
+- CSS transitions on `max-height` or `grid-template-rows` are needed to animate height to "auto".

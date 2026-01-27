@@ -1,31 +1,34 @@
 # Kata 06: The Resizer
 
 ## Goal
-The goal of this kata is to use state values to control the **dimensions** of an element dynamically.
+Use state values to control the **dimensions** of an element dynamically. This reinforces the concept of property binding.
 
 ## Core Concepts
 
 ### 1. Binding Dimensions
-You can bind integer state values to CSS properties like `width` and `height`.
+Bind integer state values to CSS `width` and `height` properties via the `style` attribute.
+
 ```elixir
 <div style={"width: #{@width}px; height: #{@height}px;"}></div>
 ```
 
 ### 2. Number Inputs
-Use `type="number"` for precise integer control.
+Use `<input type="number">` for precise integer control. This gives you native browser validation (min/max).
+
 ```html
 <input type="number" name="width" value={@width} min="50" max="500" />
 ```
 
-## Steps to Create
+## Implementation Details
 
-1.  **Define state**: Initialize `width` (e.g., 200) and `height` (e.g., 200).
-2.  **Render UI**:
-    *   Two inputs for Width and Height.
-    *   A resizable container (e.g., a colored box).
-    *   Display the current dimensions text.
-3.  **Handle interaction**: Update state on form change.
+1.  **State**: Initialize `width` and `height` (e.g., 200px).
+2.  **UI**:
+    - Two number inputs (Width, Height).
+    - A `div` acting as the resizable box.
+    - CSS `transition` property on the box for smooth resizing effects.
+3.  **Events**:
+    - Handle the `phx-change` event from the form to update `width` and `height`.
 
 ## Tips
-- Always sanitize or limit inputs to avoid breaking the layout (e.g., sets min/max).
-- Adding `transition-all` via CSS makes the resizing smooth!
+- Always include the unit (`px`) in your style string if the numbers are raw integers.
+- Add `transition-all` in CSS to make the resize action feel animated and polished.

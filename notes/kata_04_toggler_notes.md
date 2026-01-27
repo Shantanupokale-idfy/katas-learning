@@ -1,48 +1,44 @@
 # Kata 04: The Toggler
 
 ## Goal
-The goal of this kata is to learn how to **conditionally render content** and apply **dynamic CSS classes** based on state.
+Learn how to **conditionally render content** and apply **dynamic CSS classes** based on state. This is fundamental for UI interactivity like showing/hiding menus or highlighting active items.
 
 ## Core Concepts
 
 ### 1. Conditional Rendering
-You can use standard Elixir `if` expressions in your HEEx templates to show or hide content.
+Use standard Elixir `if` expressions inside `{ }` blocks to show or hide HTML elements.
 
 ```elixir
-{if @show_details do}
-  <div class="alert alert-info">Here are the details!</div>
+{if @visible do}
+  <div>I am visible!</div>
+{else}
+  <div>I am hidden.</div>
 {end}
+# Or using the special attribute syntax:
+<div :if={@visible}>I am visible!</div>
 ```
 
-### 2. Boolean State Toggling
-A common pattern is to flip a boolean value in `handle_event`.
+### 2. Dynamic Classes
+You can interpolate values into the `class` attribute.
 
 ```elixir
-def handle_event("toggle", _params, socket) do
-  {:noreply, update(socket, :show_details, &(!&1))}
-end
+<div class={if @active, do: "bg-blue-500", else: "bg-gray-200"}>
 ```
 
-### 3. Dynamic Classes
-You can interpolate strings into the `class` attribute to change styles dynamically.
+A cleaner way for multiple classes is using a list:
 
 ```elixir
-<div class={"card #{if @active, do: "bg-primary text-white", else: "bg-base-200"}"}>
-  ...
-</div>
+class={["base-class", @active && "active-class"]}
 ```
 
-Alternatively, you can use a list for cleaner logic:
+## Implementation Details
 
-```elixir
-<div class={["card", @active && "bg-primary text-white"]}>
-```
+1.  **State**: Initialize `show_details` (boolean) and `is_active` (boolean).
+2.  **UI**:
+    - A button to toggle a "Secrets" section.
+    - A card that changes execution styling (color/border) when active.
+3.  **Events**:
+    - `handle_event` to toggle the boolean states (`!value`).
 
-## Steps to Create
-
-1.  **Define state**: Initialize `show_details` (boolean) and `theme` (string) in `mount/3`.
-2.  **Render UI**:
-    *   A button to toggle the details view.
-    *   A section that only appears when `show_details` is true.
-    *   A card that changes color when clicked.
-3.  **Handle interaction**: Implement events to toggle the boolean and switch the theme.
+## Tips
+- The `:if` attribute (HEEx shortcut) is often cleaner than wrapping blocks in `{if ...} ... {end}`.

@@ -1,37 +1,44 @@
 # Kata 03: The Mirror
 
 ## Goal
-The goal of this kata is to understand **Form Bindings** and the `phx-change` event. You will create a text input that mirrors its content to another part of the page in real-time.
+Create a text input that mirrors its content to another part of the page in real-time. This concept is often called **Unidirectional Data Flow** or "Form Binding".
 
 ## Core Concepts
 
 ### 1. `phx-change`
-Unlike `phx-click` which fires on a specific interaction, `phx-change` fires whenever a form input changes.
+Unlike `phx-click` (which triggers on action), `phx-change` triggers whenever a form input's value changes.
 
 ```html
-<form phx-change="validate">
-  <input type="text" name="text" />
+<form phx-change="mirror">
+  <input type="text" name="user_text" />
 </form>
 ```
 
-### 2. Forms in LiveView
-Even for a single input, it is best practice to wrap it in a `<form>` tag. This allows LiveView to handle the submission and change events correctly.
-
-### 3. Handling params
-The `handle_event` callback for `phx-change` receives the form data as a map.
+### 2. Handling Form Params
+The second argument of `handle_event/3` receives the form data as a map.
 
 ```elixir
-def handle_event("validate", %{"text" => text}, socket) do
-  {:noreply, assign(socket, text: text)}
+def handle_event("mirror", %{"user_text" => val}, socket) do
+  {:noreply, assign(socket, text: val)}
 end
 ```
 
-## Steps to Create
+### 3. Debouncing
+For text inputs, sending an event on every keystroke can be expensive. Use `phx-debounce` to limit the rate.
 
-1.  **Define state**: Initialize `text` to an empty string in `mount/3`.
-2.  **Render UI**: Create a form with a text input and a display area for the `@text`.
-3.  **Handle interaction**: Implement `handle_event("validate", ...)` to update the state.
+```html
+<input phx-debounce="300" ... />
+```
+
+## Implementation Details
+
+1.  **State**: Initialize `text` to `""`.
+2.  **UI**:
+    - A `<form>` with a text input.
+    - A display area showing `{@text}`.
+3.  **Events**:
+    - `handle_event("mirror", ...)`: Updates the `text` assign with the input value.
 
 ## Tips
-- **Debounce**: You can use `phx-debounce="300"` on the input to limit how often the event is sent to the server. This is useful for search inputs or expensive operations.
-- **Value Binding**: Ensure the input's `value` attribute is set to `{@text}` if you want the server to control the input content (controlled component).
+- Always wrap inputs in a `<form>` tag when using `phx-change`.
+- If you need to clear the input programmatically, you would need to bind `value={@text}` (Controlled Input).

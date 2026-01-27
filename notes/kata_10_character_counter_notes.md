@@ -1,32 +1,31 @@
 # Kata 10: The Character Counter
 
-## The Goal
-Create a text input that tracks the specific number of characters typed by the user. It should validate this count against a predefined limit and provide visual feedback as the user approaches or exceeds that limit.
+## Goal
+Create a text input that tracks character count, validates it against a limit, and provides real-time visual feedback.
 
-## Key Concepts
-- **String Manipulation**: Using `String.length/1` to count characters (graphemes) correctly.
-- **Computed Assigns (or Logic in Render)**: Calculating derived values (like `count_class` or `progress_color`) based on the current state.
-- **Form Events**: Handling `phx-keyup` to capture keystrokes in real-time.
+## Core Concepts
 
-## The Solution
-We store the text in the socket assigns. On every keyup event, we update this state.
+### 1. Computed Checks
+You don't need to store "is_error" in the state if it can be derived from existing data.
+Calculate it in the render or a helper function:
 
 ```elixir
-def handle_event("update_text", %{"value" => value}, socket) do
-  {:noreply, assign(socket, text: value)}
-end
+current_length = String.length(@text)
+is_error = current_length > @limit
 ```
 
-In the template, we calculate the length dynamically:
+### 2. String.length/1
+Elixir handles Unicode correctly. `String.length("José")` is 4, even though it might be more bytes.
 
-```elixir
-<span>{String.length(@text)} / {@limit}</span>
-```
+## Implementation Details
 
-We also dynamically calculate CSS classes to give feedback:
+1.  **State**: `text` ("") and `limit` (e.g., 100).
+2.  **UI**:
+    - A `<textarea>` bound to `@text`.
+    - A counter display: `{String.length(@text)} / {@limit}`.
+    - Conditional classes: turn the counter red if `length > limit`.
+3.  **Events**:
+    - `phx-change` or `phx-keyup` to update the text state on every keystroke.
 
-```elixir
-class={if String.length(@text) > @limit, do: "text-red-500", else: "text-gray-500"}
-```
-
-This ensures the UI is always a pure function of the application state.
+## Tips
+- Use a helper function (e.g., `count_class/2`) in your view to keep the HTML template clean if the logic gets complex (e.g., warning at 90%, error at 100%).

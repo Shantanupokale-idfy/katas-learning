@@ -1,62 +1,37 @@
-# Kata 01: Hello World - Tutorial Notes
+# Kata 01: Hello World
 
 ## Goal
-The goal of this kata is to create a basic "Hello World" page using Phoenix LiveView. This introduces the core concepts of LiveView: rendering a template, maintaining state, and handling basic events.
+Create a basic "Hello World" page using Phoenix LiveView. This introduces the core lifecycle of a LiveView component: mounting, rendering, and handling a basic event.
 
-## Steps to Create
+## Core Concepts
 
-### 1. Create the LiveView Module
-Create a file named `lib/elixir_katas_web/live/kata_01_hello_world_live.ex`.
+### 1. The ~H Sigil
+LiveView uses the `~H` sigil to define HTML templates. It enforces well-formed HTML and allows for Elixir expression interpolation using `{ }`.
 
-**Key Functions:**
-- `mount/3`: Initializes the LiveView. We set the initial state here.
-- `render/1`: Defines the UI using the `~H` sigil.
-- `handle_event/3`: Handles user interactions (like clicks).
+### 2. State (Assigns)
+State is stored in `socket.assigns`. It is immutable. To change what the user sees, you must update the socket assigns.
+
+### 3. Event Handling (`phx-click`)
+The `phx-click` attribute binds a DOM click event to a server-side handler.
+
+```html
+<button phx-click="toggle">Click me</button>
+```
+
+In your LiveView, you handle this with `handle_event/3`:
 
 ```elixir
-defmodule ElixirKatasWeb.Kata01HelloWorldLive do
-  use ElixirKatasWeb, :live_view
-
-  # Initialize state
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, clicked: false)}
-  end
-
-  # Render the UI
-  def render(assigns) do
-    ~H"""
-    <div class="prose dark:prose-invert">
-      <h1>Kata 01: Hello World</h1>
-      <button phx-click="toggle" class="btn btn-primary">
-        {if @clicked, do: "You clicked me!", else: "Click me!"}
-      </button>
-    </div>
-    """
-  end
-
-  # Handle the click event
-  def handle_event("toggle", _params, socket) do
-    {:noreply, update(socket, :clicked, &(!&1))}
-  end
+def handle_event("toggle", _params, socket) do
+  {:noreply, assign(socket, clicked: true)}
 end
 ```
 
-### 2. Add the Route
-Open `lib/elixir_katas_web/router.ex` and add the live route inside the main scope:
+## Implementation Details
 
-```elixir
-scope "/", ElixirKatasWeb do
-  pipe_through :browser
-
-  live "/katas/01", Kata01HelloWorldLive
-end
-```
+1.  **Mount**: Initialize the state (`clicked: false`).
+2.  **Render**: Display a welcome message and a button. Use an `if` expression to change the button text based on `@clicked`.
+3.  **Handle Event**: Create a "toggle" event handler that flips the `clicked` state.
 
 ## Tips
-- **Sigils**: The `~H` sigil is used for HEEx (HTML + EEX) templates. It verifies your HTML structure at compile time.
-- **Assigns**: Use `@variable` in the template to access data from the socket assigns.
-- **Colocation**: Keeping the `render` function in the same file as the logic (as we did here) is great for small components. For larger ones, you might use a separate `.heex` file.
-
-## Caveats
-- **State**: LiveView state is held in memory on the server. Be mindful of what you store in `assigns`.
-- **CSS Classes**: We used `prose` (Tailwind Typography) and `btn` (DaisyUI) classes. Ensure these libraries are configured in `assets/package.json` and `assets/tailwind.config.js` if you want the styles to appear.
+- Use `assign(socket, key: value)` to set state.
+- Use `update(socket, key, function)` to modify existing state.

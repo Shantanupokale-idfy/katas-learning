@@ -1,48 +1,43 @@
 # Kata 09: The Tabs
 
-## The Goal
-In this kata, we will build a tabbed interface. The user should be able to click on a tab header (like "Home", "Pricing", or "About") and see the corresponding content area update instantly.
+## Goal
+Build a tabbed interface where clicking a header switches the visible content. This simulates a "multi-page" feel within a single component.
 
-## Key Concepts
-- **Conditional Rendering**: Using Elixir's `case` or `if` to display different HTML blocks based on state.
-- **Active State Tracking**: Storing the current tab's ID (e.g., `:home`) in the LiveView socket.
-- **Event Handling**: Using `phx-click` to send the selected tab to the server.
-- **Styling Active States**: Dynamically applying CSS classes to highlight the selected tab.
+## Core Concepts
 
-## The Solution
-We'll use a single atom, `@active_tab`, to track which tab is currently selected.
+### 1. Atom State
+Using atoms (e.g., `:home`, `:pricing`) is a clean way to represent a finite set of states (Enums).
 
 ```elixir
-# 1. Initialize state
-def mount(_params, _session, socket) do
-  {:ok, assign(socket, selected_tab: :home)}
-end
-
-# 2. Handle tab clicks
-def handle_event("set_tab", %{"tab" => tab}, socket) do
-  # Convert string param to atom safely
-  tab_atom = String.to_existing_atom(tab)
-  {:noreply, assign(socket, selected_tab: tab_atom)}
-end
-
-# 3. Render based on state
-def render(assigns) do
-  ~H"""
-  <div>
-    <!-- Navigation -->
-    <button phx-click="set_tab" phx-value-tab="home" class={if @selected_tab == :home, do: "active", else: ""}>Home</button>
-    <button phx-click="set_tab" phx-value-tab="pricing" class={if @selected_tab == :pricing, do: "active", else: ""}>Pricing</button>
-
-    <!-- Content -->
-    <%= case @selected_tab do %>
-      <% :home -> %>
-        <p>Welcome Home!</p>
-      <% :pricing -> %>
-        <p>Our prices are low.</p>
-    <% end %>
-  </div>
-  """
-end
+assign(socket, selected_tab: :home)
 ```
 
-This pattern is fundamental for building "Single Page Application" (SPA) feels within LiveView. It allows for complex UI navigation without ever leaving the page or triggering a full browser refresh.
+### 2. Case Statements in HEEx
+Use Elixir's `case` statement to render completely different blocks of HTML based on the state.
+
+```elixir
+<%= case @selected_tab do %>
+  <% :home -> %> <HomeComponent />
+  <% :pricing -> %> <PricingComponent />
+<% end %>
+```
+
+### 3. Styling the Active Tab
+Apply specific styles to the button that matches the current state.
+
+```elixir
+class={if @selected_tab == :home, do: "border-b-2 border-primary", else: "text-gray-500"}
+```
+
+## Implementation Details
+
+1.  **State**: `selected_tab` (default `:home`).
+2.  **UI**:
+    - Navigation bar with buttons.
+    - Content area using a `case` statement.
+3.  **Events**:
+    - `handle_event("set_tab", %{"tab" => tab_str}, socket)`
+    - Convert the string parameter (from HTML) to an existing atom.
+
+## Tips
+- `String.to_existing_atom/1` is safer than `String.to_atom/1` to prevent atom exhaustion attacks, though for a fixed set of tabs, either is generally fine in a constrained environment.
