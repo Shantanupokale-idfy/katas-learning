@@ -32,6 +32,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
                 <th 
                   class="cursor-pointer hover:bg-base-300 transition-colors"
                   phx-click="sort" 
+                  phx-target={@myself}
                   phx-value-field="id"
                 >
                   ID {sort_indicator(@sort_by, @sort_order, :id)}
@@ -39,6 +40,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
                 <th 
                   class="cursor-pointer hover:bg-base-300 transition-colors"
                   phx-click="sort" 
+                  phx-target={@myself}
                   phx-value-field="name"
                 >
                   Name {sort_indicator(@sort_by, @sort_order, :name)}
@@ -46,6 +48,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
                 <th 
                   class="cursor-pointer hover:bg-base-300 transition-colors"
                   phx-click="sort" 
+                  phx-target={@myself}
                   phx-value-field="age"
                 >
                   Age {sort_indicator(@sort_by, @sort_order, :age)}
@@ -53,6 +56,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
                 <th 
                   class="cursor-pointer hover:bg-base-300 transition-colors"
                   phx-click="sort" 
+                  phx-target={@myself}
                   phx-value-field="role"
                 >
                   Role {sort_indicator(@sort_by, @sort_order, :role)}

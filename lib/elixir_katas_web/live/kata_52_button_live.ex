@@ -61,7 +61,7 @@ defmodule ElixirKatasWeb.Kata52ButtonLive do
           <div class="flex gap-3 flex-wrap">
             <.btn>Normal</.btn>
             <.btn disabled>Disabled</.btn>
-            <.btn loading={@loading} phx-click="toggle_loading">
+            <.btn loading={@loading} phx-click="toggle_loading" phx-target={@myself}>
               <%= if @loading, do: "Loading...", else: "Click to Load" %>
             </.btn>
           </div>
