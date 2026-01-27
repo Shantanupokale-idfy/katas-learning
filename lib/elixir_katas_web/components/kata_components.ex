@@ -13,28 +13,32 @@ defmodule ElixirKatasWeb.KataComponents do
   attr :compiling, :boolean, default: false
   attr :saved_at, :integer, default: nil
   
+  attr :mode, :string, default: "full"
+  
   def kata_viewer(assigns) do
     ~H"""
     <div class="flex flex-col h-full">
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-4 py-2">
         <div class="flex items-center gap-4">
           <h2 class="text-xl font-bold">{@title}</h2>
-          <%= if @compiling do %>
-             <div class="flex items-center gap-2">
-                <span class="loading loading-spinner loading-xs text-primary"></span>
-                <span class="text-xs text-zinc-500">Compiling...</span>
-             </div>
-          <% else %>
-             <%= if @saved_at && !@compile_error do %>
-                <span class="text-xs text-green-600 font-medium animate-out fade-out duration-1000 delay-[2000ms]">
-                  ✓ Saved!
-                </span>
-             <% end %>
-          <% end %>
-          <%= if @read_only == false and @active_tab == "source" and @is_user_author do %>
-             <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="btn btn-xs btn-outline btn-error">
-               Revert to Original
-             </button>
+          <%= if @mode != "notes_only" do %>
+            <%= if @compiling do %>
+               <div class="flex items-center gap-2">
+                  <span class="loading loading-spinner loading-xs text-primary"></span>
+                  <span class="text-xs text-zinc-500">Compiling...</span>
+               </div>
+            <% else %>
+               <%= if @saved_at && !@compile_error do %>
+                  <span class="text-xs text-green-600 font-medium animate-out fade-out duration-1000 delay-[2000ms]">
+                    ✓ Saved!
+                  </span>
+               <% end %>
+            <% end %>
+            <%= if @read_only == false and @active_tab == "source" and @is_user_author do %>
+               <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="btn btn-xs btn-outline btn-error">
+                 Revert to Original
+               </button>
+            <% end %>
           <% end %>
         </div>
         
@@ -42,19 +46,22 @@ defmodule ElixirKatasWeb.KataComponents do
           <.tab_button active={@active_tab == "notes"} phx-click="set_tab" phx-value-tab="notes">
             Description
           </.tab_button>
-          <.tab_button active={@active_tab == "interactive"} phx-click="set_tab" phx-value-tab="interactive">
-            Interactive
-          </.tab_button>
-          <.tab_button active={@active_tab == "source"} phx-click="set_tab" phx-value-tab="source">
-            Source Code
-          </.tab_button>
+          <%= if @mode != "notes_only" do %>
+            <.tab_button active={@active_tab == "interactive"} phx-click="set_tab" phx-value-tab="interactive">
+              Interactive
+            </.tab_button>
+            <.tab_button active={@active_tab == "source"} phx-click="set_tab" phx-value-tab="source">
+              Source Code
+            </.tab_button>
+          <% end %>
           
-          <%= if @read_only do %>
+          <%= if @read_only and @mode != "notes_only" do %>
              <span class="ml-2 px-2 py-1 text-xs font-semibold bg-gray-200 text-gray-700 rounded-full dark:bg-gray-700 dark:text-gray-300">
                Read Only
              </span>
           <% end %>
         </div>
+
       </div>
 
       <div class="flex-1 overflow-auto p-4">

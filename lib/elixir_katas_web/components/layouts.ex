@@ -53,7 +53,11 @@ defmodule ElixirKatasWeb.Layouts do
                 Learning Logic
               </h3>
               <div class="mt-2 space-y-1 pl-2">
-                 <!-- Example Kata Link -->
+                  <!-- Example Kata Link -->
+                 <.link navigate="/katas/00-liveview-basics" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-indigo-600 animate-pulse"></span>
+                   00 - LiveView Basics
+                 </.link>
                  <.link navigate="/katas/01-hello-world" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
                    01 - Hello World

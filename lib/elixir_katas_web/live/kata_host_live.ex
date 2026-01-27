@@ -92,15 +92,20 @@ defmodule ElixirKatasWeb.KataHostLive do
       notes_content = 
           if notes_path && File.exists?(notes_path), do: File.read!(notes_path), else: "Notes not found."
 
-      {:ok, 
-       socket
-       |> assign(:dynamic_module, dynamic_module)
-       |> assign(:source_code, source_code)
-       |> assign(:user_id, user_id)
-       |> assign(:kata_id, kata_id)
-       |> assign(:title, title)
-       |> assign(:active_tab, "interactive")
-       |> assign(:notes_content, notes_content)
+
+       kata_mode = if kata_id == "00", do: "notes_only", else: "full"
+       initial_tab = if kata_mode == "notes_only", do: "notes", else: "interactive"
+
+       {:ok, 
+        socket
+        |> assign(:dynamic_module, dynamic_module)
+        |> assign(:source_code, source_code)
+        |> assign(:user_id, user_id)
+        |> assign(:kata_id, kata_id)
+        |> assign(:title, title)
+        |> assign(:active_tab, initial_tab)
+        |> assign(:notes_content, notes_content)
+        |> assign(:kata_mode, kata_mode)
        |> assign(:read_only, false)
        |> assign(:is_user_author, is_user_author)
        |> assign(:compiling, false)
@@ -135,6 +140,7 @@ defmodule ElixirKatasWeb.KataHostLive do
       compile_error={@compile_error}
       compiling={@compiling}
       saved_at={@saved_at}
+      mode={@kata_mode}
     >
       <div class="h-full w-full">
          <%= if @dynamic_module do %>
