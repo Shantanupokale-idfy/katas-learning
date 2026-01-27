@@ -262,7 +262,23 @@ This is an important distinction for these katas.
 use ElixirKatasWeb, :live_component
 ```
 
-And why event handlers need `phx-target={@myself}`:
+### The `update/2` Callback
+LiveComponents receive data from their parent through the `update/2` callback (not `mount/1` like LiveViews). Most katas use this pattern:
+
+```elixir
+def update(assigns, socket) do
+  socket = assign(socket, assigns)
+  # Set up your initial state here
+  {:ok, assign(socket, count: 0, name: "World")}
+end
+```
+
+`update/2` is called whenever the parent sends new assigns to the component. The first argument is the map of assigns passed from the parent; the second is the current socket.
+
+> **Note**: If you define `update/2`, your `mount/1` still runs once for initial setup, but `update/2` is where you'll do most initialization in these katas.
+
+### Event Targeting
+Event handlers need `phx-target={@myself}`:
 
 ```heex
 <!-- Without phx-target, the event goes to the PARENT LiveView -->
@@ -481,7 +497,153 @@ end
 
 ---
 
-## 12. Quick Reference
+## 12. Concepts Ahead (Roadmap)
+
+As you progress through the katas, you'll encounter these additional LiveView features. Each kata's notes explain them in detail — this is just a preview so nothing catches you off guard.
+
+### Function Components
+Reusable template fragments defined with `attr` and `slot` declarations. Called with dot syntax:
+
+```elixir
+attr :variant, :string, default: "primary"
+slot :inner_block, required: true
+
+defp btn(assigns) do
+  ~H"""
+  <button class={@variant}>{render_slot(@inner_block)}</button>
+  """
+end
+```
+```heex
+<.btn variant="danger">Delete</.btn>
+```
+
+Named slots let you pass multiple content blocks:
+```heex
+<.card>
+  <:header>Title</:header>
+  <:body>Content</:body>
+</.card>
+```
+*First appears: Kata 25+. Heavy use: Kata 50+.*
+
+### Forms with `to_form`
+Phoenix provides a `.form` component and `to_form/1` helper for structured form handling with validation and error display:
+
+```elixir
+socket |> assign(:form, to_form(%{"email" => "", "name" => ""}))
+```
+```heex
+<.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself}>
+  <input name="email" value={@form[:email].value} />
+  <span :if={@form[:email].errors != []}>{@form[:email].errors}</span>
+</.form>
+```
+*First appears: Kata 26+.*
+
+### Flash Messages
+Temporary notifications shown to users after actions:
+
+```elixir
+{:noreply, socket |> put_flash(:info, "Saved!") |> put_flash(:error, "Failed")}
+```
+*First appears: Kata 26+.*
+
+### Navigation
+Update the URL without a full page reload:
+
+```elixir
+# Same LiveView, different params (triggers handle_params):
+push_patch(socket, to: ~p"/katas/41?filter=active")
+
+# Different LiveView (full remount):
+push_navigate(socket, to: ~p"/other-page")
+```
+```heex
+<!-- Clickable link that patches: -->
+<.link patch={~p"/katas/42/#{item.id}"}>View</.link>
+```
+*First appears: Kata 41+.*
+
+### File Uploads
+LiveView has built-in upload support with progress tracking and drag-and-drop:
+
+```elixir
+socket |> allow_upload(:avatar, accept: ~w(.jpg .png), max_entries: 2)
+```
+```heex
+<.live_file_input upload={@uploads.avatar} />
+<div phx-drop-target={@uploads.avatar.ref}>Drop files here</div>
+```
+*First appears: Kata 40.*
+
+### Streams
+For large lists, streams send only diffs instead of re-rendering the entire list:
+
+```elixir
+socket |> stream(:items, items)               # Initialize
+socket |> stream_insert(:items, new_item)     # Add
+socket |> stream_delete_by_dom_id(:items, id) # Remove
+```
+```heex
+<div id="items" phx-update="stream">
+  <div :for={{dom_id, item} <- @streams.items} id={dom_id}>
+    {item.name}
+  </div>
+</div>
+```
+*First appears: Kata 71+.*
+
+### JavaScript Hooks
+When you need client-side behavior (charts, scroll events, animations), use `phx-hook`:
+
+```heex
+<canvas id="chart" phx-hook="ChartJS" phx-update="ignore"></canvas>
+```
+
+- `phx-hook="Name"` — Connects a JS hook to the element.
+- `phx-update="ignore"` — Tells LiveView not to touch this element's DOM (let JS manage it).
+- `push_event(socket, "event-name", payload)` — Push data from server to JS.
+
+*First appears: Kata 72+.*
+
+### PubSub (Real-Time Broadcasting)
+Send messages between LiveView processes (different users, different tabs):
+
+```elixir
+# Subscribe (in mount or update, when connected):
+Phoenix.PubSub.subscribe(ElixirKatas.PubSub, "chat:lobby")
+
+# Broadcast (from anywhere):
+Phoenix.PubSub.broadcast(ElixirKatas.PubSub, "chat:lobby", {:new_message, msg})
+
+# Receive (in handle_info):
+def handle_info({:new_message, msg}, socket) do
+  {:noreply, update(socket, :messages, &[msg | &1])}
+end
+```
+*First appears: Kata 77+.*
+
+### Async Assigns
+Load data asynchronously with automatic loading/error states:
+
+```elixir
+socket |> assign_async(:stats, fn ->
+  {:ok, %{stats: fetch_stats()}}
+end)
+```
+```heex
+<.async_result :let={stats} assign={@stats}>
+  <:loading>Loading...</:loading>
+  <:failed>Error</:failed>
+  {stats.revenue}
+</.async_result>
+```
+*First appears: Kata 95.*
+
+---
+
+## 13. Quick Reference
 
 | Concept | Code |
 |---------|------|
@@ -497,15 +659,29 @@ end
 | Conditional render | `<div :if={@show}>...</div>` |
 | Loop render | `<li :for={x <- @list}>{x}</li>` |
 | Debounce input | `phx-debounce="300"` |
+| Function component | `<.btn variant="primary">Click</.btn>` |
+| Form component | `<.form for={@form} phx-submit="save">` |
+| Flash message | `put_flash(socket, :info, "Saved!")` |
+| URL patch | `push_patch(socket, to: ~p"/path?q=1")` |
+| Stream init | `stream(socket, :items, list)` |
+| Stream insert | `stream_insert(socket, :items, item)` |
+| JS hook | `<div phx-hook="MyHook">` |
+| PubSub subscribe | `Phoenix.PubSub.subscribe(PS, topic)` |
+| PubSub broadcast | `Phoenix.PubSub.broadcast(PS, topic, msg)` |
 
 ---
 
-## 13. What's Next?
+## 14. What's Next?
 
-You now have the foundation to write LiveView code.
+You now have the foundation to write LiveView code. Here's the progression:
 
-*   **Kata 01**: Write your first render and handle your first event.
-*   **Kata 02**: Build a counter — learn `assign` vs `update`.
-*   **Kata 03+**: Forms, conditional rendering, dynamic styles, timers, and beyond.
+*   **Kata 01–10**: Core basics — rendering, events, state, conditional UI, dynamic styles.
+*   **Kata 11–15**: Timers, keyboard events, animation.
+*   **Kata 16–25**: Lists, editing, filtering, sorting, pagination, tree structures.
+*   **Kata 26–40**: Forms, validation, file uploads, multi-step wizards.
+*   **Kata 41–55**: Navigation, URL params, function components, slots, modals.
+*   **Kata 56–70**: Component patterns, lifecycle, JS interop basics.
+*   **Kata 71–85**: Streams, PubSub, real-time chat, presence.
+*   **Kata 86+**: Advanced patterns — async, uploads, hooks, virtual scrolling.
 
 Click **Next Kata** in the sidebar to begin.
