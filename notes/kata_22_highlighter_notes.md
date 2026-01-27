@@ -1,35 +1,33 @@
 # Kata 22: The Highlighter
 
-## Overview
-This kata demonstrates how to manipulate text presentation based on user input, specifically highlighting substrings that match a search term. This is a common feature in search interfaces and document viewers.
+## Goal
+Manipulate text presentation to **highlight matches** based on a search term. This demonstrates safe HTML string generation and `raw` rendering.
 
-## Key Concepts
-1.  **State**:
-    - `text`: The content to search within.
-    - `search_term`: The user's input.
-    
-2.  **Text Processing**:
-    - We need to find all occurrences of `search_term` in `text` and wrap them in a styling tag (like `<span class="highlight">`).
-    - **Security**: When injecting HTML (like `<span>`), we must be careful. The safest way is to HTML-escape the original text *first*, then match/replace, and finally render using `raw/1`.
+## Core Concepts
 
-3.  **Regex**:
-    - `Regex.compile!(Regex.escape(term), "i")` creates a case-insensitive regex safely.
+### 1. Safe HTML Injection
+To highlight text, we must wrap it in a `<span>`. But we cannot just trust the input string.
+**Process**:
+1. Escape the *entire* original text (to prevent XSS).
+2. Use Regex to find the match in the escaped text.
+3. Replace the match with the highlighted version (which includes our specific classes).
+4. Render the final result with `raw()`.
+
+### 2. Regex Compilation
+Use `Regex.escape(term)` to ensure special characters in the search term don't break the regex.
+
+```elixir
+Regex.compile!(Regex.escape(term), "i")
+```
 
 ## Implementation Details
 
-```elixir
-defp highlight_text(text, term) do
-  safe_text = Phoenix.HTML.html_escape(text) |> Phoenix.HTML.safe_to_string()
-  regex = Regex.compile!(Regex.escape(term), "i")
-  
-  String.replace(safe_text, regex, fn match -> 
-    "<span class=\"bg-yellow-200\">#{match}</span>" 
-  end)
-end
-```
+1.  **State**: `text`, `search_term`.
+2.  **UI**: 
+    - Text input for search.
+    - Content block using `<%= raw(highlight(...)) %>`.
+3.  **Events**:
+    - `search`: Update state.
 
-In the template:
-```heex
-<%= raw(highlight_text(@text, @search_term)) %>
-```
-**Note**: `raw` tells Phoenix "I trust this string is safe HTML". Since we manually escaped the content before adding our trusted spans, this is effectively safe.
+## Tips
+- Always worry about XSS when using `raw`. In this kata, we manually ensure safety by escaping the source text first.

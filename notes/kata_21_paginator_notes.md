@@ -1,39 +1,36 @@
 # Kata 21: The Paginator
 
-## Overview
-Pagination is essential for dealing with large datasets. Sending all data to the client at once is inefficient. This kata demonstrates **offset-based pagination**, where we calculate a "slice" of data to show based on the current page number and a fixed number of items per page.
+## Goal
+Implement **offset-based pagination** to handle large datasets by displaying a subset of items at a time.
 
-## Key Concepts
-1.  **State**: We need to track:
-    - `page`: The current page number (starts at 1).
-    - `per_page`: How many items to show per page.
-    - `items`: The full dataset (in a real app, this might be a database query, but here it's a list).
+## Core Concepts
 
-2.  **Calculations**:
-    - **Total Pages**: `ceil(total_items / per_page)`
-    - **Current Slice**: We use `Enum.slice(items, offset, limit)` where `offset = (page - 1) * per_page`.
+### 1. Pagination Params
+You need two key integers:
+- `page`: The current page number (1-based index).
+- `per_page`: Number of items per page.
 
-3.  **Events**:
-    - `prev`: Decrements the page (min 1).
-    - `next`: Increments the page (max total_pages).
+### 2. Slicing Data
+In a real application, you'd use Ecto's `limit` and `offset`. Within a LiveView list, we simulate this with `Enum.slice`.
+
+```elixir
+start = (page - 1) * per_page
+Enum.slice(all_items, start, per_page)
+```
+
+### 3. Total Pages
+To disable "Next" appropriately, you must know the total count.
+`ceil(total_items / per_page)`
 
 ## Implementation Details
 
-```elixir
-# Calculating the slice
-defp paginated_items(items, page, per_page) do
-  start_index = (page - 1) * per_page
-  Enum.slice(items, start_index, per_page)
-end
+1.  **State**: `items` (list), `page` (1), `per_page` (5).
+2.  **UI**:
+    - List rendering the sliced subset.
+    - Previous/Next buttons (disabled at boundaries).
+3.  **Events**:
+    - `prev`: `max(page - 1, 1)`
+    - `next`: `min(page + 1, total_pages)`
 
-# Navigating
-def handle_event("next", _, socket) do
-  new_page = min(socket.assigns.page + 1, total_pages(...))
-  {:noreply, assign(socket, :page, new_page)}
-end
-```
-
-## Extensions
-- Add a "Jump to Page" input.
-- Make `per_page` configurable by the user.
-- Add "First" and "Last" buttons.
+## Tips
+- Calculating the slice in a helper function or computed assign keeps the render function clean.

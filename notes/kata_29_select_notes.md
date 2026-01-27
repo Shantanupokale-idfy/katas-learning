@@ -1,37 +1,26 @@
 # Kata 29: The Select
 
-## Overview
-A **Select** (or Dropdown) input allows users to choose one option from a list. It acts similarly to radio buttons but is more compact, occupying less screen real estate.
+## Goal
+Handle selection from a **Dropdown** list.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Generating Options
-In Phoenix, we often use `Phoenix.HTML.Form.options_for_select/2` to generate the inner `<option>` tags, but we can also write them manually or use a simple loop.
-The structure is: `<option value="server_value">Display Label</option>`.
+### 1. Options Helper
+Values can be hardcoded `<option>` tags or generated dynamically.
+`Phoenix.HTML.Form.options_for_select/2` is a standard helper that takes a list of options (tuples or simple values) and the currently selected value.
 
-### 2. Default Values
-To set a default selected option, we can use the `selected` attribute on the option, but in LiveView form contexts, we simply ensure the `@form` parameter has the matching value. The browser will check the correct option.
-
-### 3. Change Events
-Just like other inputs, `<select>` triggers `phx-change`. This is commonly used for filtering data or immediate navigation.
-
-## The Code Structure
 ```elixir
-<.form for={@form} phx-change="validate">
-  <select name="role" id="role" class="form-select">
-    <%= Phoenix.HTML.Form.options_for_select(
-          [{"Admin", "admin"}, {"Editor", "editor"}, {"User", "user"}],
-          @form[:role].value
-        ) %>
-  </select>
-</.form>
+options_for_select(["Admin", "User"], selected_value)
 ```
 
-Alternatively, manually:
-```elixir
-<select name="role">
-  <%= for role <- ["admin", "editor", "user"] do %>
-    <option value={role} selected={@form[:role].value == role}><%= role %></option>
-  <% end %>
-</select>
-```
+### 2. Single Value
+A standard `<select>` sends a single string value for the chosen option.
+
+## Implementation Details
+
+1.  **State**: `role` (string), `country` (string).
+2.  **UI**: Two select inputs. One manually built, one using the helper.
+3.  **Events**: `validate` updates the selection.
+
+## Tips
+- Always provide a sensible default or a "Please select..." placeholder option with a nil/empty value.

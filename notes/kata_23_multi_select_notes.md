@@ -1,30 +1,36 @@
 # Kata 23: The Multi-Select
 
-## Overview
-Selecting multiple items is a common UI pattern. Unlike a standard `<select multiple>`, modern UIs often use pills, tags, or checkboxes. This kata demonstrates managing a set of selected items using `MapSet`.
+## Goal
+Manage a set of selected items (e.g., for tagging or filtering).
 
-## Key Concepts
-1.  **State**:
-    - `items`: The list of available options.
-    - `selected`: A `MapSet` of selected item IDs or values. Using `MapSet` ensures uniqueness and provides O(1) lookups.
+## Core Concepts
 
-2.  **Toggling Logic**:
-    - If the item is in the set, remove it.
-    - If not, add it.
-    
-    ```elixir
-    # Inside handle_event
-    if MapSet.member?(set, item) do
-      MapSet.delete(set, item)
-    else
-      MapSet.put(set, item)
-    end
-    ```
+### 1. MapSet
+Use `MapSet` instead of `List` for the selected collection.
+- Lookups (`member?`) are O(1).
+- Uniqueness is guaranteed automatically.
 
-3.  **Visual Feedback**:
-    - Conditional classes based on membership: `if MapSet.member?(@selected, item), do: "active", else: "inactive"`.
+### 2. Toggling Logic
+In the event handler, check membership:
+- **If present**: `MapSet.delete/2`
+- **If absent**: `MapSet.put/2`
 
-## Extensions
-- Add a "Select All" button.
-- Limit the maximum number of selections (e.g., "Pick up to 3").
-- Filter the available items (combining with Kata 19).
+### 3. Conditional Styling
+Check membership to apply "active" styles.
+
+```elixir
+class={if MapSet.member?(@selected, item), do: "bg-blue-100", else: "bg-white"}
+```
+
+## Implementation Details
+
+1.  **State**: `items` (available), `selected` (MapSet).
+2.  **UI**:
+    - Buttons for each item.
+    - Visual indicator of selection.
+3.  **Events**:
+    - `toggle`: The main interaction.
+    - `clear`: `MapSet.new()`.
+
+## Tips
+- When rendering the list of selected items for specific display order, remember that MapSets are not ordered. You may need `MapSet.to_list(selected) |> Enum.sort()`.

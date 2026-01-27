@@ -1,26 +1,30 @@
 # Kata 24: The Grid
 
-## Overview
-Rendering lists as a grid (cards) rather than a table is a common pattern for "Gallery" views. CSS Grid makes this trivial, and LiveView can dynamically control the grid properties (like column count) via assigns.
+## Goal
+Implement a dynamic **CSS Grid** layout where user input controls the number of columns. This shows how to bind styles to state.
 
-## Key Concepts
-1.  **CSS Grid**:
-    - `display: grid`: Enables grid layout.
-    - `gap-4`: Adds spacing between items.
-    - `grid-template-columns`: The core property we manipulate.
-    
-2.  **Dynamic Styles**:
-    - We can inject state into the `style` attribute directly for values that change frequently or are user-controlled (like column count).
-    
-    ```heex
-    <div style={"grid-template-columns: repeat(#{@cols}, minmax(0, 1fr))"}>
-      ...
-    </div>
-    ```
+## Core Concepts
 
-3.  **Responsive Design**:
-    - While we manually set columns here, in a real app you might use Tailwind's responsive prefixes (e.g., `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`). But user-controlled density is also a valid use case.
+### 1. CSS Grid & Repeat
+The `repeat(N, 1fr)` function is powerful for creating equal-width columns.
+```css
+grid-template-columns: repeat(3, minmax(0, 1fr));
+```
 
-## Extensions
-- Allow switching between "List View" (1 column, wide cards) and "Grid View" (multiple columns).
-- Add sorting to the grid cards.
+### 2. Dynamic Style Binding
+Inject the state variable directly into the style attribute.
+```elixir
+style={"grid-template-columns: repeat(#{@cols}, minmax(0, 1fr))"}
+```
+
+## Implementation Details
+
+1.  **State**: `items`, `cols` (integer).
+2.  **UI**:
+    - Buttons to pick column count (1, 2, 3, 4).
+    - A container div with `display: grid` and the dynamic style.
+3.  **Events**:
+    - `set_cols`: Updates the integer state.
+
+## Tips
+- `minmax(0, 1fr)` is often safer than just `1fr` to prevent grid blowouts when content (like long words) overflows.

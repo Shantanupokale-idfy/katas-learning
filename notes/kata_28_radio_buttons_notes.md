@@ -1,38 +1,31 @@
 # Kata 28: Radio Buttons
 
-## Overview
-Radio buttons are used when users must select **exactly one** option from a set of mutually exclusive choices.
+## Goal
+Handle **Mutually Exclusive** choices.
 
-## Key Concepts
+## Core Concepts
 
-### 1. Grouping by Name
-Radio buttons behave as a group when they share the same `name` attribute. The browser ensures only one radio with a given name is checked at a time.
-- In Phoenix forms: `name="plan"` (or `name="user[plan]"`).
+### 1. Grouping
+Radio buttons are grouped by sharing the same `name` attribute. Only one in the group can be checked.
+`name="plan"`
 
-### 2. The `value` Attribute
-Unlike checkboxes (which are often boolean), each radio button in a group has a distinct `value`.
-- Option A: `value="free"`
-- Option B: `value="pro"`
+### 2. Distinct Values
+Each radio button has a fixed `value` attribute that differs from the others.
+- `value="free"`
+- `value="pro"`
 
-### 3. checked state
-The `checked` attribute determines which one is selected.
-- In LiveView/HTML: You compare the current value in your state (`@form[:plan].value`) with the radio button's own value. If they match, `checked` is true.
+### 3. Checked State
+The one that matches the current form value gets `checked`.
 
-## The Code Structure
 ```elixir
-<.form for={@form} phx-change="validate">
-  <label>
-    <input type="radio" name="plan" value="free" checked={@form[:plan].value == "free"} />
-    Free Plan
-  </label>
-  
-  <label>
-    <input type="radio" name="plan" value="pro" checked={@form[:plan].value == "pro"} />
-    Pro Plan
-  </label>
-</.form>
+checked={@form[:plan].value == "pro"}
 ```
-Using the `Phoenix.HTML.Form.normalize_value` helper is safer to handle string/atom mismatches if needed.
 
-## Styling
-Custom styling radio buttons often involves creating a visual wrapper (like a card) and hiding the actual input, or using CSS `accent-color`.
+## Implementation Details
+
+1.  **State**: `plan` (string, default "starter").
+2.  **UI**: Three radio inputs sharing the same name but different values.
+3.  **Events**: `validate` updates the selected plan.
+
+## Tips
+- Radio buttons are great for small sets of options (2-5). For larger sets, use a Select dropdown.
