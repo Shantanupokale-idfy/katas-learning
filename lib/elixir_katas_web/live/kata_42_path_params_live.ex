@@ -9,25 +9,24 @@ defmodule ElixirKatasWeb.Kata42PathParamsLive do
       %{id: 3, name: "Ecto", description: "Database wrapper and query generator"},
       %{id: 4, name: "Plug", description: "Composable web middleware"}
     ]
+    
+    params = assigns[:params] || %{}
+    id = params["id"]
+    
+    selected_item = 
+       if id do
+         Enum.find(items, &(Integer.to_string(&1.id) == id))
+       else
+         nil
+       end
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
       |> assign(:items, items)
-      |> assign(:selected_item, nil)
+      |> assign(:selected_item, selected_item)
 
     {:ok, socket}
-  end
-
-  def handle_params(%{"id" => id}, _uri, socket) do
-    item = Enum.find(socket.assigns.items, &(Integer.to_string(&1.id) == id))
-    {:noreply, assign(socket, selected_item: item)}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, selected_item: nil)}
   end
 
   def render(assigns) do

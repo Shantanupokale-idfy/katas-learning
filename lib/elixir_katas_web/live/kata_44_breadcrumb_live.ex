@@ -3,21 +3,14 @@ defmodule ElixirKatasWeb.Kata44BreadcrumbLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    socket =
-      socket
-      |> assign(active_tab: "notes")
-      
-      
-      |> assign(:breadcrumbs, [{"Home", ~p"/katas/44-breadcrumb"}])
-      |> assign(:current_content, "Home Page")
-
-    {:ok, socket}
-  end
-
-  def handle_params(params, _uri, socket) do
+    socket = assign(socket, active_tab: "notes")
+    
+    params = assigns[:params] || %{}
     breadcrumbs = build_breadcrumbs(params)
     content = get_content(params)
-    {:noreply, assign(socket, breadcrumbs: breadcrumbs, current_content: content)}
+    
+    socket = assign(socket, breadcrumbs: breadcrumbs, current_content: content)
+    {:ok, socket}
   end
 
   defp build_breadcrumbs(params) do

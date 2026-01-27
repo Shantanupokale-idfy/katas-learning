@@ -8,26 +8,20 @@ defmodule ElixirKatasWeb.Kata46SearchUrlLive do
       "Erlang", "OTP", "GenServer", "Supervisor", "ETS",
       "PostgreSQL", "Redis", "Docker", "Kubernetes", "AWS"
     ]
+    
+    params = assigns[:params] || %{}
+    query = params["q"] || ""
+    
+    results = search(all_items, query)
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
       |> assign(:all_items, all_items)
-      |> assign(:results, all_items)
-      |> assign(:query, "")
+      |> assign(:results, results)
+      |> assign(:query, query)
 
     {:ok, socket}
-  end
-
-  def handle_params(%{"q" => query}, _uri, socket) do
-    results = search(socket.assigns.all_items, query)
-    {:noreply, assign(socket, query: query, results: results)}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, query: "", results: socket.assigns.all_items)}
   end
 
   defp search(items, query) do

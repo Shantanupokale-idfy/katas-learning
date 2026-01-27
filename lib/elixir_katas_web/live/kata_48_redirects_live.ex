@@ -3,24 +3,19 @@ defmodule ElixirKatasWeb.Kata48RedirectsLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
+    
+    params = assigns[:params] || %{}
+    page = params["page"]
+    page_int = if page, do: String.to_integer(page), else: 1
+    
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
-      |> assign(:page, 1)
+      |> assign(:page, page_int)
       |> assign(:patch_count, 0)
       |> assign(:navigate_count, 0)
 
     {:ok, socket}
-  end
-
-  def handle_params(%{"page" => page}, _uri, socket) do
-    {:noreply, assign(socket, page: String.to_integer(page))}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, page: 1)}
   end
 
   def render(assigns) do

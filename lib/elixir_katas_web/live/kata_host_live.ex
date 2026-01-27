@@ -106,6 +106,7 @@ defmodule ElixirKatasWeb.KataHostLive do
        |> assign(:compiling, false)
        |> assign(:compile_error, nil)
        |> assign(:saved_at, nil)
+       |> assign(:params, params)
        |> then(fn s -> 
           if flash do
             {type, msg} = flash
@@ -137,7 +138,7 @@ defmodule ElixirKatasWeb.KataHostLive do
     >
       <div class="h-full w-full">
          <%= if @dynamic_module do %>
-            <.live_component module={@dynamic_module} id="kata-sandbox" />
+            <.live_component module={@dynamic_module} id="kata-sandbox" params={@params} />
          <% else %>
             <div class="flex flex-col items-center justify-center h-full text-zinc-500 gap-4">
               <.icon name="hero-exclamation-triangle" class="w-12 h-12 opacity-20" />
@@ -147,6 +148,10 @@ defmodule ElixirKatasWeb.KataHostLive do
       </div>
     </.kata_viewer>
     """
+  end
+
+  def handle_params(params, _uri, socket) do
+    {:noreply, assign(socket, params: params)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

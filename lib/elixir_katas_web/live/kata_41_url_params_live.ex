@@ -14,33 +14,24 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
       %{id: 8, name: "OTP", category: "language"}
     ]
 
-    socket =
-      socket
-      |> assign(active_tab: "notes")
-      
-      
-      |> assign(:all_items, all_items)
-      |> assign(:items, all_items)
-      |> assign(:current_filter, "all")
-
-    {:ok, socket}
-  end
-
-  # This is called AFTER mount and whenever URL params change
-  def handle_params(params, _uri, socket) do
+    params = assigns[:params] || %{}
     filter = params["filter"] || "all"
     
     filtered_items = 
       if filter == "all" do
-        socket.assigns.all_items
+        all_items
       else
-        Enum.filter(socket.assigns.all_items, &(&1.category == filter))
+        Enum.filter(all_items, &(&1.category == filter))
       end
 
-    {:noreply, 
-     socket
-     |> assign(:items, filtered_items)
-     |> assign(:current_filter, filter)}
+    socket =
+      socket
+      |> assign(active_tab: "notes")
+      |> assign(:all_items, all_items)
+      |> assign(:items, filtered_items)
+      |> assign(:current_filter, filter)
+
+    {:ok, socket}
   end
 
   def render(assigns) do

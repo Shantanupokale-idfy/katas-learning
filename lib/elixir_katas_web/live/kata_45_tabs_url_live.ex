@@ -3,22 +3,16 @@ defmodule ElixirKatasWeb.Kata45TabsUrlLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
+    
+    params = assigns[:params] || %{}
+    tab = params["tab"] || "profile"
+    
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
-      |> assign(:content_tab, "profile")
+      |> assign(:content_tab, tab)
 
     {:ok, socket}
-  end
-
-  def handle_params(%{"tab" => tab}, _uri, socket) do
-    {:noreply, assign(socket, content_tab: tab)}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, content_tab: "profile")}
   end
 
   def render(assigns) do

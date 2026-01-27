@@ -3,22 +3,16 @@ defmodule ElixirKatasWeb.Kata43NavbarLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
+    
+    params = assigns[:params] || %{}
+    page = params["page"] || "home"
+    
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
-      |> assign(:current_page, "home")
+      |> assign(:current_page, page)
 
     {:ok, socket}
-  end
-
-  def handle_params(%{"page" => page}, _uri, socket) do
-    {:noreply, assign(socket, current_page: page)}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, current_page: "home")}
   end
 
   def render(assigns) do
