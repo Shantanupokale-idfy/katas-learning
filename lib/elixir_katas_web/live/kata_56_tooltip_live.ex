@@ -6,9 +6,6 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
-      |> assign(:show_tooltip, false)
 
     {:ok, socket}
   end
@@ -24,15 +21,18 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
           <div class="space-y-4">
-            <div class="relative inline-block">
-              <button class="px-4 py-2 bg-indigo-600 text-white rounded" phx-click="toggle_tooltip" phx-target={@myself}>
+            <!-- Added 'group' class for hover state targeting -->
+            <div class="relative inline-block group">
+              <button class="px-4 py-2 bg-indigo-600 text-white rounded">
                 Hover me
               </button>
-              <%= if @show_tooltip do %>
-                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded whitespace-nowrap">
-                  This is a tooltip!
-                </div>
-              <% end %>
+              
+              <!-- CSS-only tooltip: invisible by default, visible on group-hover -->
+              <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded whitespace-nowrap invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">
+                This is a tooltip!
+                <!-- Little arrow -->
+                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+              </div>
             </div>
           </div>
     
@@ -40,22 +40,6 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
       </div>
     
     """
-  end
-
-  def handle_event("toggle_tooltip", _, socket) do
-    {:noreply, assign(socket, show_tooltip: !socket.assigns.show_tooltip)}
-  end
-
-  def handle_event("show_message", _, socket) do
-    {:noreply, assign(socket, show_tooltip: true)}
-  end
-
-  def handle_event("hide_flash", _, socket) do
-    {:noreply, assign(socket, show_tooltip: false)}
-  end
-
-  def handle_event("prevent_close", _, socket) do
-    {:noreply, socket}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
