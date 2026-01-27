@@ -31,3 +31,13 @@ Enum.reject(items, fn i -> i.id == target_id end)
 
 ## Tips
 - Using `phx-value-id` always sends the value as a **String**. If your IDs are integers in Elixir, remember to cast them or compare them as strings.
+
+## Challenge
+Add an **Undo** feature. When an item is deleted, show a temporary "Undo" button that restores it.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># 1. Store deleted item in assign `last_deleted`
+# 2. On "undo", prepend `last_deleted` back to `items` and set `last_deleted` to nil.</code></pre>
+</details>

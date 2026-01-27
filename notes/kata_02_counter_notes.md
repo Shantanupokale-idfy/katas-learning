@@ -33,3 +33,18 @@ Display the state using `{@count}`. LiveView automatically tracks this dependenc
 ## Tips
 - Pattern match on the event name in `handle_event/3` to keep your code clean.
 - Use `phx-window-keydown` (covered in later katas) if you wanted keyboard support.
+
+## Challenge
+Add a button labeled **"+5"** that increments the count by 5 at once.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In render
+&lt;button phx-click="inc_5"&gt; +5 &lt;/button&gt;
+
+# In module
+def handle_event("inc_5", _, socket) do
+  {:noreply, update(socket, :count, &(&1 + 5))}
+end</code></pre>
+</details>

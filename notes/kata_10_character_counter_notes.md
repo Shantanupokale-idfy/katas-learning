@@ -29,3 +29,20 @@ Elixir handles Unicode correctly. `String.length("José")` is 4, even though it 
 
 ## Tips
 - Use a helper function (e.g., `count_class/2`) in your view to keep the HTML template clean if the logic gets complex (e.g., warning at 90%, error at 100%).
+
+## Challenge
+Count **Words** instead of characters.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># Helper
+def word_count(text) do
+  text
+  |> String.split(~r/\s+/, trim: true)
+  |> length()
+end
+
+# Usage
+{word_count(@text)} words</code></pre>
+</details>

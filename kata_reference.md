@@ -55,6 +55,21 @@ To add a new kata (e.g., Kata 99: New Feature):
 
 2.  **Create the Notes File**:
     *   Path: `notes/kata_99_new_feature_notes.md`
-    *   Content: Markdown description of the task.
+    *   Path: `notes/kata_99_new_feature_notes.md`
+    *   Content: Markdown description of the task. Standard sections:
+        *   **Goal**: What the user will build.
+        *   **Core Concepts**: Theory and snippets.
+        *   **Implementation Details**: Steps to build it.
+        *   **Tips**: Helpful advice.
+        *   **Challenge**: An extra task for the user.
+            *   **View Solution**: Use the following HTML structure for hidden solutions:
+                ```html
+                <details>
+                <summary>View Solution</summary>
+                
+                <pre><code class="elixir">def handle_event...
+                </code></pre>
+                </details>
+                ```
 
 The `KataHostLive` will automatically detect these files based on the file naming convention (`kata_ID_*`).

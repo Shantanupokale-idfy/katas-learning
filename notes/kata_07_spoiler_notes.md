@@ -35,3 +35,18 @@ end
 ## Tips
 - `select-none` (user-select: none) is important! Otherwise, users could still copy the blurred text.
 - `backdrop-blur` can be used on the overlay for a nice glassmorphism effect.
+
+## Challenge
+Reveal the spoiler on **Hover** (MouseEnter) instead of Click.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In render
+&lt;div phx-mouseenter="reveal" phx-mouseleave="hide"&gt;...&lt;/div&gt;
+
+# In module
+def handle_event("reveal", _, socket), do: {:noreply, assign(socket, visible: true)}
+def handle_event("hide", _, socket), do: {:noreply, assign(socket, visible: false)}
+</code></pre>
+</details>

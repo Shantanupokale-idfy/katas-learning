@@ -31,3 +31,14 @@ Regex.compile!(Regex.escape(term), "i")
 
 ## Tips
 - Always worry about XSS when using `raw`. In this kata, we manually ensure safety by escaping the source text first.
+
+## Challenge
+Add a **Case Sensitive** toggle (Checkbox). If checked, "elixir" should not match "Elixir".
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># Pass options to Regex based on state
+options = if @case_sensitive, do: "", else: "i"
+Regex.compile!(Regex.escape(term), options)</code></pre>
+</details>

@@ -32,3 +32,16 @@ Raw data (e.g., total deciseconds) should be stored in the state, but formatted 
 
 ## Tips
 - Always check if `@running` is true in `handle_info` before scheduling the next tick to ensure you can stop the loop cleanly.
+
+## Challenge
+Add a **Lap** feature. Button records the current time into a list of laps without stopping the watch.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># State: laps: []
+
+def handle_event("lap", _, socket) do
+  {:noreply, update(socket, :laps, &([socket.assigns.time | &1]))}
+end</code></pre>
+</details>

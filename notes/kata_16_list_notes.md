@@ -33,3 +33,15 @@ new_list = [item | @items]
 
 ## Tips
 - For large lists, specialized features like `streams` (covered in advanced katas) are preferred over raw lists to optimize memory and DOM patching. For small lists, raw assigns are perfect.
+
+## Challenge
+Add a **Prepend** button that adds the new item to the **top** of the list instead of the bottom.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("prepend", %{"text" => text}, socket) do
+  # [new | old] is O(1)
+  {:noreply, update(socket, :items, fn items -> [text | items] end)}
+end</code></pre>
+</details>

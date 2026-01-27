@@ -25,3 +25,16 @@ Add `multiple` to the select tag.
 
 ## Tips
 - Native multi-selects are often hard to use (require Ctrl/Cmd+Click). Consider using a custom checkbox list (Kata 23) for better UX unless the list is huge.
+
+## Challenge
+Add a **"Select All Interests"** button.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("select_all", _, socket) do
+  all = socket.assigns.all_interests
+  new_params = Map.put(socket.assigns.form.params, "interests", all)
+  {:noreply, assign(socket, form: to_form(new_params))}
+end</code></pre>
+</details>

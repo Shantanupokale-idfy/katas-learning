@@ -28,3 +28,13 @@ style={"grid-template-columns: repeat(#{@cols}, minmax(0, 1fr))"}
 
 ## Tips
 - `minmax(0, 1fr)` is often safer than just `1fr` to prevent grid blowouts when content (like long words) overflows.
+
+## Challenge
+Add buttons to control the **Gap** size: "Small" (4px), "Medium" (16px), "Large" (32px).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># State: gap (e.g., "1rem" or class name if using Tailwind safelist, but inline style is easier for arbitrary values)
+style={"...; gap: #{@gap}"}</code></pre>
+</details>

@@ -42,3 +42,14 @@ For text inputs, sending an event on every keystroke can be expensive. Use `phx-
 ## Tips
 - Always wrap inputs in a `<form>` tag when using `phx-change`.
 - If you need to clear the input programmatically, you would need to bind `value={@text}` (Controlled Input).
+
+## Challenge
+Modify the `handle_event` so that the mirrored text is always **UPPERCASE**, regardless of how the user typed it.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("mirror", %{"user_text" => val}, socket) do
+  {:noreply, assign(socket, text: String.upcase(val))}
+end</code></pre>
+</details>

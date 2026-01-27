@@ -34,3 +34,19 @@ class={if MapSet.member?(@selected, item), do: "bg-blue-100", else: "bg-white"}
 
 ## Tips
 - When rendering the list of selected items for specific display order, remember that MapSets are not ordered. You may need `MapSet.to_list(selected) |> Enum.sort()`.
+
+## Challenge
+Enforce a **Limit**. Allow the user to select at most **3 items**. If they try to select a 4th, ignore the action (or show a flash message).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("toggle", %{"item" => item}, socket) do
+  # check size before adding
+  if MapSet.size(selected) &lt; 3 or MapSet.member?(selected, item) do
+     # proceed
+  else
+     {:noreply, put_flash(socket, :error, "Max 3 items allowed!")}
+  end
+end</code></pre>
+</details>

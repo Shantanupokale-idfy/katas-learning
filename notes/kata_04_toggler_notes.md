@@ -42,3 +42,21 @@ class={["base-class", @active && "active-class"]}
 
 ## Tips
 - The `:if` attribute (HEEx shortcut) is often cleaner than wrapping blocks in `{if ...} ... {end}`.
+
+## Challenge
+Add a "Self Destruct" button. When clicked, the button itself should disappear from the UI.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In mount
+assign(socket, alive: true)
+
+# In render
+&lt;button :if={@alive} phx-click="destruct"&gt;Self Destruct&lt;/button&gt;
+
+# In module
+def handle_event("destruct", _, socket) do
+  {:noreply, assign(socket, alive: false)}
+end</code></pre>
+</details>

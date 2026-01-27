@@ -24,3 +24,17 @@ A standard `<select>` sends a single string value for the chosen option.
 
 ## Tips
 - Always provide a sensible default or a "Please select..." placeholder option with a nil/empty value.
+
+## Challenge
+Add a button **"Set to Japan"** that programmatically changes the selected country to "jp".
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">&lt;button phx-click="set_jp"&gt;Set to Japan&lt;/button&gt;
+
+def handle_event("set_jp", _, socket) do
+  new_data = Map.put(socket.assigns.form.params, "country", "jp")
+  {:noreply, assign(socket, form: to_form(new_data))}
+end</code></pre>
+</details>

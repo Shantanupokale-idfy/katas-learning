@@ -29,3 +29,14 @@ checked={@form[:plan].value == "pro"}
 
 ## Tips
 - Radio buttons are great for small sets of options (2-5). For larger sets, use a Select dropdown.
+
+## Challenge
+Make the **Enterprise** option **Disabled** so it cannot be selected.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">&lt;input ... value="enterprise" disabled={true} ... /&gt;
+# OR if using .input component
+&lt;.input ... options={[..., {"Enterprise", "enterprise", disabled: true}]} /&gt;</code></pre>
+</details>

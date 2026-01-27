@@ -31,3 +31,14 @@ Enum.sort_by(items, &Map.get(&1, @sort_by), @sort_order)
 
 ## Tips
 - Sorting is usually fast enough to do on the server for page-sized datasets. For database-backed lists, you would pass these params to your Ecto query.
+
+## Challenge
+Add a **Reset Sort** button that restores the list to its original unsorted order (e.g., set `sort_by` to `nil` or default ID).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("reset", _, socket) do
+  {:noreply, assign(socket, sort_by: :id, sort_order: :asc)}
+end</code></pre>
+</details>

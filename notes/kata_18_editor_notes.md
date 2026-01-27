@@ -29,3 +29,14 @@ When swapping to an input, use the `autofocus` attribute (or a JS hook) so the u
 ## Tips
 - Swapping the UI instantly creates a very interactive "app-like" feel.
 - Using `phx-blur` on the input to trigger a "cancel" or "save" is a common pattern for inline editing.
+
+## Challenge
+Trigger edit mode on **Double Click** (`phx-dblclick`) of the text items, instead of using a specific "Edit" button/icon.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">&lt;div phx-dblclick="edit" phx-value-id={item.id}&gt;
+  {item.text}
+&lt;/div&gt;</code></pre>
+</details>

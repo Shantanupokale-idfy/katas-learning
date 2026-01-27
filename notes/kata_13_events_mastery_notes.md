@@ -26,3 +26,15 @@ Great for showing helper text or validating a field *after* the user is done typ
 
 ## Tips
 - `phx-key` (not used here, but related) is widely used to capture specific keys on the *window*, whereas `phx-keyup` on an input captures typing within that input.
+
+## Challenge
+Log **Mouse Enter** and **Mouse Leave** events on the input container.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">&lt;div phx-mouseenter="mouse_enter" phx-mouseleave="mouse_leave"&gt; ... &lt;/div&gt;
+
+def handle_event("mouse_enter", _, socket), do: log(socket, "Mouse Entered")
+def handle_event("mouse_leave", _, socket), do: log(socket, "Mouse Left")</code></pre>
+</details>

@@ -35,3 +35,22 @@ Use `<input type="range">` for numerical sliders.
 
 ## Tips
 - `String.to_integer/1` is your friend when dealing with form params, as they always come in as strings.
+
+## Challenge
+Add an **Opacity** slider (0.0 to 1.0) and apply it to the `rgba(...)` style.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In mount
+assign(socket, ..., a: 1.0)
+
+# In render
+&lt;div style={"...; opacity: #{@a}"}&gt;...&lt;/div&gt;
+&lt;input type="range" min="0" max="1" step="0.1" name="a" value={@a} /&gt;
+
+# In handle_event
+a = Map.get(params, "a") # parse as float!
+{f, _} = Float.parse(a)
+assign(socket, ..., a: f)</code></pre>
+</details>

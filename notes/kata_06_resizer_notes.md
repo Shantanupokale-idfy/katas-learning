@@ -32,3 +32,16 @@ Use `<input type="number">` for precise integer control. This gives you native b
 ## Tips
 - Always include the unit (`px`) in your style string if the numbers are raw integers.
 - Add `transition-all` in CSS to make the resize action feel animated and polished.
+
+## Challenge
+Add a **Max Limit**. Ensure that neither the width nor the height can exceed 500px, even if the user types a larger number.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("resize", %{"width" => w, "height" => h}, socket) do
+  w = min(String.to_integer(w), 500)
+  h = min(String.to_integer(h), 500)
+  {:noreply, assign(socket, width: w, height: h)}
+end</code></pre>
+</details>

@@ -34,3 +34,14 @@ Track which nodes are expanded using a `MapSet` of IDs (`expanded_ids`).
 ## Tips
 - Ensure your data has unique IDs.
 - Indentation is usually handled via CSS (margin-left or padding-left) inside the recursive child `<ul>`.
+
+## Challenge
+Add a **"Collapse All"** button that closes every open folder.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("collapse_all", _, socket) do
+  {:noreply, assign(socket, expanded_ids: MapSet.new())}
+end</code></pre>
+</details>

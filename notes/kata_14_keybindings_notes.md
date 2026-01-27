@@ -32,3 +32,17 @@ end
 ## Tips
 - Be careful not to override essential browser shortcuts (like Ctrl+P).
 - This is the standard way to implement power-user navigation (e.g., Gmail shortcuts).
+
+## Challenge
+Detect **Shift+K** vs **k**. (In `phx-window-keydown`, the key value comes as "K" if Shift is held, or check metadata).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("keydown", %{"key" => key}, socket) do
+  case key do
+    "K" -> ... # Shift is held (uppercase)
+    "k" -> ... # Lowercase
+  end
+end</code></pre>
+</details>

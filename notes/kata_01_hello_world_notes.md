@@ -35,3 +35,18 @@ end
 ## Tips
 - Use `assign(socket, key: value)` to set state.
 - Use `update(socket, key, function)` to modify existing state.
+
+## Challenge
+Add a second button labeled "Reset" that sets the state back to `false` (shows "Hello World" again) when clicked.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In render
+&lt;button phx-click="reset"&gt;Reset&lt;/button&gt;
+
+# In module
+def handle_event("reset", _params, socket) do
+  {:noreply, assign(socket, clicked: false)}
+end</code></pre>
+</details>

@@ -38,3 +38,23 @@ Use `phx-value-*` to pass data (like an ID) to your event handler.
 ## Tips
 - This pattern scales to lists of any size without increasing memory usage for state.
 - CSS transitions on `max-height` or `grid-template-rows` are needed to animate height to "auto".
+
+## Challenge
+Allow **Multiple Items** to be open at once (instead of just one).
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># Change state from `active_id` (string) to `active_ids` (MapSet or List).
+
+def handle_event("toggle", %{"id" => id}, socket) do
+  ids = socket.assigns.active_ids
+  new_ids = 
+    if MapSet.member?(ids, id) do
+      MapSet.delete(ids, id)
+    else
+      MapSet.put(ids, id)
+    end
+  {:noreply, assign(socket, active_ids: new_ids)}
+end</code></pre>
+</details>

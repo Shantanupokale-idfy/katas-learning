@@ -29,3 +29,16 @@ Use `String.contains?/2` and `String.downcase/1` for case-insensitive partial ma
 
 ## Tips
 - For large lists, filtering on every keystroke might be slow. Use `phx-debounce="300"` on the input.
+
+## Challenge
+Add a **Clear** button (x) inside the search input that clears the query and resets the list.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">&lt;button phx-click="clear" class="absolute right-2 top-2"&gt;x&lt;/button&gt;
+
+def handle_event("clear", _, socket) do
+  {:noreply, assign(socket, query: "")}
+end</code></pre>
+</details>

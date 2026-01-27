@@ -28,3 +28,17 @@ A helper that converts a map or changeset into a `Phoenix.HTML.Form` struct, whi
 
 ## Tips
 - Always use `phx-submit` alongside `phx-change` to support creating a robust form experience (e.g. hitting Enter to submit).
+
+## Challenge
+Add **Validation Feedback**. Show a small text below the input:
+- Green "Good!" if length > 3.
+- Red "Too short!" if length <= 3.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># In render
+&lt;p class={if String.length(@form[:name].value) &gt; 3, do: "text-green-500", else: "text-red-500"}&gt;
+  &lt;%= if String.length(@form[:name].value) &gt; 3, do: "Good!", else: "Too short!" %&gt;
+&lt;/p&gt;</code></pre>
+</details>

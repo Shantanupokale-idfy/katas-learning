@@ -34,3 +34,16 @@ To disable "Next" appropriately, you must know the total count.
 
 ## Tips
 - Calculating the slice in a helper function or computed assign keeps the render function clean.
+
+## Challenge
+Add a **Jump to Page** input. allowing the user to type a page number and go there on Enter (or Blur). Handle invalid numbers gracefully.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("jump", %{"page" => p}, socket) do
+  p = String.to_integer(p)
+  new_page = p |> max(1) |> min(total_pages(socket.assigns.items, ...))
+  {:noreply, assign(socket, page: new_page)}
+end</code></pre>
+</details>

@@ -34,3 +34,15 @@ end
 ## Tips
 - DaisyUI's `countdown` component uses a CSS variable `--value` to animate numbers.
   `<span style={"--value:#{@seconds};"}></span>`
+
+## Challenge
+Add **Pause** functionality. The timer should stop but retain the current remaining time, allowing `Start` to resume from there.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir"># Currently 'Stop' resets or kills the loop. 
+# Just ensure 'Stop' sets running: false without clearing seconds.
+# The 'Start' event logic already handles finding the existing seconds.
+# (See existing solution for Kata 12 - it might already effectively pause if not reset explicitly).</code></pre>
+</details>

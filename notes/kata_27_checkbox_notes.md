@@ -26,3 +26,15 @@ Form parameters are always strings (`"true"` / `"false"`).
 
 ## Tips
 - Use `Phoenix.HTML.Form.normalize_value("checkbox", val)` if you are manually building the input, but the standard `<.input>` component handles this for you.
+
+## Challenge
+Add a **"Select All"** checkbox that toggles both "Newsletter" and "Terms" at once.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("toggle_all", %{"value" => "true"}, socket) do
+  # Set both to true
+  {:noreply, assign(socket, form: to_form(%{"newsletter" => true, "terms" => true}))}
+end</code></pre>
+</details>

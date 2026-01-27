@@ -29,3 +29,14 @@ Converting between String (display) and Number (calculation) logic.
 
 ## Tips
 - Simplicity first: evaluating strictly left-to-right (no order of operations) is acceptable for a basic calculator kata.
+
+## Challenge
+Add a **CE (Clear Entry)** button. It should clear only the current `display` (reset to "0") but keep the accumulated value (`acc`) and operation (`op`) intact.
+
+<details>
+<summary>View Solution</summary>
+
+<pre><code class="elixir">def handle_event("ce", _, socket) do
+  {:noreply, assign(socket, display: "0", new_entry: true)}
+end</code></pre>
+</details>
