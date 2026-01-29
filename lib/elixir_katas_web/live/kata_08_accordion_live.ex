@@ -16,6 +16,11 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
       },
       %{
         id: "faq-3",
+        question: "what about memeory?",
+        answer: "It maintains a stateful connection via WebSockets, allowing the server to push updates to the client efficiently."
+      },
+      %{
+        id: "faq-4",
         question: "Is it scalable?",
         answer: "Yes! Since it runs on the BEAM (Erlang VM), it handles concurrency extremely well, supporting millions of connections."
       }
@@ -24,34 +29,34 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(faqs: faqs)
-     |> assign(active_id: nil)}
+     |> assign(open_ids: [])}
   end
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col gap-8 mx-auto mt-12 items-center w-full max-w-2xl">
-        
+
         <div class="w-full space-y-4">
           <div :for={faq <- @faqs} class="border border-base-300 rounded-lg overflow-hidden bg-base-100 shadow-sm">
-            
-            <button 
-              phx-click="toggle" phx-target={@myself} 
+
+            <button
+              phx-click="toggle" phx-target={@myself}
               phx-value-id={faq.id}
-              class={"w-full flex justify-between items-center p-4 text-left font-semibold transition-colors duration-200 hover:bg-base-200 " <> if(@active_id == faq.id, do: "bg-base-200 text-primary", else: "")}
+              class={"w-full flex justify-between items-center p-4 text-left font-semibold transition-colors duration-200 hover:bg-base-200 " <> if(faq.id in @open_ids, do: "bg-base-200 text-primary", else: "")}
             >
               <span>{faq.question}</span>
-              <.icon 
-                name="hero-chevron-down" 
-                class={"w-5 h-5 transition-transform duration-300 " <> if(@active_id == faq.id, do: "rotate-180", else: "")} 
+              <.icon
+                name="hero-chevron-down"
+                class={"w-5 h-5 transition-transform duration-300 " <> if(faq.id in @open_ids, do: "rotate-180", else: "")}
               />
             </button>
-            
-            <div 
-              class={"grid transition-all duration-300 ease-in-out " <> if(@active_id == faq.id, do: "grid-rows-[1fr] opacity-100", else: "grid-rows-[0fr] opacity-0")}
+
+            <div
+              class={"grid transition-all duration-300 ease-in-out " <> if(faq.id in @open_ids, do: "grid-rows-[1fr] opacity-100", else: "grid-rows-[0fr] opacity-0")}
             >
               <div class="overflow-hidden">
                 <div class="p-4 pt-0 text-base-content/80 leading-relaxed border-t border-base-200">
@@ -64,15 +69,22 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
         </div>
 
       </div>
-    
+
     """
   end
 
   def handle_event("toggle", %{"id" => id}, socket) do
     # Toggle logic: if clicking the active one, close it. Otherwise open the new one.
-    new_active = if socket.assigns.active_id == id, do: nil, else: id
-    {:noreply, assign(socket, active_id: new_active)}
-  end
+    open_ids = socket.assigns.open_ids
+  new_open_ids =
+    if id in open_ids do
+      List.delete(open_ids, id)   # close
+    else
+      [id | open_ids]             # open
+    end
+
+  {:noreply, assign(socket, open_ids: new_open_ids)}
+end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
