@@ -6,8 +6,8 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      
-      
+
+
       |> assign(:form, to_form(%{"email" => "", "phone" => ""}))
       |> assign(:submitted_data, nil)
 
@@ -16,7 +16,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Validating input formats (Email & Phone) using Regex.
@@ -24,7 +24,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <.form for={@form} phx-change="validate" phx-submit="save" phx-target={@myself} class="space-y-6">
-            
+
             <!-- Email Input -->
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
@@ -34,7 +34,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
                   name="email"
                   id="email"
                   value={@form[:email].value}
-                  class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <> 
+                  class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <>
                          if(@form[:email].errors != [], do: "border-red-300 focus:ring-red-500 focus:border-red-500", else: "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500")}
                   placeholder="you@example.com"
                 />
@@ -53,7 +53,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
                   name="phone"
                   id="phone"
                   value={@form[:phone].value}
-                   class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <> 
+                   class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <>
                          if(@form[:phone].errors != [], do: "border-red-300 focus:ring-red-500 focus:border-red-500", else: "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500")}
                   placeholder="555-123-4567"
                 />
@@ -80,7 +80,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
              <p class="font-bold text-gray-700 mb-2">Live State (@form):</p>
             <pre class="whitespace-pre-wrap text-xs text-gray-600"><%= inspect(@form.params, pretty: true) %></pre>
           </div>
-          
+
            <div class="p-4 bg-green-50 rounded text-sm border border-green-200">
              <p class="font-bold text-green-700 mb-2">Last Submitted:</p>
              <%= if @submitted_data do %>
@@ -91,20 +91,20 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
           </div>
         </div>
       </div>
-    
+
     """
   end
 
   def handle_event("validate", params, socket) do
     email = params["email"]
     phone = params["phone"]
-    
+
     # Regex Patterns
-    email_regex = ~r/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+    email_regex = ~r/^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$/
     phone_regex = ~r/^\d{3}-\d{3}-\d{4}$/
 
     errors = []
-    
+
     errors = if email != "" and !String.match?(email, email_regex), do: [{:email, {"Invalid email format", []}} | errors], else: errors
     errors = if phone != "" and !String.match?(phone, phone_regex), do: [{:phone, {"Format must be XXX-XXX-XXXX", []}} | errors], else: errors
 
@@ -112,7 +112,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
   end
 
   def handle_event("save", params, socket) do
-    {:noreply, 
+    {:noreply,
      socket
      |> put_flash(:info, "Contact info saved!")
      |> assign(:submitted_data, params)}
@@ -121,7 +121,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
   end
-  
+
   defp local_translate_error({msg, opts}) do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", to_string(value))
