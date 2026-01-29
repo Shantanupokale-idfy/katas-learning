@@ -6,19 +6,17 @@ defmodule ElixirKatasWeb.Kata04TogglerLive do
     {:ok,
      socket
      |> assign(active_tab: "notes")
-
-
+     
+     
      |> assign(show_details: false)
-     |> assign(is_active: false)
-     |> assign(self_destruct: false)
-    }
+     |> assign(is_active: false)}
   end
 
   def render(assigns) do
     ~H"""
-
+    
       <div class="flex flex-col gap-8 max-w-lg mx-auto mt-12 items-center">
-
+        
         <!-- Conditional Rendering Example -->
         <div class="flex flex-col items-center gap-4 w-full">
           <button phx-click="toggle_details" phx-target={@myself} class="btn btn-primary">
@@ -39,9 +37,9 @@ defmodule ElixirKatasWeb.Kata04TogglerLive do
         <!-- Dynamic Class Example -->
         <div class="flex flex-col items-center gap-4 w-full">
           <h3 class="text-lg font-semibold">Dynamic Styling</h3>
-
-          <button
-            phx-click="toggle_active" phx-target={@myself}
+          
+          <button 
+            phx-click="toggle_active" phx-target={@myself} 
             class={[
               "card w-full shadow-xl transition-all duration-300 cursor-pointer border-2",
               if(@is_active, do: "bg-secondary text-secondary-content scale-105 border-secondary", else: "bg-base-100 hover:bg-base-200 border-base-300")
@@ -56,20 +54,9 @@ defmodule ElixirKatasWeb.Kata04TogglerLive do
           </button>
         </div>
 
-
-        <div>
-        <button :if={!@self_destruct} phx-click="toggle_destruction" phx-target={@myself} class="btn")}>
-          click me to destruct the button
-        </button>
-        </div>
-
       </div>
-
+    
     """
-  end
-
-  def handle_event("toggle_destruction", _params, socket) do
-    {:noreply , update(socket, :self_destruct, &(!&1))}
   end
 
   def handle_event("toggle_details", _params, socket) do

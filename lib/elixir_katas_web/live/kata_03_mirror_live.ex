@@ -6,24 +6,26 @@ defmodule ElixirKatasWeb.Kata03MirrorLive do
     {:ok,
      socket
      |> assign(active_tab: "notes")
+     
+     
      |> assign(text: "")}
   end
 
   def render(assigns) do
     ~H"""
-
+    
       <div class="flex flex-col gap-8 max-w-lg mx-auto mt-12">
         <form phx-change="mirror" phx-target={@myself} class="flex flex-col gap-4">
           <label class="form-control w-full">
             <div class="label">
               <span class="label-text">Type something here:</span>
             </div>
-            <input
-              type="text"
-              name="text"
-              value={@text}
-              placeholder="Hello..."
-              class="input input-bordered w-full"
+            <input 
+              type="text" 
+              name="text" 
+              value={@text} 
+              placeholder="Hello..." 
+              class="input input-bordered w-full" 
               phx-debounce="100"
               autocomplete="off"
             />
@@ -42,12 +44,12 @@ defmodule ElixirKatasWeb.Kata03MirrorLive do
           </div>
         </div>
       </div>
-
+    
     """
   end
 
   def handle_event("mirror", %{"text" => text}, socket) do
-    {:noreply, assign(socket, text: String.upcase(text))}
+    {:noreply, assign(socket, text: text)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
