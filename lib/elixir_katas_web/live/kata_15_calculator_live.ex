@@ -3,11 +3,11 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(display: "0")
      |> assign(acc: nil)
      |> assign(op: nil)
@@ -16,7 +16,7 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex items-center justify-center p-8 h-full">
         <div class="w-72 bg-gray-900 rounded-2xl p-4 shadow-2xl">
           <!-- Display -->
@@ -50,18 +50,19 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
              <button phx-click="op" phx-target={@myself} phx-value-op="+" class="btn btn-secondary w-full text-xl">+</button>
 
              <!-- Row 4 -->
-             <button phx-click="num" phx-target={@myself} phx-value-n="1" class="btn btn-neutral w-full text-xl">1</button>
-             <button phx-click="num" phx-target={@myself} phx-value-n="2" class="btn btn-neutral w-full text-xl">2</button>
-             <button phx-click="num" phx-target={@myself} phx-value-n="3" class="btn btn-neutral w-full text-xl">3</button>
-             <button phx-click="eval" phx-target={@myself} class="btn btn-primary w-full text-xl row-span-2">=</button>
+              <button phx-click="num" phx-target={@myself} phx-value-n="1" class="btn btn-neutral w-full text-xl">1</button>
+              <button phx-click="num" phx-target={@myself} phx-value-n="2" class="btn btn-neutral w-full text-xl">2</button>
+              <button phx-click="num" phx-target={@myself} phx-value-n="3" class="btn btn-neutral w-full text-xl">3</button>
+              <button phx-click="eval" phx-target={@myself} class="btn btn-primary w-full text-xl row-span-2">=</button>
 
-             <!-- Row 5 -->
-             <button phx-click="num" phx-target={@myself} phx-value-n="0" class="btn btn-neutral w-full text-xl col-span-2">0</button>
-             <button phx-click="dot" phx-target={@myself} class="btn btn-neutral w-full text-xl">.</button>
+              <!-- Row 5 -->
+                <button phx-click="num" phx-target={@myself} phx-value-n="0" class="btn btn-neutral w-full text-xl col-span-1">0</button>
+                <button phx-click="dot" phx-target={@myself} class="btn btn-neutral w-full text-xl col-span-1">.</button>
+                <button phx-click="ce" phx-target={@myself} class="btn btn-neutral w-full text-xl col-span-1">CE</button>
           </div>
         </div>
       </div>
-    
+
     """
   end
 
@@ -72,12 +73,12 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
       else
         if socket.assigns.display == "0", do: n, else: socket.assigns.display <> n
       end
-    
+
     {:noreply, assign(socket, display: new_display, new_entry: false)}
   end
 
   def handle_event("dot", _, socket) do
-    new_display = 
+    new_display =
       if String.contains?(socket.assigns.display, "."), do: socket.assigns.display, else: socket.assigns.display <> "."
     {:noreply, assign(socket, display: new_display, new_entry: false)}
   end
@@ -85,7 +86,11 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
   def handle_event("clear", _, socket) do
     {:noreply, assign(socket, display: "0", acc: nil, op: nil, new_entry: true)}
   end
-  
+
+  def handle_event("ce", _, socket) do
+     {:noreply, assign(socket, display: "0", new_entry: true)}
+end
+
   def handle_event("backspace", _, socket) do
     display = socket.assigns.display
     new_display = if String.length(display) > 1, do: String.slice(display, 0..-2//1), else: "0"
@@ -94,7 +99,7 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
 
   def handle_event("op", %{"op" => op}, socket) do
     current = parse(socket.assigns.display)
-    
+
     if socket.assigns.acc && !socket.assigns.new_entry do
        res = calculate(socket.assigns.acc, socket.assigns.op, current)
        {:noreply, assign(socket, display: format_number(res), acc: res, op: op, new_entry: true)}
@@ -116,13 +121,13 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end
 
 
-  defp parse(s) do 
+  defp parse(s) do
      case Integer.parse(s) do
        {i, ""} -> i / 1
        _ -> case Float.parse(s) do
