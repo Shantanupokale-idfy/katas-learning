@@ -3,25 +3,25 @@ defmodule ElixirKatasWeb.Kata16ListLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(items: ["Learn Elixir", "Master LiveView"])
      |> assign(new_item: "")}
   end
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col items-center p-8 gap-8">
         <form phx-submit="add" phx-target={@myself} class="flex gap-2 w-full max-w-md">
-          <input 
-            type="text" 
-            name="text" 
-            value={@new_item} 
-            placeholder="Add new item..." 
+          <input
+            type="text"
+            name="text"
+            value={@new_item}
+            placeholder="Add new item..."
             class="input input-bordered flex-1"
             required
             autocomplete="off"
@@ -38,18 +38,27 @@ defmodule ElixirKatasWeb.Kata16ListLive do
            </ul>
         </div>
       </div>
-    
+
     """
   end
 
+  # def handle_event("add", %{"text" => text}, socket) do
+  #   {:noreply, update(socket, :items, fn items -> items ++ [text] end) |> assign(new_item: "")}
+  # end
   def handle_event("add", %{"text" => text}, socket) do
-    {:noreply, update(socket, :items, fn items -> items ++ [text] end) |> assign(new_item: "")}
+    {:noreply,
+      socket
+      |> update(:items , fn items -> [text | items] end)
+      |> assign(new_item: "")
+
+  }
+
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end
