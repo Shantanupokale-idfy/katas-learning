@@ -8,18 +8,20 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(time: 0)
-     |> assign(running: false)}
+     |> assign(running: false)
+     |> assign(laps: [])}
+
   end
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]">
         <div class="flex flex-col items-center gap-8">
           <!-- Digital Display -->
@@ -30,32 +32,53 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
           <!-- Controls -->
           <div class="flex gap-4">
             <%= if @running do %>
-              <button 
-                phx-click="stop" phx-target={@myself} 
+              <button
+                phx-click="stop" phx-target={@myself}
                 class="btn btn-error btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Stop
               </button>
             <% else %>
-              <button 
-                phx-click="start" phx-target={@myself} 
+              <button
+                phx-click="start" phx-target={@myself}
                 class="btn btn-primary btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Start
               </button>
             <% end %>
 
-            <button 
-              phx-click="reset" phx-target={@myself} 
+            <button
+              phx-click="reset" phx-target={@myself}
               class="btn btn-outline btn-lg w-32 hover:scale-105 transition-transform"
               disabled={@running}
             >
               Reset
             </button>
+
+            <button
+              phx-click="lap"
+              phx-target={@myself}
+              class="btn btn-secondary btn-lg w-32"
+              disabled={!@running}
+            >
+              Lap
+            </button>
+
           </div>
+
+         <div :if={@laps != []} class="w-full max-w-sm mt-6">
+            <h3 class="font-semibold mb-2">Laps</h3>
+            <ul class="space-y-1 font-mono">
+              <li :for={lap <- @laps}>
+              {format_time(lap)}
+            </li>
+
+            </ul>
+          </div>
+
         </div>
       </div>
-    
+
     """
   end
 
@@ -76,10 +99,14 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
     {:noreply, assign(socket, time: 0)}
   end
 
+  def handle_event("lap", _, socket) do
+  {:noreply, update(socket, :laps, &([socket.assigns.time | &1]))}
+end
+
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end
@@ -96,7 +123,7 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
   defp format_time(deci_seconds) do
     seconds = div(deci_seconds, 10)
     decis = rem(deci_seconds, 10)
-    
+
     minutes = div(seconds, 60)
     seconds = rem(seconds, 60)
 
